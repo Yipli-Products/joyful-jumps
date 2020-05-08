@@ -1,0 +1,36 @@
+﻿using GodSpeedGames.Tools;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
+{
+    public static System.Action<string> OnGotActionFromBridge;
+
+    public string bluetooth_mac_address;
+
+    AndroidJavaClass _unityPlayerClass;
+    AndroidJavaObject _androidPlugin;
+    AndroidJavaObject _activityContext;
+
+    void Start()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        _androidPlugin = new AndroidJavaObject("com.example.yj.bluetoothapplication.FitmatPlugin");
+
+        _unityPlayerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        _activityContext = _unityPlayerClass.GetStatic<AndroidJavaObject>("currentActivity");
+
+        _androidPlugin.Call("setContext", _activityContext);
+        _androidPlugin.Call("setMacAddress", bluetooth_mac_address);
+        _androidPlugin.Call("setupListener");
+    }
+
+    public void GotResponseFromBridge(string message)
+    {
+        Debug.Log("GotResponseFromBridge " + message);
+        OnGotActionFromBridge?.Invoke(message);
+    }
+
+}

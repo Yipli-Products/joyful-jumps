@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5613b5aa46e5e24d97c453bd61a97fe, type: 3}
+  m_Name: BlockData
+  m_EditorClassIdentifier: 
+  tutorialBlocks:
+  - {fileID: 5617387486801181964, guid: f9301e411e7139c41a6f1305695c69a2, type: 3}
+  - {fileID: 5617387486801181964, guid: 99451bd41f2b37f4ca4acfd839e613fa, type: 3}
+  - {fileID: 4037665065509490047, guid: 8f496a0e409e0c04b9183006e129cbb7, type: 3}
+  - {fileID: 5617387486801181964, guid: a17fad3d685120c4aabbfdfebd9d7665, type: 3}
+  - {fileID: 5617387486801181964, guid: cb584604a453a4345ae17e8f70c49dec, type: 3}
+  - {fileID: 5617387486801181964, guid: 88b1a03578ac3a94db0c3b6e02e4a681, type: 3}
+  - {fileID: 4884683113473782012, guid: ce032e235aedc674fb5dd100e8de2eab, type: 3}
+  - {fileID: 3407120873937200660, guid: 94fdb095890380e44a8b1b9bcb4c0e81, type: 3}
+  - {fileID: 3407120873937200660, guid: 22a932537a309514d916fc7d4e660f30, type: 3}
+  startBlocks:
+  - {fileID: 4703486424640251908, guid: 8aacc2c7597a3b7439e12008fe2ec84f, type: 3}
+  endBlocks:
+  - {fileID: 8561230488054532045, guid: 88b2a3bb97c67e541b716f021efeed6b, type: 3}
+  easyBlocks:
+  - length: 50
+    blockPrefab: {fileID: 3407120873937200660, guid: 94fdb095890380e44a8b1b9bcb4c0e81,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 3407120873937200660, guid: 22a932537a309514d916fc7d4e660f30,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 3407120873937200660, guid: f9ec277527b455f4d895357c38a68fca,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 4884683113473782012, guid: ce032e235aedc674fb5dd100e8de2eab,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 3407120873937200660, guid: 164d3295e567a14449ffbeaaf5b16e16,
+      type: 3}
+  - length: 30
+    blockPrefab: {fileID: 4884683113473782012, guid: 3f6647fa48c38cb49a8290afa32de9fb,
+      type: 3}
+  mediumBlocks:
+  - length: 50
+    blockPrefab: {fileID: 5798039148587510031, guid: b5e7f7dfe831d474aa0c021ff8ebec0d,
+      type: 3}
+  - length: 30
+    blockPrefab: {fileID: 4884683113473782012, guid: 78b633a51a214074ea0844dfa44fcf80,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 6140568882783322365, guid: c3a074acc4d0edd43a1ea7b431378503,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 6140568882783322365, guid: f4f7899da33f09c409d138963129d60c,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 5798039148587510031, guid: ddfde0758ec06f04a824e7ef4c82aadd,
+      type: 3}
+  hardBlocks:
+  - length: 30
+    blockPrefab: {fileID: 4037665065509490047, guid: 2be5bb1b1b9200b41b5c7689d7d41337,
+      type: 3}
+  - length: 50
+    blockPrefab: {fileID: 4037665065509490047, guid: ffdfd4cf12aaa8142a937b7529463dc7,
+      type: 3}
+  - length: 100
+    blockPrefab: {fileID: 4037665065509490047, guid: 404dd9d3a074c8f4d91b5a0366f889a6,
+      type: 3}
+  - length: 100
+    blockPrefab: {fileID: 5617387486801181964, guid: 8c0297f6f398868489172b821dc58102,
+      type: 3}

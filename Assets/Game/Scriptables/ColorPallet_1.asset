@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ed8ce47e2829de45b24ed3c8c71b4b4, type: 3}
+  m_Name: ColorPallet_1
+  m_EditorClassIdentifier: 
+  sceneLightColor: {r: 1, g: 0.9843137, b: 0.7764706, a: 0.25882354}
+  skyColor: {r: 0.5176471, g: 0.6431373, b: 0.7921569, a: 1}
+  equuatorColor: {r: 0.5764706, g: 0.53333336, b: 0.4745098, a: 1}
+  groundColor: {r: 0.41568628, g: 0.4862745, b: 0.5294118, a: 1}
+  skybox: {fileID: 2100000, guid: 579a5b5d592b03647ae61ccd3b43c9cc, type: 2}
+  propTexture_1: {fileID: 2800000, guid: 43f827b5a53775045af734f36a9ec167, type: 3}
+  propTexture_2: {fileID: 2800000, guid: a9c502016d92c4d49a430e5e2dcddd68, type: 3}
+  book_and_cone_texture: {fileID: 2800000, guid: 46eb6386b18a19c4ba1429a0f2ad1990,
+    type: 3}
+  mat_1: {r: 0.36862746, g: 0.7921569, b: 0.9137255, a: 1}
+  mat_2: {r: 0.45882353, g: 0.98039216, b: 0.23529412, a: 1}
+  mat_3: {r: 0.98039216, g: 0.41960785, b: 0.5294118, a: 1}
+  mat_4: {r: 1, g: 0.96862745, b: 0.3254902, a: 1}

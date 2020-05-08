@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1e42521bc00f404c8a2858de82ea661, type: 3}
+  m_Name: CharacterScriptable
+  m_EditorClassIdentifier: 
+  characterData:
+  - playerPrefab: {fileID: 5300302815051009419, guid: 59bf024de21c0ab4d8949383d1f02f75,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: fecef1eaec185c34193504c888382cec, type: 2}
+  - playerPrefab: {fileID: 8524435961887615473, guid: 8b9375224ec93f24ba503ad5e208fba9,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: 072d0092ed31691409a618f9f5b738fc, type: 2}
+  - playerPrefab: {fileID: 7935885419648365540, guid: 8c8bf89b94b788748b51eae07bbc6cb0,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: e6e9c2a5cc7cbe843bd53aaa536453dd, type: 2}
+  - playerPrefab: {fileID: 7795627119051761362, guid: 38266adcd9eef9a47a1ebfd0f319fdea,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: 86096fd866bb3dc47b2d386c963f6f6b, type: 2}
+  - playerPrefab: {fileID: 3978639773578853719, guid: 4748573af1313b24089843b0a0e122d5,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: 8dde65237931e464c80c8fef5927c177, type: 2}
+  - playerPrefab: {fileID: 2706148695030900668, guid: 38a3c56dab98406489354f87f4cd1fce,
+      type: 3}
+    renderTexture: {fileID: 8400000, guid: 5790e5699f5bf2646906fb1c668f8e05, type: 2}

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f32ffc334968c84e887866ca14a2dfa, type: 3}
+  m_Name: LevelData
+  m_EditorClassIdentifier: 
+  levelInfo:
+  - difficulty: 1
+    lenght: 100
+  - difficulty: 1
+    lenght: 100
+  - difficulty: 2
+    lenght: 100
+  - difficulty: 1
+    lenght: 100
+  - difficulty: 1
+    lenght: 200
+  - difficulty: 2
+    lenght: 100
+  - difficulty: 3
+    lenght: 100
+  - difficulty: 2
+    lenght: 200
+  - difficulty: 2
+    lenght: 350
+  - difficulty: 1
+    lenght: 200
+  - difficulty: 2
+    lenght: 200
+  - difficulty: 2
+    lenght: 350
+  - difficulty: 1
+    lenght: 500
+  - difficulty: 2
+    lenght: 200
+  - difficulty: 2
+    lenght: 350
+  - difficulty: 3
+    lenght: 200
+  - difficulty: 2
+    lenght: 300
+  - difficulty: 3
+    lenght: 350
+  - difficulty: 1
+    lenght: 500
+  - difficulty: 2
+    lenght: 350
+  - difficulty: 3
+    lenght: 200
+  - difficulty: 1
+    lenght: 500
+  - difficulty: 2
+    lenght: 350
+  - difficulty: 3
+    lenght: 200
+  - difficulty: 3
+    lenght: 350
