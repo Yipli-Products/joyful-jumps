@@ -8,7 +8,7 @@
         <category android:name="android.intent.category.LAUNCHER" />
         <action android:name="android.intent.action.SEND" />
         <action android:name="android.intent.action.VIEW" />
-        <data android:mimeType="text/plain" />
+        <data android:mimeType="text/*" />
       </intent-filter>
       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>

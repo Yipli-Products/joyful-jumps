@@ -8,7 +8,7 @@ public class YipliConfig : ScriptableObject
     public string callbackLevel;
 
     [HideInInspector]
-    public YipliPLayerInfo playerInfo;
+    public YipliPlayerInfo playerInfo;
 
     [HideInInspector]
     public YipliMatInfo matInfo;

@@ -10,95 +10,110 @@ using UnityEngine.UI;
 
 public class MatSelection : MonoBehaviour
 {
-    public TextMeshProUGUI NoMatText;
-    public TextMeshProUGUI PasswordErrorText;
+    public TextMeshProUGUI noMatText;
+    public TextMeshProUGUI passwordErrorText;
     public InputField inputPassword;
-    public GameObject LoadingPanel;
-    private List<YipliMatInfo> Mats = new List<YipliMatInfo>();
+    public GameObject loadingPanel;
+    private YipliMatInfo yipliMat;
 
     public GameObject NoMatPanel;
-    public GameObject SecretEntryPanel;
+    public GameObject secretEntryPanel;
     public YipliConfig currentYipliConfig;
     private string connectionState;
     private int checkMatStatusCount;
 
-    public void CheckMatConnectionStatus(string user)
+    public void MatConnectionFlow()
     {
         Debug.Log("Checking Mat.");
 
         NoMatPanel.SetActive(false);
 
         string connectionState = "";
-        if (Mats.Count > 0)
+        if (yipliMat != null && yipliMat.macAddress.Length > 0)
         {
             connectionState = InitBLE.getBLEStatus();
+            //uncomment blemow to to skip mat
+            //connectionState = "CONNECTED";
             if (connectionState == "CONNECTED")
             {
+                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
                 //load last Scene
                 SceneManager.LoadScene(currentYipliConfig.callbackLevel);
             }
             else
             {
+                FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
                 Debug.Log("Mat not reachable.");
-                NoMatText.text = "Make sure that the registered mat is reachable.";
+                noMatText.text = "Make sure that the registered mat is reachable.";
                 NoMatPanel.SetActive(true);
             }
         }
         else //Current Mat not found in Db.
         {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
             Debug.Log("No Mat found in cache.");
             NoMatPanel.SetActive(true);
         }
     }
-
     public void SkipMat()
     {
         NoMatPanel.SetActive(false);
-        PasswordErrorText.text = "";
+        passwordErrorText.text = "";
         inputPassword.text = "";
-        SecretEntryPanel.SetActive(true);
+        secretEntryPanel.SetActive(true);
     }
 
     public void OnPlayPress()
     {
         if (inputPassword.text == "123456")
         {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_success");
             //load last Scene
             SceneManager.LoadScene(currentYipliConfig.callbackLevel);
         }
-        else {
-            inputPassword.text = "";
-            PasswordErrorText.text = "Invalid pasword";
+        else
+        {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_failure"); inputPassword.text = "";
+            passwordErrorText.text = "Invalid pasword";
             Debug.Log("incorrect password");
         }
     }
 
     public void OnBackPress()
     {
-        SecretEntryPanel.SetActive(false);
+        secretEntryPanel.SetActive(false);
         NoMatPanel.SetActive(true);
     }
 
     public async void ReCheckMatConnection()
     {
         Debug.Log("Checking Mat.");
-
         NoMatPanel.SetActive(false);
-
+        string result = "failure";
         //To handle the case of No mats registered
-        if (Mats.Count == 0)
+        if ((yipliMat == null) || (yipliMat.macAddress.Length == 0))
         {
-            LoadingPanel.SetActive(true);
-            await ConnectMat(currentYipliConfig.userId);
-            LoadingPanel.SetActive(false);
+            loadingPanel.SetActive(true);
+            result = await ValidateAndConnectMat();
+            loadingPanel.SetActive(false);
         }
 
         string connectionState = "";
-        if (Mats.Count > 0)
+        if ((yipliMat != null) || (result == "success"))
         {
-            connectionState = InitBLE.getBLEStatus();
+            try
+            {
+                connectionState = InitBLE.getBLEStatus();
+            }
+            catch (Exception exp)
+            {
+                Debug.Log("Exception occured in ReCheckMatConnection() : " + exp.Message);
+            }
+
             if (connectionState == "CONNECTED")
             {
+                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+                
                 //load last Scene
                 SceneManager.LoadScene(currentYipliConfig.callbackLevel);
             }
@@ -106,38 +121,103 @@ public class MatSelection : MonoBehaviour
             {
                 // If it is > 1, reCheckis clicked atleast once. After ReChecking the status, if the status isnt connected,
                 //then initiate the Mat connection again, so that, in next reCheck it will get connected.
-                InitBLE.InitBLEFramework(Mats[0].matMacId);
+                try
+                {
+                    loadingPanel.SetActive(true);
+                    string res = await ValidateAndConnectMat();
+                    connectionState = InitBLE.getBLEStatus();
+                    loadingPanel.SetActive(false);
 
+                    if (res == "success")
+                    {
+                        if (connectionState == "CONNECTED")
+                        {
+                            FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+
+                            //load last Scene
+                            SceneManager.LoadScene(currentYipliConfig.callbackLevel);
+                        }
+                    }
+                }
+                catch (Exception exp)
+                {
+                    Debug.Log("Exception occured in ReCheckMatConnection() : " + exp.Message);
+                }
                 Debug.Log("Mat not reachable.");
-                NoMatText.text = "Make sure that the registered mat is reachable.";
+                noMatText.text = "Make sure that the registered mat is reachable.";
+
+                FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
                 NoMatPanel.SetActive(true);
             }
         }
         else //Current Mat not found in Db.
         {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
             Debug.Log("No Mat found in cache.");
+            if(YipliHelper.checkInternetConnection())
+                noMatText.text = "Register MAT in the Yipli App to continue playing";
+            else
+                noMatText.text = "Register MAT in the Yipli App to continue playing with active network connection";
+
             NoMatPanel.SetActive(true);
         }
     }
 
-    public async Task<string> ConnectMat(string userId)
+    public async Task<string> ValidateAndConnectMat()
     {
         Debug.Log("Starting mat connection");
-        Mats = await FirebaseDBHandler.GetAllMatDetails(userId, () => { Debug.Log("Got the Mat details from db"); });
-        if (Mats.Count > 0)
+        try
         {
-            Debug.Log("No. of mats found : " + Mats.Count);
-            Debug.Log("connecting to : " + Mats[0].matName);
+            if (YipliHelper.checkInternetConnection())
+            {
+                //Allow backent Get calls only if network is reachable
+                yipliMat = await FirebaseDBHandler.GetCurrentMatDetails(currentYipliConfig.userId, () => { Debug.Log("Got the Mat details from db"); });
+                if(yipliMat != null)
+                {
+                    currentYipliConfig.matInfo = yipliMat;
+                    UserDataPersistence.SaveMatToDevice(yipliMat);
+                }
+            }
+            else
+            { 
+                //No Network case handling
+                Debug.Log("Network not reachable");
+                //Take the default mat info stored in the Config
+                if (currentYipliConfig.matInfo != null)
+                {
+                    yipliMat = currentYipliConfig.matInfo;
+                }
+                else
+                {
+                    yipliMat = UserDataPersistence.GetSavedMat();
+                }
+            }
 
-            //Initiate the connection with the mat.
-            currentYipliConfig.matInfo = Mats[0];
-            InitBLE.InitBLEFramework(Mats[0].matMacId);
+            if (yipliMat != null)
+            {
+                if (yipliMat.macAddress != null)
+                {
+                    Debug.Log("connecting to : " + yipliMat.matName);
+                    //Initiate the connection with the mat.
+                    InitBLE.InitBLEFramework(yipliMat.macAddress);
+                    return "success";
+                }
+                else
+                {
+                    Debug.Log("No valid yipli mat found. Register a YIPLI mat and try again.");
+                }
+            }
+            else
+            {
+                Debug.Log("No valid yipli mat found. Register a YIPLI mat and try again.");
+            }
         }
-        else
+        catch (Exception exp)
         {
-            Debug.Log("No mat found");
+            Debug.Log("Exception occured in ConnectMat(). Check if the Mat is registered wih Valid Mac ID.");
+            Debug.Log(exp.Message);
         }
-        return "";
+        return "failure";
     }
 
 
@@ -157,7 +237,7 @@ public class MatSelection : MonoBehaviour
         catch (AndroidJavaException e)
         {
             Debug.Log(e);
-            NoMatText.text = "Yipli App is not installed. Please install Yipli from playstore to proceed.";
+            noMatText.text = "Yipli App is not installed. Please install Yipli from playstore to proceed.";
         }
     }
 }
