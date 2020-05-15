@@ -63,8 +63,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: 'Coin Earned : 3333'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a9aac80e629308943b1e7d43c0cf5b70, type: 2}
@@ -222,8 +220,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: bd23fc856e094fb44b619290bc7f72a6, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
@@ -297,8 +293,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: ff22bb9f4406dc348aeca3a0753321bd, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
@@ -372,8 +366,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: 'Time : 999 Sec'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: a9aac80e629308943b1e7d43c0cf5b70, type: 2}
@@ -568,8 +560,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: 2f99e60d04a022146adf9c263ff94cb8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
@@ -648,8 +638,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: e8bc52ec7190a1d47a247f9dd7be84d6, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
@@ -725,8 +713,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
@@ -754,6 +740,7 @@ MonoBehaviour:
   titleHeading: {fileID: 9182075042542557875}
   tracker: {fileID: 11400000, guid: f6a544b12b7c4d04e858be154fadd5ce, type: 2}
   levelData: {fileID: 11400000, guid: 62ec10907e1fa4147b33f90ebcce873e, type: 2}
+  playerGameData: {fileID: 11400000, guid: c81a9f84ada7c3e4484791082bfaf960, type: 2}
 --- !u!1 &9182075042542557877
 GameObject:
   m_ObjectHideFlags: 0
@@ -817,8 +804,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_text: Level 03 Finished
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 64108d3ff5e6d6f458103c1c9b4ffb69, type: 2}

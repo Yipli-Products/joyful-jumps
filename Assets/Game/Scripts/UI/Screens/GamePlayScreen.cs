@@ -17,6 +17,8 @@ public class GamePlayScreen : MonoBehaviour
 
     public GameDataTracker tracker;
 
+    public PlayerGameData playerGameData;
+
     private int _previousTime = -1;
     private int _previousDistance = -1;
 
@@ -38,8 +40,8 @@ public class GamePlayScreen : MonoBehaviour
 
     private void Start()
     {
-        current_level_text.text = string.Format("Level : {0}", PlayerData.CurrentLevel + 1);
-        current_reward_text.text = string.Format("Coins : {0}", PlayerData.RewardCoin);
+        current_level_text.text = string.Format("Level : {0}", playerGameData.GetCurrentLevel() + 1);
+        current_reward_text.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
     }
 
     void LevelEnd(GSGGameEvent _event)

@@ -13,6 +13,8 @@ public class GameOverScreen : MonoBehaviour
     public GameDataTracker tracker;
     public LevelData levelData;
 
+    public PlayerGameData playerGameData;
+
     /*protected void Start()
     {
        // base.Start();
@@ -40,9 +42,9 @@ public class GameOverScreen : MonoBehaviour
 
     public void SetData()
     {
-        int currentLevel = PlayerData.CurrentLevel;
+        int currentLevel = playerGameData.GetCurrentLevel() ;
 
-        titleHeading.text = string.Format("Level {0} Complete", (currentLevel + 1));
+        titleHeading.text = string.Format("Level {0} Complete", (currentLevel));
 
         totalTimeTaken.text = "Total Time : "+GameManager.FormatTime(tracker.timeElapsed);
         coinTaken.text = string.Format("Rewards Earned : {0}", tracker.totalPointsEarned);

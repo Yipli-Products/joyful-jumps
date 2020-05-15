@@ -1,10 +1,13 @@
-﻿using System.Collections;
+﻿using Firebase.Database;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class PlayerData
 {
-    public static int CurrentLevel
+   /*public static int CurrentLevel
     {
         get
         {
@@ -15,7 +18,7 @@ public class PlayerData
             PlayerPrefs.SetInt("CurrentLevel", value);
             PlayerPrefs.Save();
         }
-    }
+    }*/
 
     public static int SelectedAvatarIndex
     {
@@ -30,7 +33,7 @@ public class PlayerData
         }
     }
 
-    public static int RewardCoin
+    /*public static int RewardCoin
     {
         get
         {
@@ -41,7 +44,7 @@ public class PlayerData
             PlayerPrefs.SetInt("RewardCoin", value);
             PlayerPrefs.Save();
         }
-    }
+    }*/
 
     public static long LastSavedTimeStamp
     {

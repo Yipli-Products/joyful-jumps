@@ -1,8 +1,11 @@
 ﻿using Cinemachine;
+using Firebase.Database;
 using GodSpeedGames.Tools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public enum Difficulty
@@ -62,6 +65,8 @@ public class LevelManager : Singleton<LevelManager>
     private bool _startTimer = false;
     private bool _gameOver = false;
 
+    public PlayerGameData playerGameData;
+
     protected override void Awake()
     {
         base.Awake();
@@ -84,9 +89,11 @@ public class LevelManager : Singleton<LevelManager>
         Player = newPlayer.GetComponent<Character>();
     }
 
+ 
+    
     public virtual IEnumerator Start()
     {
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(0.1f);
 
         if (PlayerSession.Instance != null)
             PlayerSession.Instance.StartSPSession("joyfuljumps");
@@ -117,7 +124,7 @@ public class LevelManager : Singleton<LevelManager>
     {
         get
         {
-            return ( PlayerData.CurrentLevel < blockData.tutorialBlocks.Length );
+            return (playerGameData.GetCurrentLevel() < blockData.tutorialBlocks.Length );
         }
     }
 
@@ -189,19 +196,19 @@ public class LevelManager : Singleton<LevelManager>
         selectedBlocks.Clear();
 
         if (testSpecificLevel)
-            PlayerData.CurrentLevel = specificLevelIndex;
+            playerGameData.SetCurrentLevel(specificLevelIndex);
 
         // add starting block
-        selectedBlocks.Add(blockData.startBlocks[Random.Range(0, blockData.startBlocks.Length)]);
+        selectedBlocks.Add(blockData.startBlocks[UnityEngine.Random.Range(0, blockData.startBlocks.Length)]);
 
         if (testBlockFuntions)
         {
             for (int i = 0; i < testBlocks.Length; i++)
                 selectedBlocks.Add(testBlocks[i]);
         }
-        else if (PlayerData.CurrentLevel < blockData.tutorialBlocks.Length)
+        else if (playerGameData.GetCurrentLevel() < blockData.tutorialBlocks.Length)
         {
-            selectedBlocks.Add(blockData.tutorialBlocks[PlayerData.CurrentLevel]);
+            selectedBlocks.Add(blockData.tutorialBlocks[playerGameData.GetCurrentLevel()]);
         }
         else
         {
@@ -209,7 +216,7 @@ public class LevelManager : Singleton<LevelManager>
                 _currentLevelDifficulty = testLevelDifficultyInfo;
             else
             {
-                int currentLevel = PlayerData.CurrentLevel;
+                int currentLevel = playerGameData.GetCurrentLevel();
 
                 if (currentLevel >= ( levelData.levelInfo.Length - 1 ))
                     currentLevel = levelData.levelInfo.Length - 1;
@@ -232,7 +239,7 @@ public class LevelManager : Singleton<LevelManager>
         }
 
         // add end block
-        selectedBlocks.Add(blockData.endBlocks[Random.Range(0, blockData.endBlocks.Length)]);
+        selectedBlocks.Add(blockData.endBlocks[UnityEngine.Random.Range(0, blockData.endBlocks.Length)]);
 
         GameObject parent = new GameObject();
         parent.name = "World";
@@ -303,7 +310,7 @@ public class LevelManager : Singleton<LevelManager>
 
     float GetBlockPrebab(BlockInfo[] info, float targetLength)
     {
-        BlockInfo _blockInfo = info[Random.Range(0, info.Length - 1)];
+        BlockInfo _blockInfo = info[UnityEngine.Random.Range(0, info.Length - 1)];
 
         selectedBlocks.Add(_blockInfo.blockPrefab);
         return _blockInfo.length;
@@ -382,17 +389,25 @@ public class LevelManager : Singleton<LevelManager>
 
             GameManager.Instance.CalculateRewardPoint(_currentLevelDifficulty, tracker);
 
-            int totalRewardPoint = PlayerData.RewardCoin + tracker.totalPointsEarned;
-            PlayerData.RewardCoin = totalRewardPoint;
+            int totalRewardPoint = playerGameData.GetTotalScore() + tracker.totalPointsEarned;
+            playerGameData.SetTotalScore(totalRewardPoint);
+            playerGameData.SetCurrentLevel(playerGameData.GetCurrentLevel() + 1);
             if (PlayerSession.Instance != null)
+            {
+                if (YipliHelper.checkInternetConnection())
+                {
+                    Dictionary<string, string> gameData = new Dictionary<string, string>();
+                    gameData.Add("reward-coins", playerGameData.GetTotalScore().ToString());
+                    gameData.Add("current-level", playerGameData.GetCurrentLevel().ToString());
+                    PlayerSession.Instance.UpdateGameData(gameData);
+                }
                 PlayerSession.Instance.StoreSPSession(tracker.totalPointsEarned);
+            }
 
             StopCoroutine("PlayEndCutScene");
             StartCoroutine("PlayEndCutScene");
         }
     }
-
-
 
     IEnumerator EndLevel()
     {
@@ -412,9 +427,6 @@ public class LevelManager : Singleton<LevelManager>
         cutscene.PlayEndCutSceneJump();
 
         yield return new WaitForSeconds(1f);
-
-        int nextLevel = PlayerData.CurrentLevel + 1;
-        PlayerData.CurrentLevel = nextLevel;
 
         level_fresh_start = false;
 

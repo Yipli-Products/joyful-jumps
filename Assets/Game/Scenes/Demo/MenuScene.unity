@@ -96,6 +96,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -249,8 +250,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 21300000, guid: ad04f18a63398664c96625bbad180b40, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
@@ -337,11 +336,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 674022333338347701, guid: a97756467d4659a48b2c42b0b74e6e25,
-        type: 3}
-      propertyPath: m_Name
-      value: UnityBridge
-      objectReference: {fileID: 0}
     - target: {fileID: 674022333338347700, guid: a97756467d4659a48b2c42b0b74e6e25,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -397,6 +391,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 674022333338347701, guid: a97756467d4659a48b2c42b0b74e6e25,
+        type: 3}
+      propertyPath: m_Name
+      value: UnityBridge
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a97756467d4659a48b2c42b0b74e6e25, type: 3}
 --- !u!1001 &645248891
@@ -406,11 +405,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5684236770375280957, guid: ac0a84abb26fa944096b29fc65c47f2b,
-        type: 3}
-      propertyPath: m_Name
-      value: Input
-      objectReference: {fileID: 0}
     - target: {fileID: 5684236770375280956, guid: ac0a84abb26fa944096b29fc65c47f2b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -466,6 +460,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5684236770375280957, guid: ac0a84abb26fa944096b29fc65c47f2b,
+        type: 3}
+      propertyPath: m_Name
+      value: Input
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ac0a84abb26fa944096b29fc65c47f2b, type: 3}
 --- !u!1001 &858428629
@@ -475,6 +474,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7708671117676258467, guid: 5d502001dba29e64499fe46fd5b3460b,
+        type: 3}
+      propertyPath: deletePlayerPrefs
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7708671117676258468, guid: 5d502001dba29e64499fe46fd5b3460b,
         type: 3}
       propertyPath: m_Name
@@ -535,11 +539,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7708671117676258467, guid: 5d502001dba29e64499fe46fd5b3460b,
-        type: 3}
-      propertyPath: deletePlayerPrefs
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d502001dba29e64499fe46fd5b3460b, type: 3}
 --- !u!1 &1216856573
@@ -567,8 +566,9 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1216856573}
   m_Enabled: 1
-  serializedVersion: 9
+  serializedVersion: 10
   m_Type: 1
+  m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
   m_Range: 10
@@ -952,11 +952,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 6741640323944523762, guid: 63040df0370a384489952e4cb9455322,
-        type: 3}
-      propertyPath: m_Name
-      value: LoadingScreen
-      objectReference: {fileID: 0}
     - target: {fileID: 6741640323944523753, guid: 63040df0370a384489952e4cb9455322,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1061,6 +1056,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6741640323944523762, guid: 63040df0370a384489952e4cb9455322,
+        type: 3}
+      propertyPath: m_Name
+      value: LoadingScreen
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 63040df0370a384489952e4cb9455322, type: 3}

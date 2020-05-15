@@ -29,7 +29,7 @@ public class PlayerSession : MonoBehaviour
         public static string LEFTMOVE = "left move";
         public static string RIGHTMOVE = "right move";
         public static string JUMP = "jumping";
-        public static string STOP = "running stop";
+        public static string STOP = "stop";
         public static string RUNNING = "running";
     }
 

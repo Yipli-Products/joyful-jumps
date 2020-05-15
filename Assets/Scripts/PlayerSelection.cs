@@ -93,7 +93,6 @@ public class PlayerSelection : MonoBehaviour
     private void InitializeUserId()
     {
         try {
-
             if (currentYipliConfig.userId != "")
             {
                 //If UserId is found in the Intents as an argument.
@@ -177,8 +176,6 @@ public class PlayerSelection : MonoBehaviour
         {
             Debug.Log("Exception occured in GetIntent!!!");
             Debug.Log(exp.Message);
-            //defaultPlayer = null;
-
             currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
             defaultPlayer = new YipliPlayerInfo("-M2iG0P2_UNsE2VRcU5P", "rooo", "03-01-1999", "120", "49");
             currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");

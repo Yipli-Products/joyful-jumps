@@ -3,7 +3,11 @@ guid: 37925425a3c004b46b7083844b559236
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - levelIndex: {instanceID: 0}
+  - playerName: {instanceID: 0}
+  - coinsEarned: {instanceID: 0}
+  - playerGameData: {fileID: 11400000, guid: c81a9f84ada7c3e4484791082bfaf960, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

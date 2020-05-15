@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
+using Firebase.Database;
+using System.Threading.Tasks;
 
 public class MenuScreen : MonoBehaviour
 {
@@ -9,6 +12,10 @@ public class MenuScreen : MonoBehaviour
 
     public TextMeshProUGUI playerName;
     public TextMeshProUGUI coinsEarned;
+
+    public PlayerGameData playerGameData;
+
+    public GameObject YipliLoaderBackground;
 
     private void OnEnable()
     {
@@ -20,17 +27,28 @@ public class MenuScreen : MonoBehaviour
         ResetGamePopup.OnGameReset -= UpdateLevel;
     }
 
-    private void Start()
+    private async void Start()
     {
-        levelIndex.text = "" + ( PlayerData.CurrentLevel + 1 );
-        coinsEarned.text = string.Format("Coins : {0}", PlayerData.RewardCoin);
+        if (YipliHelper.checkInternetConnection())
+        {
+            YipliLoaderBackground.SetActive(true);
+            await GetPlayerData();
+            YipliLoaderBackground.SetActive(false);
+        } else
+        {
+            playerGameData.SetTotalScore(0);
+            playerGameData.SetCurrentLevel(0);
+        }
+        
+        levelIndex.text = "" + (playerGameData.GetCurrentLevel() + 1 );
+        coinsEarned.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
         if (PlayerSession.Instance)
             playerName.text = PlayerSession.Instance.GetCurrentPlayer();
     }
 
     private void SetLevelData()
     {
-        levelIndex.text = "" + ( PlayerData.CurrentLevel + 1 );
+        levelIndex.text = "" + (playerGameData.GetCurrentLevel() + 1 );
     }
 
     public void ClickOnSettings()
@@ -55,7 +73,7 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
-        if (PlayerData.CurrentLevel == 0)
+        if (playerGameData.GetCurrentLevel() == 0)
             LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
         else
             LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
@@ -69,5 +87,30 @@ public class MenuScreen : MonoBehaviour
     void UpdateLevel()
     {
         SetLevelData();
+    }
+
+    private async Task GetPlayerData()
+    {
+        Debug.Log("GetPlayerData started.");
+        DataSnapshot dataSnapshot = await PlayerSession.Instance.GetGameData("joyfuljumps");
+        try
+        {
+            if (dataSnapshot.Value != null)
+            {
+                playerGameData.SetTotalScore(int.Parse(dataSnapshot.Child("reward-coins").Value?.ToString()));
+                playerGameData.SetCurrentLevel(Convert.ToInt32(dataSnapshot.Child("current-level").Value.ToString()));
+            }
+            else
+            {
+                playerGameData.SetTotalScore(0);
+                playerGameData.SetCurrentLevel(0);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Something is wrong : " + e.Message);
+            playerGameData.SetTotalScore(0);
+            playerGameData.SetCurrentLevel(0);
+        }
     }
 }
