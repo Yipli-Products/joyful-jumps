@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,12 +22,15 @@ public class PauseScreen : MonoBehaviour
 
     public virtual void ResumeGame()
     {
-        if (PlayerSession.Instance != null)
-            PlayerSession.Instance.ResumeSPSession();
-        Time.timeScale = 1;
-        if (UnityFitmatBridge.Instance != null)
-            UnityFitmatBridge.Instance.EnableGameInput();
-        Destroy(gameObject);
+        if (PlayerSession.Instance.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        {
+            if (PlayerSession.Instance != null)
+                PlayerSession.Instance.ResumeSPSession();
+            Time.timeScale = 1;
+            if (UnityFitmatBridge.Instance != null)
+                UnityFitmatBridge.Instance.EnableGameInput();
+            Destroy(gameObject);
+        }
     }
 
     public virtual void RestartGame()

@@ -95,7 +95,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
     {
         _currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if ((_currentTime - _previousTime) >= 1000 || normalInput)
+        if ((_currentTime - _previousTime) >= 750 || normalInput)
         {
             string FMResponse = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
 

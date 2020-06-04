@@ -109,7 +109,7 @@ public class InputController : PersistentSingleton<InputController>
             isRunning = true;
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction("running");
+                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.RUNNING);
         }
         else if (isRunning)
         {
@@ -168,7 +168,7 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction("running");
+                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.RUNNING);
         }
         else if (data == "Running Stopped")
         {

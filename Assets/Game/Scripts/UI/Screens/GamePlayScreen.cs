@@ -42,6 +42,7 @@ public class GamePlayScreen : MonoBehaviour
     {
         current_level_text.text = string.Format("Level : {0}", playerGameData.GetCurrentLevel() + 1);
         current_reward_text.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
+        StartCoroutine(BluetoothCheck());
     }
 
     void LevelEnd(GSGGameEvent _event)
@@ -75,6 +76,21 @@ public class GamePlayScreen : MonoBehaviour
         {
             _previousDistance = tracker.distanceCovered;
             speedText.text = "" + _previousDistance;
+        }
+    }
+
+    //Pause the game if Bluetooth isnt connected.
+    private IEnumerator BluetoothCheck()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            if (PlayerSession.Instance.GetBleConnectionStatus() != "Connected" && Time.timeScale != .00000001f)
+            {
+                //Pause the game.
+                Debug.Log("Pausing the game as the bluetooth isnt connected.");
+                UiManager.Instance.LoadPopup(UiManager.Popup.PauseScreen);
+            }
         }
     }
 

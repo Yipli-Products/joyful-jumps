@@ -25,6 +25,7 @@ public static class UserDataPersistence
         SavePropertyValue("player-dob", playerInfo.playerDob);
         SavePropertyValue("player-height", playerInfo.playerHeight);
         SavePropertyValue("player-weight", playerInfo.playerWeight);
+        PlayerPrefs.Save();
     }
 
     public static YipliPlayerInfo GetSavedPlayer()
@@ -46,6 +47,7 @@ public static class UserDataPersistence
         Debug.Log("Saving mat to device with properties : " + matInfo.matId + " " + matInfo.macAddress);
         SavePropertyValue("mat-id", matInfo.matId);
         SavePropertyValue("mac-address", matInfo.macAddress);
+        PlayerPrefs.Save();
     }
 
     public static YipliMatInfo GetSavedMat()

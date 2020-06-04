@@ -73,6 +73,10 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
+        Debug.Log("PlayerSession.Instance.GetBleConnectionStatus()" + PlayerSession.Instance.GetBleConnectionStatus());
+        if (!PlayerSession.Instance.GetBleConnectionStatus().Equals("connected",StringComparison.OrdinalIgnoreCase))
+            return;
+
         if (playerGameData.GetCurrentLevel() == 0)
             LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
         else

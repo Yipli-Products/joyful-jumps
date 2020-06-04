@@ -1,13 +1,18 @@
 ﻿using Firebase.Database;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerSession : MonoBehaviour
 {
+    //TODO : remove below:
+    string retStatus;
     private string userId = ""; // to be recieved from Yipli
     private string gameId = ""; // to be assigned to every game.
     private string playerId = ""; // to be recieved from Yipli for each game
@@ -24,12 +29,22 @@ public class PlayerSession : MonoBehaviour
     private IDictionary<string, int> playerActionCounts; // to be updated by the player movements
     private IDictionary<string, string> playerGameData; // to be used to store the player gameData like Highscore, last played level etc.
 
+    [HideInInspector]
+    public bool bIsBleErrorPanelExist = false;
+
+    public TextMeshProUGUI bleErrorText;
+
+    public GameObject BleErrorPanelPrefab;
+    private GameObject instantiatedBleErrorPanel;
+    private bool bIsBleConnectionCoroutineRunning = false;
+
     public class PlayerActions
     {
         public static string LEFTMOVE = "left move";
         public static string RIGHTMOVE = "right move";
         public static string JUMP = "jumping";
         public static string STOP = "stop";
+        public static string RUNNINGSTOPPED = "running stopped";
         public static string RUNNING = "running";
     }
 
@@ -49,7 +64,9 @@ public class PlayerSession : MonoBehaviour
     {
         if (_instance != null && _instance != this)
         {
+            Debug.Log("Destroying current instance of playersession and reinitializing");
             Destroy(gameObject);
+            _instance = this;
         }
         else
         {
@@ -59,14 +76,28 @@ public class PlayerSession : MonoBehaviour
         if (currentYipliConfig.playerInfo == null)
         {
             // Call Yipli_GameLib_Scene
-            Instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
-            Debug.Log("Updating the callBackLevel Value to :" + Instance.currentYipliConfig.callbackLevel);
+            _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
+            Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
             Debug.Log("Loading Yipli scene for player Selection...");
             SceneManager.LoadScene("yipli_lib_scene");
         }
         else
         {
             Debug.Log("Current player is not null.");
+        }
+    }
+
+    public void Start()
+    {
+        //Check for Bluetooth connection every 1/10th of a second.
+        if (!SceneManager.GetActiveScene().name.Equals("yipli_lib_scene", StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.Log("Starting the BLE routine check in PlayerSession Start()");
+            StartCoroutine(CheckBleRoutine());
+        }
+        else
+        {
+            Debug.Log("Not Starting the BLE routine check in yipli_lib_scene");
         }
     }
 
@@ -77,8 +108,8 @@ public class PlayerSession : MonoBehaviour
 
     public void ChangePlayer()
     {
-        Instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
-        Debug.Log("Updating the callBackLevel Value to :" + Instance.currentYipliConfig.callbackLevel);
+        _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
+        Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
         Debug.Log("Loading Yipli scene for player Selection...");
         SceneManager.LoadScene("yipli_lib_scene");
     }
@@ -285,7 +316,7 @@ public class PlayerSession : MonoBehaviour
     //to be called from all the player movment actions handled script
     public void AddPlayerAction(string action, int steps = 1)
     {
-        Debug.Log("Adding action current player session.");
+        Debug.Log("Adding action in current player session.");
         if (playerActionCounts.ContainsKey(action))
             playerActionCounts[action] = playerActionCounts[action] + steps;
         else
@@ -327,5 +358,108 @@ public class PlayerSession : MonoBehaviour
     public void SetGameClusterId(int gameClusterId)
     {
         InitBLE.setGameClusterID(gameClusterId);
+    }
+
+    private IEnumerator CheckBleRoutine()
+    {
+        int autoRetryBleConnectionCount = 10;
+        while (true) {
+            yield return new WaitForSeconds(.1f);
+            string retStatus = GetBleConnectionStatus();
+            Debug.Log("Bluetooth Status : " + retStatus);
+            if (!retStatus.Equals("Connected", StringComparison.OrdinalIgnoreCase))
+            {
+                if(autoRetryBleConnectionCount > 0)
+                {
+                    Debug.Log("Mat is disconnected. Trying to connect back : " + currentYipliConfig.matInfo.macAddress);
+                    InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress);
+                    autoRetryBleConnectionCount--;
+                }
+                else
+                {
+                    //Exhausted auto reties
+                    if (!bIsBleErrorPanelExist)
+                    {
+                        Debug.Log("Setting the Error Panel Active");
+                        bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
+                        BleErrorPanelPrefab.SetActive(true);
+                        bIsBleErrorPanelExist = true;
+                    }
+                    else
+                    {
+                        Debug.Log("Ble error panel prefab is already Active");
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("Bluetooth connection is established.");
+                if(bIsBleErrorPanelExist == true)
+                {
+                    Debug.Log("Destroying Ble Error canvas prefab.");
+                    BleErrorPanelPrefab.SetActive(false);
+                    bIsBleErrorPanelExist = false;
+                }
+                autoRetryBleConnectionCount = 10;
+            }
+        }
+    }
+
+    public void StartCoroutineForBleReConnection()
+    {
+        Debug.Log("In StartCoroutineForBleReConnection.");
+        if (!bIsBleConnectionCoroutineRunning)
+        {
+            StartCoroutine(ReconnectBleFromGame());
+        }
+        else
+        {
+            Debug.Log("Coroutine : ReconnectBleFromGame is already running");
+        }
+    }
+
+    private IEnumerator ReconnectBleFromGame()
+    {
+        Debug.Log("In ReconnectBleFromGame.");
+        bIsBleConnectionCoroutineRunning = true;
+        bleErrorText.text = "Retrying bluetooth connection...";
+
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress);
+        bool bIsConnected = false;
+        int iTryCount = 10;
+        while (iTryCount > 0) {
+            Debug.Log("In ReconnectBleFromGame while : " + iTryCount);
+            iTryCount--;
+            yield return new WaitForSeconds(.15f);
+            string strStatus = GetBleConnectionStatus();
+            if(strStatus.Equals("connected", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("Connected back");
+                bleErrorText.text = "Connected back successfully";
+                yield return new WaitForSeconds(.5f);
+
+                if (bIsBleErrorPanelExist == true)
+                {
+                    BleErrorPanelPrefab.SetActive(false);
+                    bIsBleErrorPanelExist = false;
+                }
+                bIsConnected = true;
+                iTryCount = 0;
+                break;
+            }
+        }
+
+         if (!bIsConnected)
+        {
+            //Function execution will come here only if the mat is not connected after the given no. of retries.
+            bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
+        }
+
+        bIsBleConnectionCoroutineRunning = false;
+    }
+
+    public string GetBleConnectionStatus()
+    {
+        return InitBLE.getBLEStatus();
     }
 }

@@ -203,7 +203,7 @@ public static class FirebaseDBHandler
     /* The function call to be allowed only if network is available */
     public static async Task<YipliMatInfo> GetCurrentMatDetails(string userId, PostUserCallback callback)
     {
-        Debug.Log("Getting the Default player from backend");
+        Debug.Log("Getting the Default mat from backend");
         DataSnapshot snapshot = null;
         YipliMatInfo defaultMat = new YipliMatInfo();
 
