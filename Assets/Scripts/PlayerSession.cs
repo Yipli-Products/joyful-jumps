@@ -29,9 +29,7 @@ public class PlayerSession : MonoBehaviour
     private IDictionary<string, int> playerActionCounts; // to be updated by the player movements
     private IDictionary<string, string> playerGameData; // to be used to store the player gameData like Highscore, last played level etc.
 
-    [HideInInspector]
-    public bool bIsBleErrorPanelExist = false;
-
+   
     public TextMeshProUGUI bleErrorText;
 
     public GameObject BleErrorPanelPrefab;
@@ -378,28 +376,16 @@ public class PlayerSession : MonoBehaviour
                 else
                 {
                     //Exhausted auto reties
-                    if (!bIsBleErrorPanelExist)
-                    {
-                        Debug.Log("Setting the Error Panel Active");
-                        bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
-                        BleErrorPanelPrefab.SetActive(true);
-                        bIsBleErrorPanelExist = true;
-                    }
-                    else
-                    {
-                        Debug.Log("Ble error panel prefab is already Active");
-                    }
+                    Debug.Log("Setting the Error Panel Active");
+                    bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
+                    BleErrorPanelPrefab.SetActive(true);
                 }
             }
             else
             {
                 Debug.Log("Bluetooth connection is established.");
-                if(bIsBleErrorPanelExist == true)
-                {
-                    Debug.Log("Destroying Ble Error canvas prefab.");
-                    BleErrorPanelPrefab.SetActive(false);
-                    bIsBleErrorPanelExist = false;
-                }
+                Debug.Log("Destroying Ble Error canvas prefab.");
+                BleErrorPanelPrefab.SetActive(false);
                 autoRetryBleConnectionCount = 10;
             }
         }
@@ -430,19 +416,15 @@ public class PlayerSession : MonoBehaviour
         while (iTryCount > 0) {
             Debug.Log("In ReconnectBleFromGame while : " + iTryCount);
             iTryCount--;
-            yield return new WaitForSeconds(.15f);
+            yield return new WaitForSeconds(.35f);
             string strStatus = GetBleConnectionStatus();
-            if(strStatus.Equals("connected", StringComparison.OrdinalIgnoreCase))
+            if (strStatus.Equals("connected", StringComparison.OrdinalIgnoreCase))
             {
                 Debug.Log("Connected back");
                 bleErrorText.text = "Connected back successfully";
-                yield return new WaitForSeconds(.5f);
+                yield return new WaitForSeconds(.35f);
 
-                if (bIsBleErrorPanelExist == true)
-                {
-                    BleErrorPanelPrefab.SetActive(false);
-                    bIsBleErrorPanelExist = false;
-                }
+                BleErrorPanelPrefab.SetActive(false);
                 bIsConnected = true;
                 iTryCount = 0;
                 break;
