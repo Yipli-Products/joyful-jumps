@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class GamePlayScreen : MonoBehaviour
 {
@@ -85,7 +86,7 @@ public class GamePlayScreen : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1f);
-            if (PlayerSession.Instance.GetBleConnectionStatus() != "Connected" && Time.timeScale != .00000001f)
+            if (!PlayerSession.Instance.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase) && (Time.timeScale == 1f))
             {
                 //Pause the game.
                 Debug.Log("Pausing the game as the bluetooth isnt connected.");
