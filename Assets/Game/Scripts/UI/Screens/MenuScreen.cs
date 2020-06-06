@@ -73,19 +73,19 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
-        Debug.Log("PlayerSession.Instance.GetBleConnectionStatus()" + PlayerSession.Instance.GetBleConnectionStatus());
-        if (!PlayerSession.Instance.GetBleConnectionStatus().Equals("connected",StringComparison.OrdinalIgnoreCase))
-            return;
+        Debug.Log("In ClickOnNextLevel PlayerSession.Instance.GetBleConnectionStatus()" + PlayerSession.Instance.GetBleConnectionStatus());
+        if (PlayerSession.Instance.GetBleConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            if (playerGameData.GetCurrentLevel() == 0)
+                LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
+            else
+                LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
 
-        if (playerGameData.GetCurrentLevel() == 0)
-            LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
-        else
-            LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
-
-        PlayerData.FootStep = 0;
-        PlayerData.FallCount = 0;
-        PlayerData.JumpStep = 0;
-        PlayerData.FallCount = 0;
+            PlayerData.FootStep = 0;
+            PlayerData.FallCount = 0;
+            PlayerData.JumpStep = 0;
+            PlayerData.FallCount = 0;
+        }
     }
 
     void UpdateLevel()

@@ -83,9 +83,10 @@ public class GamePlayScreen : MonoBehaviour
     //Pause the game if Bluetooth isnt connected.
     private IEnumerator BluetoothCheck()
     {
+        Debug.Log("Starting the Co-routine for Bluetooth Check");
         while (true)
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
             if (!PlayerSession.Instance.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase) && (Time.timeScale == 1f))
             {
                 //Pause the game.

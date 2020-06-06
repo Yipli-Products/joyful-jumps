@@ -32,9 +32,10 @@ public class MatSelection : MonoBehaviour
         if (yipliMat != null && yipliMat.macAddress.Length > 0)
         {
             connectionState = InitBLE.getBLEStatus();
-            //uncomment blemow to to skip mat
+            //uncomment below to to skip mat
             //connectionState = "CONNECTED";
-            if (connectionState == "CONNECTED")
+
+            if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_success");
                 //load last Scene
@@ -110,7 +111,7 @@ public class MatSelection : MonoBehaviour
                 Debug.Log("Exception occured in ReCheckMatConnection() : " + exp.Message);
             }
 
-            if (connectionState == "CONNECTED")
+            if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_success");
                 
@@ -130,7 +131,7 @@ public class MatSelection : MonoBehaviour
 
                     if (res == "success")
                     {
-                        if (connectionState == "CONNECTED")
+                        if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
                         {
                             FindObjectOfType<YipliAudioManager>().Play("BLE_success");
 
