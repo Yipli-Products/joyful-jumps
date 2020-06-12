@@ -32,7 +32,8 @@ public class PlayerSession : MonoBehaviour
    
     public TextMeshProUGUI bleErrorText;
 
-    public GameObject BleErrorPanelPrefab;
+    public GameObject BleErrorPanel;
+    public GameObject LoadingPanel;
     private GameObject instantiatedBleErrorPanel;
     private bool bIsBleConnectionCoroutineRunning = false;
 
@@ -307,10 +308,10 @@ public class PlayerSession : MonoBehaviour
         if (!GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("In PauseSPSession : Ble disconnected");
-            if (!BleErrorPanelPrefab.activeSelf)
+            if (!BleErrorPanel.activeSelf)
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
-                BleErrorPanelPrefab.SetActive(true);
+                BleErrorPanel.SetActive(true);
             }
         }
     }
@@ -344,10 +345,10 @@ public class PlayerSession : MonoBehaviour
         if (GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("In UpdateDuration : Ble connected");
-            if (BleErrorPanelPrefab.activeSelf)
+            if (BleErrorPanel.activeSelf)
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                BleErrorPanelPrefab.SetActive(false);
+                BleErrorPanel.SetActive(false);
             }
         }
     }
@@ -406,11 +407,11 @@ public class PlayerSession : MonoBehaviour
                 {
                     //Exhausted auto reties
                     Debug.Log("Setting the Error Panel Active");
-                    if (!BleErrorPanelPrefab.activeSelf)
+                    if (!BleErrorPanel.activeSelf)
                     {
                         bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
                         FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
-                        BleErrorPanelPrefab.SetActive(true);
+                        BleErrorPanel.SetActive(true);
                     }
                 }
             }
@@ -418,10 +419,10 @@ public class PlayerSession : MonoBehaviour
             {
                 Debug.Log("Bluetooth connection is established.");
                 Debug.Log("Destroying Ble Error canvas prefab.");
-                if (BleErrorPanelPrefab.activeSelf)
+                if (BleErrorPanel.activeSelf)
                 {
                     FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                    BleErrorPanelPrefab.SetActive(false);
+                    BleErrorPanel.SetActive(false);
                 }
                 autoRetryBleConnectionCount = 10;
             }
@@ -473,9 +474,9 @@ public class PlayerSession : MonoBehaviour
                 bleErrorText.text = "Connected back successfully";
                 yield return new WaitForSecondsRealtime(.5f);
                 
-                if (BleErrorPanelPrefab.activeSelf)
+                if (BleErrorPanel.activeSelf)
                 {
-                    BleErrorPanelPrefab.SetActive(false);
+                    BleErrorPanel.SetActive(false);
                     FindObjectOfType<YipliAudioManager>().Play("BLE_success");
                 }
                 bIsConnected = true;
@@ -497,5 +498,11 @@ public class PlayerSession : MonoBehaviour
     {
         Debug.Log("GetBleConnectionStatus returning : " + InitBLE.getBLEStatus() );
         return InitBLE.getBLEStatus();
+    }
+
+    public void LoadingScreenSetActive(bool bOn)
+    {
+        Debug.Log("Loading Screen : " + bOn);
+        LoadingPanel.SetActive(bOn);
     }
 }

@@ -15,8 +15,6 @@ public class MenuScreen : MonoBehaviour
 
     public PlayerGameData playerGameData;
 
-    public GameObject YipliLoaderBackground;
-
     private void OnEnable()
     {
         ResetGamePopup.OnGameReset += UpdateLevel;
@@ -31,9 +29,9 @@ public class MenuScreen : MonoBehaviour
     {
         if (YipliHelper.checkInternetConnection())
         {
-            YipliLoaderBackground.SetActive(true);
+            PlayerSession.Instance.LoadingScreenSetActive(true);
             await GetPlayerData();
-            YipliLoaderBackground.SetActive(false);
+            PlayerSession.Instance.LoadingScreenSetActive(false);
         } else
         {
             playerGameData.SetTotalScore(0);
