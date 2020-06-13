@@ -1,4 +1,5 @@
 ﻿using GodSpeedGames.Tools;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -154,7 +155,7 @@ public class InputController : PersistentSingleton<InputController>
 
     protected virtual void OnGotActionFromBridge(string data)
     {
-        if (data == "Jumping")
+        if (data.Equals(PlayerSession.PlayerActions.JUMP, StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Jump);
 
@@ -164,28 +165,28 @@ public class InputController : PersistentSingleton<InputController>
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.JUMP);
         }
 
-        else if (data == "Running")
+        else if (data.Equals(PlayerSession.PlayerActions.RUNNING, StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.RUNNING);
         }
-        else if (data == "Running Stopped")
+        else if (data.Equals(PlayerSession.PlayerActions.RUNNINGSTOPPED, StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.StopRunning);
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.STOP);
         }
-        else if (data == "Pause" && _lastMatData != "Pause")
+        else if (data.Equals(PlayerSession.PlayerActions.PAUSE, StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
             SetMove(Move.KeyPause);
 
-        else if (data == "Left")
+        else if (data.Equals("Left", StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyLeft);
 
-        else if (data == "Right")
+        else if (data.Equals("Right", StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyRight);
 
-        else if (data == "Enter")
+        else if (data.Equals("Enter", StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyEnter);
 
         _lastMatData = data;

@@ -196,16 +196,23 @@ public class MatSelection : MonoBehaviour
 
             if (yipliMat != null)
             {
-                if (yipliMat.macAddress != null)
+                try
                 {
-                    Debug.Log("connecting to : " + yipliMat.matName);
-                    //Initiate the connection with the mat.
-                    InitBLE.InitBLEFramework(yipliMat.macAddress);
-                    return "success";
+                    if (yipliMat.macAddress.Length > 1)
+                    {
+                        Debug.Log("connecting to : " + yipliMat.matName);
+                        //Initiate the connection with the mat.
+                        InitBLE.InitBLEFramework(yipliMat.macAddress);
+                        return "success";
+                    }
+                    else
+                    {
+                        Debug.Log("No valid yipli mat found. Register a YIPLI mat and try again.");
+                    }
                 }
-                else
+                catch(Exception exp)
                 {
-                    Debug.Log("No valid yipli mat found. Register a YIPLI mat and try again.");
+                    Debug.Log("Exception in InitBLEFramework :" + exp.Message);
                 }
             }
             else
