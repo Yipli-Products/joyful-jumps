@@ -378,7 +378,13 @@ public class PlayerSession : MonoBehaviour
 
     public void SetGameClusterId(int gameClusterId)
     {
+        Debug.Log("Setting Game Cluster Id to  : " + gameClusterId);
         InitBLE.setGameClusterID(gameClusterId);
+    }
+
+    public int GetGameClusterId()
+    {
+        return InitBLE.getGameClusterID();
     }
 
     private IEnumerator CheckBleRoutine()

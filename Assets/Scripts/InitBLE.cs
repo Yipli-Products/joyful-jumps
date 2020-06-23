@@ -111,4 +111,9 @@ public class InitBLE
         PluginInstance.Call("_setGameID", gameID);
     }
 
+    public static int getGameClusterID()
+    {
+        return PluginInstance.CallStatic<int>("_getGameID");
+    }
+
 }

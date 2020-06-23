@@ -24,6 +24,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     public void EnableGameInput()
     {
+        Debug.Log("Enabling Game Input");
         normalInput = true;
         if (PlayerSession.Instance != null)
             PlayerSession.Instance.SetGameClusterId(1);
@@ -31,6 +32,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     public void DisableGameInput()
     {
+        Debug.Log("Disabling Game Input");
         normalInput = false;
         if (PlayerSession.Instance != null)
             PlayerSession.Instance.SetGameClusterId(0);

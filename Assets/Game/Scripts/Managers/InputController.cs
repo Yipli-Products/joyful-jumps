@@ -155,6 +155,13 @@ public class InputController : PersistentSingleton<InputController>
 
     protected virtual void OnGotActionFromBridge(string data)
     {
+        try {
+            Debug.Log("Current Cluster Id is : " + PlayerSession.Instance.GetGameClusterId());
+        }
+        catch(Exception exp)
+        {
+            Debug.Log("Failed to get GameId : " + exp.Message);
+        }
         if (data.Equals(PlayerSession.PlayerActions.JUMP, StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Jump);
@@ -178,7 +185,10 @@ public class InputController : PersistentSingleton<InputController>
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.STOP);
         }
         else if (data.Equals(PlayerSession.PlayerActions.PAUSE, StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
+        {
+            Debug.Log("Recieved Pause in InputController. Processing it.");
             SetMove(Move.KeyPause);
+        }
 
         else if (data.Equals("Left", StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyLeft);

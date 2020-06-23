@@ -12,6 +12,7 @@ public class PauseScreen : MonoBehaviour
 
     protected virtual void Start()
     {
+        Debug.Log("In Start of PauseScreen");
         Time.timeScale = .00000001f;
         if (UnityFitmatBridge.Instance != null)
             UnityFitmatBridge.Instance.DisableGameInput();
