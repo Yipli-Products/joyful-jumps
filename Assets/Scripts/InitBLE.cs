@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-
 public class InitBLE
 {
     static AndroidJavaClass _pluginClass;
@@ -8,46 +7,36 @@ public class InitBLE
     const string driverPathName = "com.fitmat.fitmatdriver.Connection.DeviceControlActivity";
     string FMResponseCount = "";
     static string BLEStatus = "";
-
-
     //STEP 3 - Create Unity Callback class
     class UnityCallback : AndroidJavaProxy
     {
-        private System.Action<string> initializeHandler;
-        public UnityCallback(System.Action<string> initializeHandlerIn) : base(driverPathName + "$UnityCallback")
+        private Action<string> initializeHandler;
+        public UnityCallback(Action<string> initializeHandlerIn) : base(driverPathName + "$UnityCallback")
         {
             initializeHandler = initializeHandlerIn;
         }
-
         public void sendMessage(string message)
         {
             Debug.Log("sendMessage: " + message);
             if (message == "connected")
             {
-                InitBLE.BLEStatus = "CONNECTED";
+                BLEStatus = "CONNECTED";
             }
             if (message == "disconnected")
             {
-                InitBLE.BLEStatus = "DISCONNECTED";
+                BLEStatus = "DISCONNECTED";
             }
-
             if (message == "lost")
             {
-                InitBLE.BLEStatus = "CONNECTION LOST";
+                BLEStatus = "CONNECTION LOST";
             }
             if (message.Contains("error"))
             {
-                InitBLE.BLEStatus = "ERROR";
+                BLEStatus = "ERROR";
             }
-
-            if (initializeHandler != null)
-            {
-                initializeHandler(message);
-            }
+            initializeHandler?.Invoke(message);
         }
     }
-
-
     //STEP 4 - Init Android Class & Objects
     public static AndroidJavaClass PluginClass
     {
@@ -60,30 +49,34 @@ public class InitBLE
             return _pluginClass;
         }
     }
-
     public static AndroidJavaObject PluginInstance
     {
         get
         {
-            if (_pluginInstance == null)
+            try
             {
-                AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-                AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
-                _pluginInstance = PluginClass.CallStatic<AndroidJavaObject>("getInstance", activity);
+                if (_pluginInstance == null)
+                {
+                    AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                    AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
+                    _pluginInstance = PluginClass.CallStatic<AndroidJavaObject>("getInstance", activity);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Exception : " + e.Message);
             }
             return _pluginInstance;
         }
     }
-
-    public static String getBLEStatus()
+    public static string getBLEStatus()
     {
         return BLEStatus;
     }
 
     //STEP 5 - Init Android Class & Objects
-    public static void InitBLEFramework(String macaddress)
+    public static void InitBLEFramework(string macaddress)
     {
-
 #if UNITY_IPHONE
                 // Now we check that it's actually an iOS device/simulator, not the Unity Player. You only get plugins on the actual device or iOS Simulator.
                 if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -101,19 +94,45 @@ public class InitBLE
             //int gameId = 2;
             PluginInstance.Call("_setMACAddress", macaddress);
             PluginInstance.Call("_InitBLEFramework", new object[] { new UnityCallback(callback) });
-
         }
 #endif
     }
 
     public static void setGameClusterID(int gameID)
     {
-        PluginInstance.Call("_setGameID", gameID);
+        try
+        {
+            PluginInstance.Call("_setGameID", gameID);
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Exception in setGameClusterID() : " + e.Message);
+        }
     }
 
     public static int getGameClusterID()
     {
-        return PluginInstance.CallStatic<int>("_getGameID");
+        try
+        {
+            return PluginInstance.CallStatic<int>("_getGameID");
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Exception in getGameClusterID() : " + e.Message);
+            return 100;
+        }
     }
 
+    public static string getFMDriverVersion()
+    {
+        try
+        {
+            return PluginInstance.CallStatic<string>("_getDriverVersion");
+        }
+        catch (Exception exp)
+        {
+            Debug.Log("Exception in Driver Version" + exp.Message);
+            return "Exception";
+        }
+    }
 }

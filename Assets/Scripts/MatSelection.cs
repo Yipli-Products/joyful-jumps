@@ -11,10 +11,13 @@ using UnityEngine.UI;
 public class MatSelection : MonoBehaviour
 {
     public TextMeshProUGUI noMatText;
+
+    public TextMeshProUGUI bleSuccessMsg;
     public TextMeshProUGUI passwordErrorText;
     public InputField inputPassword;
     public GameObject loadingPanel;
     private YipliMatInfo yipliMat;
+    public GameObject BluetoothSuccessPanel;
 
     public GameObject NoMatPanel;
     public GameObject secretEntryPanel;
@@ -37,9 +40,7 @@ public class MatSelection : MonoBehaviour
 
             if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
             {
-                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                //load last Scene
-                SceneManager.LoadScene(currentYipliConfig.callbackLevel);
+                StartCoroutine(LoadMainGameScene());
             }
             else
             {
@@ -68,9 +69,8 @@ public class MatSelection : MonoBehaviour
     {
         if (inputPassword.text == "123456")
         {
-            FindObjectOfType<YipliAudioManager>().Play("BLE_success");
             //load last Scene
-            SceneManager.LoadScene(currentYipliConfig.callbackLevel);
+            StartCoroutine(LoadMainGameScene());
         }
         else
         {
@@ -78,6 +78,20 @@ public class MatSelection : MonoBehaviour
             passwordErrorText.text = "Invalid pasword";
             Debug.Log("incorrect password");
         }
+    }
+
+    IEnumerator LoadMainGameScene()
+    {
+        string strFmDriverVersion = InitBLE.getFMDriverVersion();
+        bleSuccessMsg.text = "Successfully Connected to the Mat.\nFmDriver Version : " + strFmDriverVersion;
+        BluetoothSuccessPanel.SetActive(true);
+        yield return new WaitForSeconds(3f);
+
+        FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+        yield return new WaitForSeconds(0.5f);
+        BluetoothSuccessPanel.SetActive(false);
+        //load last Scene
+        SceneManager.LoadScene(currentYipliConfig.callbackLevel);
     }
 
     public void OnBackPress()
@@ -113,10 +127,8 @@ public class MatSelection : MonoBehaviour
 
             if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
             {
-                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                
                 //load last Scene
-                SceneManager.LoadScene(currentYipliConfig.callbackLevel);
+                StartCoroutine(LoadMainGameScene());
             }
             else
             {
@@ -133,10 +145,8 @@ public class MatSelection : MonoBehaviour
                     {
                         if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
                         {
-                            FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-
                             //load last Scene
-                            SceneManager.LoadScene(currentYipliConfig.callbackLevel);
+                            StartCoroutine(LoadMainGameScene());
                         }
                     }
                 }

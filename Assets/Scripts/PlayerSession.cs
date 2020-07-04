@@ -33,7 +33,7 @@ public class PlayerSession : MonoBehaviour
     public TextMeshProUGUI bleErrorText;
 
     public GameObject BleErrorPanel;
-    public GameObject LoadingPanel;
+    private GameObject LoadingScreen;
     private GameObject instantiatedBleErrorPanel;
     private bool bIsBleConnectionCoroutineRunning = false;
 
@@ -93,6 +93,18 @@ public class PlayerSession : MonoBehaviour
     {
         Debug.Log("Starting the BLE routine check in PlayerSession Start()");
         StartCoroutine(CheckBleRoutine());
+    }
+
+    public void Update()
+    {
+        try
+        {
+            Debug.Log("Game Cluster Id : " + GetGameClusterId());
+        }
+        catch(Exception exp)
+        {
+            Debug.Log("Exception is getting Cluster ID" + exp.Message);
+        }
     }
 
     public string GetCurrentPlayer()
@@ -378,13 +390,7 @@ public class PlayerSession : MonoBehaviour
 
     public void SetGameClusterId(int gameClusterId)
     {
-        Debug.Log("Setting Game Cluster Id to  : " + gameClusterId);
         InitBLE.setGameClusterID(gameClusterId);
-    }
-
-    public int GetGameClusterId()
-    {
-        return InitBLE.getGameClusterID();
     }
 
     private IEnumerator CheckBleRoutine()
@@ -512,6 +518,16 @@ public class PlayerSession : MonoBehaviour
     public void LoadingScreenSetActive(bool bOn)
     {
         Debug.Log("Loading Screen : " + bOn);
-        LoadingPanel.SetActive(bOn);
+        LoadingScreen.SetActive(bOn);
+    }
+
+    public int GetGameClusterId()
+    {
+        return InitBLE.getGameClusterID();
+    }
+
+    public string GetFMDriverVersion()
+    {
+        return InitBLE.getFMDriverVersion();
     }
 }
