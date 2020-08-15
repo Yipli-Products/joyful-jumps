@@ -7,6 +7,8 @@ public class GameOverScreen : MonoBehaviour
 {
     public TextMeshProUGUI totalTimeTaken;
     public TextMeshProUGUI coinTaken;
+    public TextMeshProUGUI caloriesBurned;
+    public TextMeshProUGUI FitnessPointsEarned;
 
     public TextMeshProUGUI titleHeading;
 
@@ -14,6 +16,8 @@ public class GameOverScreen : MonoBehaviour
     public LevelData levelData;
 
     public PlayerGameData playerGameData;
+
+    public string[] reportCardMessages = {"Well done...!!", "Awesome game !!", "Good Job !!", "Fantastic play !!", "Good going champ !!"};
 
     /*protected void Start()
     {
@@ -43,11 +47,16 @@ public class GameOverScreen : MonoBehaviour
     public void SetData()
     {
         int currentLevel = playerGameData.GetCurrentLevel() ;
+        float calories = PlayerSession.Instance.GetCaloriesBurned(PlayerSession.Instance.getPlayerActionCounts());
+        float fitnessPoints = PlayerSession.Instance.GetFitnessPoints(PlayerSession.Instance.getPlayerActionCounts());
 
-        titleHeading.text = string.Format("Level {0} Complete", (currentLevel));
+        //titleHeading.text = string.Format("Well Done. Level {0} Complete", (currentLevel));
+        titleHeading.text = reportCardMessages[Random.Range(0,4)];
 
         totalTimeTaken.text = "Total Time : "+GameManager.FormatTime(tracker.timeElapsed);
         coinTaken.text = string.Format("Rewards Earned : {0}", tracker.totalPointsEarned);
+        caloriesBurned.text = "Calories burned : " + calories;
+        FitnessPointsEarned.text = "Fitness points : " + fitnessPoints;
 
         tracker.timeElapsed = 0;
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using YipliFMDriverCummunication;
 
 public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 {
@@ -95,35 +96,101 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     protected virtual void Update()
     {
-        _currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if ((_currentTime - _previousTime) >= 750 || normalInput)
+        try
         {
-            string FMResponse = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
+            string fmActionData = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
 
-            string[] FMTokens = FMResponse.Split('.');
+            fmActionData = "{\"response_count\":100},\"response_timestamp\":1597412044712,\"playerdata\":[{\"id\":1,\"fmresponse\":{\"action_id\":\"7RCE\",\"action_name\":\"Running Stopped\",\"properties\":\"null\"}}]}";
 
-            if (FMTokens.Length > 0 && !FMTokens[0].Equals(FMResponseCount))
-            {
-                Debug.Log("FMResponse " + FMResponse);
-                FMResponseCount = FMTokens[0];
+            Debug.Log("Json Data from Fmdriver : " + fmActionData);
 
-                if (FMTokens.Length > 1)
-                {
-                    string[] whiteSpace = FMTokens[1].Split('+');
+            //string[] tt = fmActionData.Split('.');
 
-                    if (whiteSpace.Length > 1)
+            //fmActionData = tt[1];
+
+            //Debug.Log("Json Data converted to : " + fmActionData);
+            
+            /* New FmDriver Response Format
+               {
+                  "response_count": 1,                 # Updates every time new action is detected
+                  "response_timestamp": 1597237057689, # Time at which response was packaged/created by Driver
+                  "playerdata": [                      # Array containing player data
                     {
-                        int step = PlayerData.FootStep;
-                        PlayerData.FootStep = step + int.Parse(whiteSpace[1]);
+                      "id": 1,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
+                      "fmresponse": {
+                        "action_id": "9D6O",           # Action ID-Unique ID for each action. Refer below table for all action IDs
+                        "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
+                        "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
+                      }
                     }
+                  ]
+                }
+            */
 
-                    OnGotActionFromBridge?.Invoke(whiteSpace[0]);
+            // Json parse FMResponse to get the input.
+            FmDriverResponseInfo fmData = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+
+
+            if (!FMResponseCount.Equals(fmData.response_count))
+            {
+                Debug.Log("FMResponse " + fmActionData);
+                FMResponseCount = fmData.response_count.ToString();
+
+
+                if (fmData.playerdata[0].fmresponse.ation_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName("running")))
+                {
+                    ///CheckPoint for the running action properties.
+                    if (fmData.playerdata[0].fmresponse.properties.ToString() != "null")
+                    {
+                        string[] tokens = fmData.playerdata[0].fmresponse.properties.Split(',');
+
+                        if(tokens.Length > 0)
+                        {
+                            //Split the property value pairs:
+                            string[] totalStepsCountKeyValue = tokens[0].Split('=');
+                            if(totalStepsCountKeyValue[0].Equals("totalStepsCount"))
+                            {
+                                Debug.Log("Adding steps : " + totalStepsCountKeyValue[1]);
+                                PlayerData.FootStep += int.Parse(totalStepsCountKeyValue[1]);
+                            }
+
+                            string[] speedKeyValue = tokens[1].Split('=');
+                            if(speedKeyValue[0].Equals("speed"))
+                            {
+                                //TODO : Do some handling if speed parameter needs to be used to adjust the running speed in the game.
+                            }
+                        }
+                    }
+                    OnGotActionFromBridge?.Invoke(fmData.playerdata[0].fmresponse.ation_id);
                 }
             }
-
-            _previousTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         }
+        catch(Exception exp)
+        {
+            Debug.Log("Exception in _getFMResponse processing : " + exp);
+        }
+
+        /*string[] FMTokens = FMResponse.Split('.');
+
+        if (FMTokens.Length > 0 && !FMTokens[0].Equals(FMResponseCount))
+        {
+            Debug.Log("FMResponse " + FMResponse);
+            FMResponseCount = FMTokens[0];
+
+            if (FMTokens.Length > 1)
+            {
+                string[] whiteSpace = FMTokens[1].Split('+');
+
+                if (whiteSpace.Length > 1)
+                {
+                    int step = PlayerData.FootStep;
+                    PlayerData.FootStep = step + int.Parse(whiteSpace[1]);
+                }
+
+                OnGotActionFromBridge?.Invoke(whiteSpace[0]);
+            }
+        }
+        */
     }
 
     protected virtual void FixedUpdate()

@@ -35,8 +35,9 @@ public class MatSelection : MonoBehaviour
         if (yipliMat != null && yipliMat.macAddress.Length > 0)
         {
             connectionState = InitBLE.getBLEStatus();
-            //uncomment below to to skip mat
-            //connectionState = "CONNECTED";
+
+            if (currentYipliConfig.matPlayMode == false)
+                connectionState = "connected";
 
             if (connectionState.Equals("CONNECTED", StringComparison.OrdinalIgnoreCase))
             {
@@ -70,6 +71,7 @@ public class MatSelection : MonoBehaviour
         if (inputPassword.text == "123456")
         {
             //load last Scene
+            currentYipliConfig.matPlayMode = false;
             StartCoroutine(LoadMainGameScene());
         }
         else
@@ -83,12 +85,12 @@ public class MatSelection : MonoBehaviour
     IEnumerator LoadMainGameScene()
     {
         string strFmDriverVersion = InitBLE.getFMDriverVersion();
-        bleSuccessMsg.text = "Successfully Connected to the Mat.\nFmDriver Version : " + strFmDriverVersion;
+        bleSuccessMsg.text = "Successfully Connected to the Mat.\nFmDriver Version : " + strFmDriverVersion + "\nGame Version : " + Application.version;
         BluetoothSuccessPanel.SetActive(true);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
 
         FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
         BluetoothSuccessPanel.SetActive(false);
         //load last Scene
         SceneManager.LoadScene(currentYipliConfig.callbackLevel);

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using YipliFMDriverCummunication;
 
 
 public enum Move
@@ -88,6 +89,8 @@ public class InputController : PersistentSingleton<InputController>
         {
             isRunning = true;
             SetMove(Move.Running);
+            if (PlayerSession.Instance != null)
+                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.RUNNING);
         }
         else if (isRunning)
         {
@@ -96,7 +99,11 @@ public class InputController : PersistentSingleton<InputController>
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
+        {
             SetMove(Move.Jump);
+            if (PlayerSession.Instance != null)
+                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.JUMP);
+        }
         else if (Input.GetKeyDown(KeyCode.Escape))
             SetMove(Move.KeyPause);
 
@@ -116,8 +123,6 @@ public class InputController : PersistentSingleton<InputController>
         {
             isRunning = false;
             SetMove(Move.StopRunning);
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.STOP);
         }
 
         if (button == GSGButtons.ButtonType.Jump)
@@ -162,7 +167,7 @@ public class InputController : PersistentSingleton<InputController>
         {
             Debug.Log("Failed to get GameId : " + exp.Message);
         }
-        if (data.Equals(PlayerSession.PlayerActions.JUMP, StringComparison.OrdinalIgnoreCase))
+        if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.JUMP), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Jump);
 
@@ -172,31 +177,29 @@ public class InputController : PersistentSingleton<InputController>
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.JUMP);
         }
 
-        else if (data.Equals(PlayerSession.PlayerActions.RUNNING, StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.RUNNING), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.RUNNING);
         }
-        else if (data.Equals(PlayerSession.PlayerActions.RUNNINGSTOPPED, StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.RUNNINGSTOPPED), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.StopRunning);
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(PlayerSession.PlayerActions.STOP);
         }
-        else if (data.Equals(PlayerSession.PlayerActions.PAUSE, StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.PAUSE), StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
         {
             Debug.Log("Recieved Pause in InputController. Processing it.");
             SetMove(Move.KeyPause);
         }
 
-        else if (data.Equals("Left", StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.LEFT), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyLeft);
 
-        else if (data.Equals("Right", StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.RIGHT), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyRight);
 
-        else if (data.Equals("Enter", StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(PlayerSession.PlayerActions.ENTER), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyEnter);
 
         _lastMatData = data;
