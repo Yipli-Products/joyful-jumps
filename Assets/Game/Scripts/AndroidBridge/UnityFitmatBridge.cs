@@ -3,14 +3,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YipliFMDriverCummunication;
+using YipliFMDriverCommunication;
 
 public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 {
     //Extend this lister to other script where you want to get response
     public static Action<string> OnGotActionFromBridge;
 
-    string FMResponseCount = "";
+    int FMResponseCount;
 
     private bool cancontrol = true;
     private float _deltaLag;
@@ -28,7 +28,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         Debug.Log("Enabling Game Input");
         normalInput = true;
         if (PlayerSession.Instance != null)
-            PlayerSession.Instance.SetGameClusterId(1);
+            YipliHelper.SetGameClusterId(1);
     }
 
     public void DisableGameInput()
@@ -36,7 +36,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         Debug.Log("Disabling Game Input");
         normalInput = false;
         if (PlayerSession.Instance != null)
-            PlayerSession.Instance.SetGameClusterId(0);
+            YipliHelper.SetGameClusterId(0);
     }
 
     protected virtual void Start()
@@ -100,16 +100,35 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         {
             string fmActionData = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
 
-            fmActionData = "{\"response_count\":100},\"response_timestamp\":1597412044712,\"playerdata\":[{\"id\":1,\"fmresponse\":{\"action_id\":\"7RCE\",\"action_name\":\"Running Stopped\",\"properties\":\"null\"}}]}";
+            //fmActionData = "{\"response_count\":126,\"response_timestamp\":1597743878113,\"playerdata\":[{\"id\":2,\"fmresponse\":{\"action_id\":\"3KWN\",\"action_name\":\"Jump\",\"properties\":\"null\"}},null]}";
 
             Debug.Log("Json Data from Fmdriver : " + fmActionData);
 
+            /*FmDriverResponseInfo sampleObj = new FmDriverResponseInfo();
+            sampleObj.response_count = 100;
+            sampleObj.response_timestamp = 1597412044712;
+            sampleObj.playerdata = new YipliFMDriverCummunication.PlayerData[1];
+            sampleObj.playerdata[0] = new YipliFMDriverCummunication.PlayerData();
+            sampleObj.playerdata[0].id = 1;
+            sampleObj.playerdata[0].fmresponse = new FMResponse();
+            sampleObj.playerdata[0].fmresponse.ation_id = "7RCE";
+            sampleObj.playerdata[0].fmresponse.action_name = "Running Stopped";
+            sampleObj.playerdata[0].fmresponse.properties = "null";*/
+
+            //string jsonString = JsonUtility.ToJson(sampleObj);
+
+            //Debug.Log("Json Data from JsonUtility.ToJson : " + jsonString);
+
             //string[] tt = fmActionData.Split('.');
 
-            //fmActionData = tt[1];
+            //fmActionData = "" + fmActionData + "}";
+
+            //fmActionData = fmActionData.Replace("\"", "\\\"");
+
+            //Debug.Log("New converted Json Data : " + fmActionData);
 
             //Debug.Log("Json Data converted to : " + fmActionData);
-            
+
             /* New FmDriver Response Format
                {
                   "response_count": 1,                 # Updates every time new action is detected
@@ -130,14 +149,13 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             // Json parse FMResponse to get the input.
             FmDriverResponseInfo fmData = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
 
-
-            if (!FMResponseCount.Equals(fmData.response_count))
+            if (FMResponseCount != fmData.response_count)
             {
                 Debug.Log("FMResponse " + fmActionData);
-                FMResponseCount = fmData.response_count.ToString();
+                FMResponseCount = fmData.response_count;
 
-
-                if (fmData.playerdata[0].fmresponse.ation_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName("running")))
+                //Handle "Running" case seperately to read the exta properties sent.
+                if (fmData.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName("running")))
                 {
                     ///CheckPoint for the running action properties.
                     if (fmData.playerdata[0].fmresponse.properties.ToString() != "null")
@@ -152,6 +170,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                             {
                                 Debug.Log("Adding steps : " + totalStepsCountKeyValue[1]);
                                 PlayerData.FootStep += int.Parse(totalStepsCountKeyValue[1]);
+                                Debug.Log("Total footSteps : " + PlayerData.FootStep);
                             }
 
                             string[] speedKeyValue = tokens[1].Split('=');
@@ -161,8 +180,8 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                             }
                         }
                     }
-                    OnGotActionFromBridge?.Invoke(fmData.playerdata[0].fmresponse.ation_id);
                 }
+                OnGotActionFromBridge?.Invoke(fmData.playerdata[0].fmresponse.action_id);
             }
         }
         catch(Exception exp)

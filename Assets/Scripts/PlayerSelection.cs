@@ -45,6 +45,8 @@ public class PlayerSelection : MonoBehaviour
          */
         currentYipliConfig.matPlayMode = true;
 
+        // Disable screen dimming
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     private void NoUserFoundInGameFlow()
@@ -188,9 +190,9 @@ public class PlayerSelection : MonoBehaviour
             Debug.Log(exp.Message);
             //defaultPlayer = null;
 
-            /*currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
+            currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
             defaultPlayer = new YipliPlayerInfo("-M2iG0P2_UNsE2VRcU5P", "rooo", "03-01-1999", "120", "49");
-            currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");*/
+            currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
         }
 
         //Setting User Id in the scriptable Object
@@ -452,22 +454,7 @@ public class PlayerSelection : MonoBehaviour
 
     public void OnGoToYipliPress()
     {
-        try
-        {
-            string bundleId = "org.hightimeshq.yipli"; //todo: Change this later
-            AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
-            AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
-
-            AndroidJavaObject launchIntent = null;
-            launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
-            ca.Call("startActivity", launchIntent);
-        }
-        catch (AndroidJavaException e)
-        {
-            Debug.Log(e);
-            zeroPlayersText.text = "Yipli App is not installed. Install Yipli from market place to continue playing.";
-        }
+        YipliHelper.GoToYipli();
     }
 
     public void OnBackButtonPress()

@@ -84,7 +84,7 @@ public class MatSelection : MonoBehaviour
 
     IEnumerator LoadMainGameScene()
     {
-        string strFmDriverVersion = InitBLE.getFMDriverVersion();
+        string strFmDriverVersion = YipliHelper.GetFMDriverVersion();
         bleSuccessMsg.text = "Successfully Connected to the Mat.\nFmDriver Version : " + strFmDriverVersion + "\nGame Version : " + Application.version;
         BluetoothSuccessPanel.SetActive(true);
         yield return new WaitForSeconds(2f);
@@ -243,21 +243,6 @@ public class MatSelection : MonoBehaviour
 
     public void OnGoToYipliPress()
     {
-        string bundleId = "org.hightimeshq.yipli"; //todo: Change this later
-        AndroidJavaClass up = new AndroidJavaClass("com.unity3d.Mat.UnityMat");
-        AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
-        AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
-
-        AndroidJavaObject launchIntent = null;
-        try
-        {
-            launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", bundleId);
-            ca.Call("startActivity", launchIntent);
-        }
-        catch (AndroidJavaException e)
-        {
-            Debug.Log(e);
-            noMatText.text = "Yipli App is not installed. Please install Yipli from playstore to proceed.";
-        }
+        YipliHelper.GoToYipli();
     }
 }

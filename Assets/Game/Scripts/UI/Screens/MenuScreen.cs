@@ -61,7 +61,7 @@ public class MenuScreen : MonoBehaviour
 
     public void GoToYipliApp()
     {
-        PlayerSession.Instance.GoToYipli();
+        YipliHelper.GoToYipli();
     }
 
     public void ClickOnSelectAvatar()
@@ -71,8 +71,7 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
-        Debug.Log("In ClickOnNextLevel PlayerSession.Instance.GetBleConnectionStatus()" + PlayerSession.Instance.GetBleConnectionStatus());
-        if (PlayerSession.Instance.GetBleConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        if (YipliHelper.GetBleConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
             if (playerGameData.GetCurrentLevel() == 0)
                 LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
@@ -93,7 +92,6 @@ public class MenuScreen : MonoBehaviour
 
     private async Task GetPlayerData()
     {
-        Debug.Log("GetPlayerData started.");
         DataSnapshot dataSnapshot = await PlayerSession.Instance.GetGameData("joyfuljumps");
         try
         {

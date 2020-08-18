@@ -23,7 +23,7 @@ public class PauseScreen : MonoBehaviour
 
     public virtual void ResumeGame()
     {
-        if (PlayerSession.Instance.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        if (YipliHelper.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.ResumeSPSession();
