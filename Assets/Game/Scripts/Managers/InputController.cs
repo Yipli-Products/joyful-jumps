@@ -90,7 +90,7 @@ public class InputController : PersistentSingleton<InputController>
             isRunning = true;
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.RUNNING);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
         }
         else if (isRunning)
         {
@@ -102,7 +102,7 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.Jump);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.JUMP);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
             SetMove(Move.KeyPause);
@@ -117,7 +117,7 @@ public class InputController : PersistentSingleton<InputController>
             isRunning = true;
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.RUNNING);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
         }
         else if (isRunning)
         {
@@ -129,7 +129,7 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.Jump);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.JUMP);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
         }
     }
 
@@ -167,39 +167,39 @@ public class InputController : PersistentSingleton<InputController>
         {
             Debug.Log("Failed to get GameId : " + exp.Message);
         }
-        if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.JUMP), StringComparison.OrdinalIgnoreCase))
+        if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.JUMP), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Jump);
 
             int jump = PlayerData.JumpStep;
             PlayerData.JumpStep = jump + 1;
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.JUMP);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
         }
 
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.RUNNING), StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Running);
             if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliPlayerActivity.PlayerActions.RUNNING);
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
         }
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.RUNNINGSTOPPED), StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.StopRunning);
         }
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.PAUSE), StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE), StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
         {
             Debug.Log("Recieved Pause in InputController. Processing it.");
             SetMove(Move.KeyPause);
         }
 
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.LEFT), StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.LEFT), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyLeft);
 
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.RIGHT), StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RIGHT), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyRight);
 
-        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliPlayerActivity.PlayerActions.ENTER), StringComparison.OrdinalIgnoreCase))
+        else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.ENTER), StringComparison.OrdinalIgnoreCase))
             SetKeyMove(MatKey.KeyEnter);
 
         _lastMatData = data;

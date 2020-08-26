@@ -47,8 +47,8 @@ public class GameOverScreen : MonoBehaviour
     public void SetData()
     {
         int currentLevel = playerGameData.GetCurrentLevel() ;
-        float calories = YipliPlayerActivity.GetCaloriesBurned(PlayerSession.Instance.getPlayerActionCounts());
-        float fitnessPoints = YipliPlayerActivity.GetFitnessPoints(PlayerSession.Instance.getPlayerActionCounts());
+        float calories = YipliUtils.GetCaloriesBurned(PlayerSession.Instance.getPlayerActionCounts());
+        float fitnessPoints = YipliUtils.GetFitnessPoints(PlayerSession.Instance.getPlayerActionCounts());
 
         //titleHeading.text = string.Format("Well Done. Level {0} Complete", (currentLevel));
         titleHeading.text = reportCardMessages[Random.Range(0,4)];

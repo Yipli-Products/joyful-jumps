@@ -100,39 +100,12 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         {
             string fmActionData = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
 
-            //fmActionData = "{\"response_count\":126,\"response_timestamp\":1597743878113,\"playerdata\":[{\"id\":2,\"fmresponse\":{\"action_id\":\"3KWN\",\"action_name\":\"Jump\",\"properties\":\"null\"}},null]}";
-
             Debug.Log("Json Data from Fmdriver : " + fmActionData);
-
-            /*FmDriverResponseInfo sampleObj = new FmDriverResponseInfo();
-            sampleObj.response_count = 100;
-            sampleObj.response_timestamp = 1597412044712;
-            sampleObj.playerdata = new YipliFMDriverCummunication.PlayerData[1];
-            sampleObj.playerdata[0] = new YipliFMDriverCummunication.PlayerData();
-            sampleObj.playerdata[0].id = 1;
-            sampleObj.playerdata[0].fmresponse = new FMResponse();
-            sampleObj.playerdata[0].fmresponse.ation_id = "7RCE";
-            sampleObj.playerdata[0].fmresponse.action_name = "Running Stopped";
-            sampleObj.playerdata[0].fmresponse.properties = "null";*/
-
-            //string jsonString = JsonUtility.ToJson(sampleObj);
-
-            //Debug.Log("Json Data from JsonUtility.ToJson : " + jsonString);
-
-            //string[] tt = fmActionData.Split('.');
-
-            //fmActionData = "" + fmActionData + "}";
-
-            //fmActionData = fmActionData.Replace("\"", "\\\"");
-
-            //Debug.Log("New converted Json Data : " + fmActionData);
-
-            //Debug.Log("Json Data converted to : " + fmActionData);
 
             /* New FmDriver Response Format
                {
-                  "response_count": 1,                 # Updates every time new action is detected
-                  "response_timestamp": 1597237057689, # Time at which response was packaged/created by Driver
+                  "count": 1,                 # Updates every time new action is detected
+                  "timestamp": 1597237057689, # Time at which response was packaged/created by Driver
                   "playerdata": [                      # Array containing player data
                     {
                       "id": 1,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
@@ -141,26 +114,27 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                         "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
                         "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
                       }
-                    }
+                    },
+                    {null}
                   ]
                 }
             */
 
             // Json parse FMResponse to get the input.
-            FmDriverResponseInfo fmData = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+            FmDriverResponseInfo singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
 
-            if (FMResponseCount != fmData.response_count)
+            if (FMResponseCount != singlePlayerResponse.count)
             {
                 Debug.Log("FMResponse " + fmActionData);
-                FMResponseCount = fmData.response_count;
+                FMResponseCount = singlePlayerResponse.count;
 
                 //Handle "Running" case seperately to read the exta properties sent.
-                if (fmData.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName("running")))
+                if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING)))
                 {
                     ///CheckPoint for the running action properties.
-                    if (fmData.playerdata[0].fmresponse.properties.ToString() != "null")
+                    if (singlePlayerResponse.playerdata[0].fmresponse.properties.ToString() != "null")
                     {
-                        string[] tokens = fmData.playerdata[0].fmresponse.properties.Split(',');
+                        string[] tokens = singlePlayerResponse.playerdata[0].fmresponse.properties.Split(',');
 
                         if(tokens.Length > 0)
                         {
@@ -181,7 +155,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                         }
                     }
                 }
-                OnGotActionFromBridge?.Invoke(fmData.playerdata[0].fmresponse.action_id);
+                OnGotActionFromBridge?.Invoke(singlePlayerResponse.playerdata[0].fmresponse.action_id);
             }
         }
         catch(Exception exp)

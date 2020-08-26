@@ -61,3 +61,4 @@ crashlytics-build.properties
 Assets/Firebase/Plugins/x86_64/FirebaseCppApp-6_8_1.so
 *.meta
 Assets/Plugins/Android/FitmatDriver.aar.meta
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-6_15_2.so

@@ -30,9 +30,13 @@ public class MenuScreen : MonoBehaviour
         if (YipliHelper.checkInternetConnection())
         {
             PlayerSession.Instance.LoadingScreenSetActive(true);
-            await GetPlayerData();
+            PlayerGameData tempData = await GameDataHandler.GetPlayerData();
+            print("Task recieved");
+            playerGameData.SetTotalScore(tempData.GetTotalScore());
+            playerGameData.SetCurrentLevel(tempData.GetCurrentLevel());
             PlayerSession.Instance.LoadingScreenSetActive(false);
-        } else
+        }
+        else
         {
             playerGameData.SetTotalScore(0);
             playerGameData.SetCurrentLevel(0);
@@ -40,8 +44,7 @@ public class MenuScreen : MonoBehaviour
         
         levelIndex.text = "" + (playerGameData.GetCurrentLevel() + 1 );
         coinsEarned.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
-        if (PlayerSession.Instance)
-            playerName.text = PlayerSession.Instance.GetCurrentPlayer();
+        playerName.text = PlayerSession.Instance.GetCurrentPlayer();
     }
 
     private void SetLevelData()
@@ -88,29 +91,5 @@ public class MenuScreen : MonoBehaviour
     void UpdateLevel()
     {
         SetLevelData();
-    }
-
-    private async Task GetPlayerData()
-    {
-        DataSnapshot dataSnapshot = await PlayerSession.Instance.GetGameData("joyfuljumps");
-        try
-        {
-            if (dataSnapshot.Value != null)
-            {
-                playerGameData.SetTotalScore(int.Parse(dataSnapshot.Child("reward-coins").Value?.ToString()));
-                playerGameData.SetCurrentLevel(Convert.ToInt32(dataSnapshot.Child("current-level").Value.ToString()));
-            }
-            else
-            {
-                playerGameData.SetTotalScore(0);
-                playerGameData.SetCurrentLevel(0);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Something is wrong : " + e.Message);
-            playerGameData.SetTotalScore(0);
-            playerGameData.SetCurrentLevel(0);
-        }
     }
 }
