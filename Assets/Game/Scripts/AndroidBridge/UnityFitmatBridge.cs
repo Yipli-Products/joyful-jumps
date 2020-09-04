@@ -109,13 +109,21 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                   "playerdata": [                      # Array containing player data
                     {
                       "id": 1,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
-                      "fmresponse": {
+                      "count" :12,
+            "fmresponse": {
                         "action_id": "9D6O",           # Action ID-Unique ID for each action. Refer below table for all action IDs
                         "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
                         "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
                       }
                     },
-                    {null}
+                   {
+                      "id": 2,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
+                      "fmresponse": {
+                        "action_id": "9D6O",           # Action ID-Unique ID for each action. Refer below table for all action IDs
+                        "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
+                        "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
+                      }
+                    }
                   ]
                 }
             */

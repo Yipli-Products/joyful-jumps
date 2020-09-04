@@ -2,9 +2,40 @@
 using UnityEngine;
 
 namespace YipliFMDriverCommunication
-{ 
+{
     public static class ActionAndGameInfoManager
     {
+        public static YipliUtils.PlayerActions GetActionEnumFromActionID(string actionID)
+        {
+            switch (actionID)
+            {
+                case "9GO5":
+                    return YipliUtils.PlayerActions.LEFT;
+                case "3KWN":
+                    return YipliUtils.PlayerActions.RIGHT;
+                case "PLW3":
+                    return YipliUtils.PlayerActions.ENTER;
+                case "UDH0":
+                    return YipliUtils.PlayerActions.PAUSE;
+                case "SWLO":
+                    return YipliUtils.PlayerActions.RUNNING;
+                case "7RCE":
+                    return YipliUtils.PlayerActions.RUNNINGSTOPPED;
+                case "9D6O":
+                    return YipliUtils.PlayerActions.JUMP;
+                case "DMEY":
+                    return YipliUtils.PlayerActions.RIGHTMOVE;
+                case "38UF":
+                    return YipliUtils.PlayerActions.LEFTMOVE;
+                case "EUOA":
+                    return YipliUtils.PlayerActions.JUMPIN;
+                case "QRTY":
+                    return YipliUtils.PlayerActions.JUMPOUT;
+            }
+            Debug.Log("Invalid action. Returning null Action ID.");
+            return YipliUtils.PlayerActions.INVALID_ACTION;
+        }
+
         public static string getActionIDFromActionName(YipliUtils.PlayerActions actionName)
         {
             switch (actionName)
@@ -124,6 +155,25 @@ namespace YipliFMDriverCommunication
         public string action_name;         //Action Name for debugging (Gamers should strictly check action ID)
         public string properties;          //Any properties action has - ex. Running could have Step Count, Speed
     }
+
+    #region Multiplayer Classes
+
+    [Serializable]
+    public class FmDriverResponseInfoMP
+    {
+        public int count;
+        public double timestamp;
+        public MultiPlayerData[] playerdata;
+    }
+    [Serializable]
+    public class MultiPlayerData
+    {
+        public int id;
+        public int count;
+        public FMResponse fmresponse;
+    }
+
+    #endregion
 }
 
 
