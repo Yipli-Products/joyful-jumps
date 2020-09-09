@@ -216,11 +216,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1023570369}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddd47240e84fac749b381b9c0bf17ab2, type: 3}
+  m_Script: {fileID: 11500000, guid: dbd63ec486a83244a96a1a123076eb0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SessionCount: 1
-  requiredAction: 3
+  SessionCount: 100
+  requiredAction: 0
 --- !u!4 &1023570371
 Transform:
   m_ObjectHideFlags: 0
