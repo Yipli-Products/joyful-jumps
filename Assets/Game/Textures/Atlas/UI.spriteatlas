@@ -31,11 +31,12 @@ SpriteAtlas:
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: c117a8d18d5456d44a8c30fff9e6ac56, type: 3}
-    totalSpriteSurfaceArea: 877447
+    totalSpriteSurfaceArea: 1074055
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 60f80f22446258942ade6a0ca1b1393a, type: 3}
+  - {fileID: 21300000, guid: 6d75989217a14be40a5aad52307ef93d, type: 3}
   - {fileID: 21300000, guid: 0319e9b33bae8414c9ca3e93b94d89af, type: 3}
   - {fileID: 21300000, guid: fef422146eeb2c84393ee44faea530c6, type: 3}
   - {fileID: 21300000, guid: c1669c74d9c57744fa3983aabccc9dc9, type: 3}
@@ -50,6 +51,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 1085df1987d954d4693f336a945aa35a, type: 3}
   - {fileID: 21300000, guid: f464a95a5dcdbdd428f9948a34e9cd56, type: 3}
   - {fileID: 21300000, guid: dd27886a5cba0514697bb0bc58ef23cc, type: 3}
+  - {fileID: 21300000, guid: d3d939baf4d330043bc3c8f0acb0f610, type: 3}
   - {fileID: 21300000, guid: 3fe7cbdae2e8e334bb50026306a0a193, type: 3}
   - {fileID: 21300000, guid: fdac4a4b91c0ba34dae857b6605153ab, type: 3}
   - {fileID: 21300000, guid: dc7f4a4cae9990e40924011256bca557, type: 3}
@@ -64,8 +66,10 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 5fdc20fe3a581904b9dc9d69e63691d5, type: 3}
   - {fileID: 21300000, guid: 15b3ba0f34912b94288f814c1bb55168, type: 3}
   - {fileID: 21300000, guid: ff22bb9f4406dc348aeca3a0753321bd, type: 3}
+  - {fileID: 21300000, guid: c1d93f9f2ad97364dbdbbe509591380c, type: 3}
   m_PackedSpriteNamesToIndex:
   - Jump_Text
+  - Y-Logo-White 4C
   - Pause
   - Button
   - Back
@@ -80,6 +84,7 @@ SpriteAtlas:
   - RestartLevel
   - Home
   - Feet
+  - BUY
   - Button_Tap
   - Timer
   - Jump
@@ -94,5 +99,6 @@ SpriteAtlas:
   - Speed
   - Sound_On
   - Flag
+  - UserC
   m_Tag: UI
   m_IsVariant: 0
