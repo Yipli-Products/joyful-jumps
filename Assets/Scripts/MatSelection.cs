@@ -72,6 +72,7 @@ public class MatSelection : MonoBehaviour
         if (inputPassword.text == "123456")
         {
             //load last Scene
+            secretEntryPanel.SetActive(false);
             currentYipliConfig.matPlayMode = false;
             StartCoroutine(LoadMainGameScene());
         }
