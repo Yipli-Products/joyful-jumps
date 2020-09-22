@@ -18,7 +18,7 @@ MonoBehaviour:
   groundColor: {r: 0.41568628, g: 0.4862745, b: 0.5294118, a: 1}
   skybox: {fileID: 2100000, guid: 579a5b5d592b03647ae61ccd3b43c9cc, type: 2}
   propTexture_1: {fileID: 2800000, guid: 43f827b5a53775045af734f36a9ec167, type: 3}
-  propTexture_2: {fileID: 2800000, guid: a9c502016d92c4d49a430e5e2dcddd68, type: 3}
+  propTexture_2: {fileID: 2800000, guid: 8eabb012385b0c142868cc2479758f18, type: 3}
   book_and_cone_texture: {fileID: 2800000, guid: 46eb6386b18a19c4ba1429a0f2ad1990,
     type: 3}
   mat_1: {r: 0.36862746, g: 0.7921569, b: 0.9137255, a: 1}

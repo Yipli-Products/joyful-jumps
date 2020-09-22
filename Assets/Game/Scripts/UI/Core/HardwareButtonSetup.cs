@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -44,9 +45,46 @@ public class HardwareButtonSetup : MonoBehaviour
     private void SelectCurrentButton(MatKey _action)
     {
         if (_action != MatKey.None && !buttons[_currentButtonIndex].interactable)
+        {
             OnHardware(_action);
+        }
         else
+        {
             buttons[_currentButtonIndex].Select();
+            
+            if (buttons[_currentButtonIndex].GetComponent<Animator>())
+            {
+                if (buttons[_currentButtonIndex].name == "selectAvatar" || buttons[_currentButtonIndex].name == "changeProfile" || buttons[_currentButtonIndex].name == "GoToYipli")
+                {
+                    buttons[_currentButtonIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().enabled = true;
+                }
+                else
+                {
+                    buttons[_currentButtonIndex].transform.GetChild(0).GetComponent<TextMeshProUGUI>().enabled = true;
+                }
+                buttons[_currentButtonIndex].GetComponent<Animator>().enabled = true;
+            }
+        }
+
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            if (i != _currentButtonIndex)
+            {
+                if (buttons[i].GetComponent<Animator>())
+                {
+                    if (buttons[i].name == "selectAvatar" || buttons[i].name == "changeProfile" || buttons[i].name == "GoToYipli")
+                    {
+                        buttons[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().enabled = false;
+                    }
+                    else
+                    {
+                        buttons[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().enabled = false;
+                    }
+                    buttons[i].GetComponent<Animator>().enabled = false;
+                    buttons[i].transform.localScale = new Vector3(1, 1, 1);
+                }
+            }
+        }
     }
 
     private void ClickCurrentButton()

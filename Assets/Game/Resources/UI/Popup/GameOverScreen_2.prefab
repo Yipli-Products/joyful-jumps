@@ -220,7 +220,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ff22bb9f4406dc348aeca3a0753321bd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4dc57bcf4c7bfb641ba19fe5eb505b9e, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1381,10 +1381,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   totalTimeTaken: {fileID: 1138322858237308309}
   coinTaken: {fileID: 0}
+  caloriesBurned: {fileID: 0}
+  FitnessPointsEarned: {fileID: 0}
   titleHeading: {fileID: 6608919849001367649}
   tracker: {fileID: 11400000, guid: f6a544b12b7c4d04e858be154fadd5ce, type: 2}
   levelData: {fileID: 11400000, guid: 62ec10907e1fa4147b33f90ebcce873e, type: 2}
   playerGameData: {fileID: 11400000, guid: c81a9f84ada7c3e4484791082bfaf960, type: 2}
+  reportCardMessages:
+  - Well done...!!
+  - Awesome game !!
+  - Good Job !!
+  - Fantastic play !!
+  - Good going champ !!
 --- !u!1 &6608919849500175512
 GameObject:
   m_ObjectHideFlags: 0

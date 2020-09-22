@@ -10,6 +10,8 @@ public class TutorialScreen : MonoBehaviour
     [SerializeField] TextMeshProUGUI animationText;
     [SerializeField] GameObject animationHolder;
 
+    [SerializeField] GameObject animationTextBG;
+
     public GameDataTracker tracker;
 
     [SerializeField] private Animator _animationAnimator;
@@ -38,6 +40,15 @@ public class TutorialScreen : MonoBehaviour
 
     void ShowTutorialMSG(string msg, string animparameter)
     {
+        if (msg == "" || msg == null)
+        {
+            animationTextBG.SetActive(false);
+        }
+        else
+        {
+            animationTextBG.SetActive(true);
+        }
+
         animationText.text = msg;
         if (animparameter !=  "none")
         {

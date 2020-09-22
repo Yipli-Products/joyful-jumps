@@ -665,7 +665,7 @@ MonoBehaviour:
   backgroundMusic:
     mixerGroup: {fileID: -6865432719491768061, guid: 67e79a93a0ce9ef4e900f320c8aaa97a,
       type: 2}
-    clip: {fileID: 8300000, guid: 74e98bf4e8997aa49bc5148c62510d32, type: 3}
+    clip: {fileID: 8300000, guid: 318b9223664e4ff43abf6f79ec4ac210, type: 3}
     duration: 0
 --- !u!4 &1313525502
 Transform:

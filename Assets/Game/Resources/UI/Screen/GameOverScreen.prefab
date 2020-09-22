@@ -78,12 +78,11 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 11400000, guid: c0905180422578c40a37ab98c048facb,
-    type: 2}
+    topLeft: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    topRight: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    bottomLeft: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+    bottomRight: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_overrideHtmlColors: 0
@@ -235,12 +234,11 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 11400000, guid: c0905180422578c40a37ab98c048facb,
-    type: 2}
+    topLeft: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    topRight: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    bottomLeft: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+    bottomRight: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_overrideHtmlColors: 0
@@ -450,7 +448,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ff22bb9f4406dc348aeca3a0753321bd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4dc57bcf4c7bfb641ba19fe5eb505b9e, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -538,12 +536,11 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 11400000, guid: c0905180422578c40a37ab98c048facb,
-    type: 2}
+    topLeft: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    topRight: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    bottomLeft: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+    bottomRight: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_overrideHtmlColors: 0
@@ -695,12 +692,11 @@ MonoBehaviour:
   m_enableVertexGradient: 1
   m_colorMode: 3
   m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 11400000, guid: c0905180422578c40a37ab98c048facb,
-    type: 2}
+    topLeft: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    topRight: {r: 0.9882353, g: 0.827451, b: 0.24705882, a: 1}
+    bottomLeft: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+    bottomRight: {r: 0.99607843, g: 0.6313726, b: 0.03137255, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_overrideHtmlColors: 0
@@ -1059,6 +1055,12 @@ MonoBehaviour:
   tracker: {fileID: 11400000, guid: f6a544b12b7c4d04e858be154fadd5ce, type: 2}
   levelData: {fileID: 11400000, guid: 62ec10907e1fa4147b33f90ebcce873e, type: 2}
   playerGameData: {fileID: 11400000, guid: c81a9f84ada7c3e4484791082bfaf960, type: 2}
+  reportCardMessages:
+  - Well done...!!
+  - Awesome game !!
+  - Good Job !!
+  - Fantastic play !!
+  - Good going champ !!
 --- !u!1 &9182075042542557877
 GameObject:
   m_ObjectHideFlags: 0

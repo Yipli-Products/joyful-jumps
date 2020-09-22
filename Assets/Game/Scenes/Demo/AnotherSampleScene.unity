@@ -412,7 +412,7 @@ MonoBehaviour:
   backgroundMusic:
     mixerGroup: {fileID: -4380900092806532690, guid: 67e79a93a0ce9ef4e900f320c8aaa97a,
       type: 2}
-    clip: {fileID: 8300000, guid: acec13b2b748a8040b55acc8c3c31bc2, type: 3}
+    clip: {fileID: 8300000, guid: 318b9223664e4ff43abf6f79ec4ac210, type: 3}
     duration: 0
 --- !u!4 &407171902
 Transform:
@@ -853,7 +853,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718620748}
-  m_LocalRotation: {x: 0.1387012, y: -0.00000007267354, z: 0.00000010569335, w: 0.99033433}
+  m_LocalRotation: {x: 0.13870122, y: -0.000000057916402, z: 0.00000010362654, w: 0.99033433}
   m_LocalPosition: {x: 0.000000834465, y: 2, z: 38.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
