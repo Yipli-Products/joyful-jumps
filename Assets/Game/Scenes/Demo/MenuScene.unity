@@ -245,12 +245,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.23137255}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ad04f18a63398664c96625bbad180b40, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -663,9 +664,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundMusic:
-    mixerGroup: {fileID: -6865432719491768061, guid: 67e79a93a0ce9ef4e900f320c8aaa97a,
-      type: 2}
-    clip: {fileID: 8300000, guid: 318b9223664e4ff43abf6f79ec4ac210, type: 3}
+    mixerGroup: {fileID: 0}
+    clip: {fileID: 0}
     duration: 0
 --- !u!4 &1313525502
 Transform:
