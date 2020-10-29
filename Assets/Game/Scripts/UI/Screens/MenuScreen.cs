@@ -92,4 +92,9 @@ public class MenuScreen : MonoBehaviour
     {
         SetLevelData();
     }
+
+    public void QuitButton()
+    {
+        Application.Quit();
+    }
 }

@@ -46,7 +46,7 @@ public class TutorialScreen : MonoBehaviour
         }
         else
         {
-            animationTextBG.SetActive(true);
+            animationTextBG.SetActive(false); // set to true if you want to displayu messages
         }
 
         animationText.text = msg;
