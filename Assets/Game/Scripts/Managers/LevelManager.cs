@@ -96,7 +96,7 @@ public class LevelManager : Singleton<LevelManager>
         yield return new WaitForSeconds(0.1f);
 
         if (PlayerSession.Instance != null)
-            PlayerSession.Instance.StartSPSession("joyfuljumps");
+            PlayerSession.Instance.StartSPSession();
 
         if (Player != null)
         {

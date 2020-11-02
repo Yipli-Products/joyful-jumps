@@ -87,7 +87,7 @@ public class GamePlayScreen : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(0.5f);
-            if (!YipliHelper.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase) && (Time.timeScale == 1f))
+            if (!YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase) && (Time.timeScale == 1f))
             {
                 //Pause the game.
                 Debug.Log("Pausing the game as the bluetooth isnt connected.");

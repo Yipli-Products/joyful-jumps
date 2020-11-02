@@ -1,11 +1,11 @@
-﻿using System;
+﻿//using com.fitmat.fitmatdriver.Producer.Connection;
+using System;
 using UnityEngine;
 public class InitBLE
 {
     static AndroidJavaClass _pluginClass;
     static AndroidJavaObject _pluginInstance;
     const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity";
-    string FMResponseCount = "";
     static string BLEStatus = "";
     //STEP 3 - Create Unity Callback class
     class UnityCallback : AndroidJavaProxy
@@ -37,6 +37,24 @@ public class InitBLE
             initializeHandler?.Invoke(message);
         }
     }
+
+    public static string GetFMResponse()
+    {
+        try
+        {
+#if UNITY_ANDROID
+                return PluginClass.CallStatic<string>("_getFMResponse");
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            return DeviceControlActivity._getFMResponse();
+#endif
+        }
+        catch(Exception e)
+        {
+            Debug.Log("Exception in getMatConnectionStatus() : " + e.Message);
+            return "error";
+        }
+    }
+
     //STEP 4 - Init Android Class & Objects
     public static AndroidJavaClass PluginClass
     {
@@ -62,9 +80,44 @@ public class InitBLE
             return _pluginInstance;
         }
     }
-    public static string getBLEStatus()
+
+
+    public static string getMatConnectionStatus()
     {
+        try
+        {
+#if UNITY_ANDROID
         return BLEStatus;
+#elif UNITY_STANDALONE_WIN
+            return DeviceControlActivity._IsDeviceConnected() == 1 ? "CONNECTED" : "DISCONNECTED";
+#endif
+        }
+        catch(Exception e)
+        {
+            Debug.Log("Exception in getMatConnectionStatus() : " + e.Message);
+            return "disconnected";
+        }
+    }
+
+
+    public static void reconnectMat()
+    {
+        try
+        {
+#if UNITY_ANDROID
+            System.Action<string> callback = ((string message) =>
+            {
+                BLEFramework.Unity.BLEControllerEventHandler.OnBleDidInitialize(message);
+            });
+            PluginInstance.Call("_InitBLEFramework", new object[] { new UnityCallback(callback) });
+#elif UNITY_STANDALONE_WIN
+        DeviceControlActivity._reconnectDevice();
+#endif
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Exception in reconnectMat() : " + e.Message);
+        }
     }
 
     //STEP 5 - Init Android Class & Objects
@@ -72,38 +125,44 @@ public class InitBLE
     {
         Debug.Log("init_ble: setting macaddress & gameID - " + macaddress + " " + gameID);
 #if UNITY_IPHONE
-                        // Now we check that it's actually an iOS device/simulator, not the Unity Player. You only get plugins on the actual device or iOS Simulator.
-                        if (Application.platform == RuntimePlatform.IPhonePlayer)
-                        {
-                            _InitBLEFramework();
-                        }
-#elif UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            System.Action<string> callback = ((string message) =>
+            // Now we check that it's actually an iOS device/simulator, not the Unity Player. You only get plugins on the actual device or iOS Simulator.
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                BLEFramework.Unity.BLEControllerEventHandler.OnBleDidInitialize(message);
-            });
-
-            PluginInstance.Call("_setMACAddress", macaddress);
-            setGameClusterID(gameID);
-            PluginInstance.Call("_InitBLEFramework", new object[] { new UnityCallback(callback) });
-            /*
-            if(!setGameMode(0)){
-                Debug.Log("Failed to set Game Mode. Probable reason is your game doesnt support MultiPlayer functionality yet. ");
+                _InitBLEFramework();
             }
-            */
-        }
+#elif UNITY_ANDROID
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                System.Action<string> callback = ((string message) =>
+                {
+                    BLEFramework.Unity.BLEControllerEventHandler.OnBleDidInitialize(message);
+                });
+
+                PluginInstance.Call("_setMACAddress", macaddress);
+                setGameClusterID(gameID);
+                PluginInstance.Call("_InitBLEFramework", new object[] { new UnityCallback(callback) });
+                /*
+                if(!setGameMode(0)){
+                    Debug.Log("Failed to set Game Mode. Probable reason is your game doesnt support MultiPlayer functionality yet. ");
+                }
+                */
+            }
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            Debug.Log("Calling DeviceControlActivity.InitPCFramework()");
+            DeviceControlActivity.InitPCFramework(gameID);
 #endif
     }
-
 
 
     public static void setGameMode(int gameMode)
     {
         try
         {
-            PluginInstance.Call("_setGameMode", gameMode);
+#if UNITY_ANDROID
+                PluginInstance.Call("_setGameMode", gameMode);
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            DeviceControlActivity._setGameMode(gameMode);
+#endif
         }
         catch (Exception e)
         {
@@ -115,7 +174,11 @@ public class InitBLE
     {
         try
         {
-            return PluginInstance.CallStatic<int>("_getGameMode");
+#if UNITY_ANDROID
+                return PluginInstance.CallStatic<int>("_getGameMode");
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            return DeviceControlActivity._getGameMode();
+#endif
         }
         catch (Exception e)
         {
@@ -129,7 +192,11 @@ public class InitBLE
     {
         try
         {
-            PluginInstance.Call("_setGameID", gameID);
+#if UNITY_ANDROID
+                PluginInstance.Call("_setGameID", gameID);
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            DeviceControlActivity._setGameID(gameID);
+#endif
         }
         catch (Exception e)
         {
@@ -141,7 +208,11 @@ public class InitBLE
     {
         try
         {
-            return PluginInstance.CallStatic<int>("_getGameID");
+#if UNITY_ANDROID
+                return PluginInstance.CallStatic<int>("_getGameID");
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            return DeviceControlActivity._getGameID();
+#endif
         }
         catch (Exception e)
         {
@@ -154,7 +225,11 @@ public class InitBLE
     {
         try
         {
-            return PluginInstance.CallStatic<string>("_getDriverVersion");
+#if UNITY_ANDROID
+                return PluginInstance.CallStatic<string>("_getDriverVersion");
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+            return DeviceControlActivity._getDriverVersion();
+#endif
         }
         catch (Exception exp)
         {

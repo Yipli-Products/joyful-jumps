@@ -7,23 +7,15 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using YipliFMDriverCommunication;
 
 public class PlayerSession : MonoBehaviour
 {
-    private string userId = ""; // to be recieved from Yipli
-    public string gameId = ""; // to be assigned to every game.
-    private string playerId = ""; // to be recieved from Yipli for each game
-    private float points; // Game points / coins
-    private string playerAge = ""; //Current age of the player
-    private string playerHeight = ""; //Current height of the player
-    private string playerWeight = ""; //Current height of the player
-    private string matId = "";
-    private string matMacAddress;
+    private float gamePoints; // Game points / coins.
     private float duration;
     private float calories;
     private float fitnesssPoints;
+    private int xp;
     public string intensityLevel = ""; // to be decided by the game.
     private IDictionary<YipliUtils.PlayerActions, int> playerActionCounts; // to be updated by the player movements
     private IDictionary<string, string> playerGameData; // to be used to store the player gameData like Highscore, last played level etc.
@@ -31,10 +23,15 @@ public class PlayerSession : MonoBehaviour
 
     public TextMeshProUGUI bleErrorText;
 
+    public TextMeshProUGUI playerNameGreetingText;
+
+    public GameObject YipliBackgroundPanel;
     public GameObject BleErrorPanel;
     public GameObject LoadingScreen;
     private GameObject instantiatedBleErrorPanel;
-    private bool bIsBleConnectionCoroutineRunning = false;
+
+
+    private bool bIsBleCheckRunning;
 
     [JsonIgnore]
     public YipliConfig currentYipliConfig;
@@ -47,6 +44,15 @@ public class PlayerSession : MonoBehaviour
 
     [JsonIgnore]
     public static PlayerSession Instance { get { return _instance; } }
+
+
+    //Delegates for Firebase Listeners
+    public delegate void OnPlayerFound();
+    public static event OnPlayerFound NewPlayerFound;
+
+    //Delegates for Firebase Listeners
+    public delegate void OnDefaultMatChanged();
+    public static event OnDefaultMatChanged NewMatFound;
 
     private void Awake()
     {
@@ -78,31 +84,46 @@ public class PlayerSession : MonoBehaviour
 
     public void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        //You are here, means PlayerInfo is found.
+        //Invoke the player found event, to get the player data.
+        if (currentYipliConfig.gameId.Length > 1)
+        {
+            NewPlayerFound();
+            NewMatFound();
+        }
+        else
+        {
+            Debug.LogError("Game Id not Set");
+        }
+
+        playerNameGreetingText.text = "Hi, " + GetCurrentPlayer();
+        
         Debug.Log("Starting the BLE routine check in PlayerSession Start()");
         if (!_instance.currentYipliConfig.callbackLevel.Equals("Yipli_Testing_harness"))
             StartCoroutine(CheckBleRoutine());
     }
 
-    public void Update()
-    {
-        try
-        {
-            Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
-        }
-        catch(Exception exp)
-        {
-            Debug.Log("Exception is getting Cluster ID" + exp.Message);
-        }
-    }
-
-    public IDictionary<YipliUtils.PlayerActions, int> getPlayerActionCounts()
-    {
-        return playerActionCounts;
-    }
+    //public void Update()
+    //{
+    //    try
+    //    {
+    //        Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
+    //    }
+    //    catch(Exception exp)
+    //    {
+    //        Debug.Log("Exception is getting Cluster ID" + exp.Message);
+    //    }
+    //}
 
     public string GetCurrentPlayer()
     {
         return currentYipliConfig.playerInfo.playerName;
+    }
+
+    public string GetCurrentPlayerId()
+    {
+        return currentYipliConfig.playerInfo.playerId;
     }
 
     public void ChangePlayer()
@@ -110,21 +131,236 @@ public class PlayerSession : MonoBehaviour
         _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
         Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
         Debug.Log("Loading Yipli scene for player Selection...");
+        currentYipliConfig.bIsChangePlayerCalled = true;
         SceneManager.LoadScene("yipli_lib_scene");
     }
+    
+    public void UpdateGameData(Dictionary<string, string> update)
+    {
+        if (update != null)
+        {
+            playerGameData = new Dictionary<string, string>();
+            playerGameData = update;
+        }
+    }
+
+    //To be called from void awake/start of the games 1st scene
+    public void SetGameId(string gameName)
+    {
+        currentYipliConfig.gameId = gameName;
+    }
+
+    // Get player game data
+    public DataSnapshot GetGameData()
+    {
+        return currentYipliConfig.gameDataForCurrentPlayer ?? null;
+    }
+
+    //First function to be called only once when the game starts()
+    //To be used for error handling
+    //Call in case of exception while playing game.
+    public void CloseSPSession()
+    {
+        //Destroy current player session data
+        calories = 0;
+        fitnesssPoints = 0;
+        gamePoints = 0;
+        duration = 0;
+        Debug.Log("Aborting current player session.");
+    }
+
+    //to be called from all the player movment actions handled script
+    //To be called from GameObject FixedUpdate
+    public void UpdateDuration()
+    {
+        Debug.Log("Updating duration for current player session.");
+        if (bIsPaused == false)
+        {
+            duration += Time.deltaTime;
+        }
+
+        if (YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.Log("In UpdateDuration : Ble connected");
+            if (BleErrorPanel.activeSelf)
+            {
+                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+                BleErrorPanel.SetActive(false);
+                YipliBackgroundPanel.SetActive(false);
+            }
+        }
+    }
+
+    //private IEnumerator CheckBleRoutine()
+    //{
+    //    int autoRetryBleConnectionCount = 40;
+    //    while (true)
+    //    {
+    //        yield return new WaitForSecondsRealtime(.15f);
+    //        string retStatus = YipliHelper.GetMatConnectionStatus();
+    //        if (!retStatus.Equals("Connected", StringComparison.OrdinalIgnoreCase))
+    //        {
+    //            if (autoRetryBleConnectionCount > 0)
+    //            {
+    //                Debug.Log("Mat is disconnected. Trying to connect back : " + currentYipliConfig.matInfo.macAddress);
+    //                try
+    //                {
+    //                    //Initiate the connection after 10 tries
+    //                    //if(autoRetryBleConnectionCount % 10 == 0)
+    //                        //InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress,0);
+    //                }
+    //                catch (Exception exp)
+    //                {
+    //                    bleErrorText.text = "Unable to connect. Check your Mat.";
+    //                    Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
+    //                }
+    //                autoRetryBleConnectionCount--;
+    //            }
+    //            else
+    //            {
+    //                //Exhausted auto reties
+    //                Debug.Log("Setting the Error Panel Active");
+    //                if (!BleErrorPanel.activeSelf)
+    //                {
+    //                    bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
+    //                    FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
+    //                    BleErrorPanel.SetActive(true);
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("Bluetooth connection is established.");
+    //            Debug.Log("Destroying Ble Error canvas prefab.");
+    //            if (BleErrorPanel.activeSelf)
+    //            {
+    //                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+    //                BleErrorPanel.SetActive(false);
+    //            }
+    //            autoRetryBleConnectionCount = 10;
+    //        }
+    //    }
+    //}
+
+    private IEnumerator CheckBleRoutine()
+    {
+        while (true)
+        {
+            if (!YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.Log("Setting the Error Panel Active");
+                if (!BleErrorPanel.activeSelf)
+                {
+                    bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
+                    FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
+
+                    YipliBackgroundPanel.SetActive(true);
+                    BleErrorPanel.SetActive(true);
+
+                }
+            }
+            else
+            {
+                Debug.Log("Bluetooth connection is established.");
+                Debug.Log("Destroying Ble Error canvas prefab.");
+                if (BleErrorPanel.activeSelf)
+                {
+                    FindObjectOfType<YipliAudioManager>().Play("BLE_success");
+                    YipliBackgroundPanel.SetActive(false);
+                    BleErrorPanel.SetActive(false);
+                }
+            }
+            yield return new WaitForSecondsRealtime(.2f);
+        }
+    }
+
+    public void StartCoroutineForBleReConnection()
+    {
+        try
+        {
+            Debug.Log("In StartCoroutineForBleReConnection.");
+            if (!bIsBleCheckRunning)
+                StartCoroutine(ReconnectBleFromGame());
+        }
+        catch(Exception e)
+        {
+            Debug.Log("Exception in Retrying ble connection." + e.Message);
+        }
+    }
+
+    private IEnumerator ReconnectBleFromGame()
+    {
+        bIsBleCheckRunning = true;
+        Debug.Log("In ReconnectBleFromGame.");
+        try
+        {
+            //Initiate mat connection with last set GameCluterId
+            Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
+            InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress, YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0);
+        }
+        catch (Exception exp)
+        {
+            Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
+        }
+
+        //Block this fuction for next 5 seconds. 
+        //Dont allow user to initiate Bluetooth connection for atleast 5 secs, as 1 connecteion initiation is enough.
+        yield return new WaitForSecondsRealtime(5f);
+        bIsBleCheckRunning = false;
+    }
+
+    public void LoadingScreenSetActive(bool bOn)
+    {
+        Debug.Log("Loading Screen called : " + bOn);
+        YipliBackgroundPanel.SetActive(bOn);
+        LoadingScreen.SetActive(bOn);
+    }
+
+    // Update store data witout gameplay. To be called by games Shop Manager.
+    public async Task UpdateStoreData(Dictionary<string, object> dStoreData)
+    {
+        await FirebaseDBHandler.UpdateStoreData(
+            currentYipliConfig.userId,
+            currentYipliConfig.playerInfo.playerId,
+            currentYipliConfig.gameId,
+            dStoreData,
+            () => { Debug.Log("Got Game data successfully"); }
+        );
+    }
+
+    public void GotoYipli()
+    {
+        YipliHelper.GoToYipli();
+    }
+
+    #region Single Player Session Functions
+
+    public void ReInitializeSPSession()
+    {
+        gamePoints = 0;
+        duration = 0;
+        bIsPaused = false;
+        ActionAndGameInfoManager.SetYipliGameInfo(currentYipliConfig.gameId);
+    }
+
+    public IDictionary<YipliUtils.PlayerActions, int> getPlayerActionCounts()
+    {
+        return playerActionCounts;
+    }
+
 
     public Dictionary<string, dynamic> GetPlayerSessionDataJsonDic()
     {
         Dictionary<string, dynamic> x;
         x = new Dictionary<string, dynamic>();
-        x.Add("game-id", gameId);
-        x.Add("user-id", userId);
-        x.Add("mat-id", matId);
-        x.Add("mac-address", matMacAddress);
-        x.Add("player-id", playerId);
-        x.Add("age", int.Parse(playerAge));
-        x.Add("points", (int)points);
-        x.Add("height", playerHeight);
+        x.Add("game-id", currentYipliConfig.gameId);
+        x.Add("user-id", currentYipliConfig.userId);
+        x.Add("mat-id", currentYipliConfig.matInfo.matId);
+        x.Add("mac-address", currentYipliConfig.matInfo.macAddress);
+        x.Add("player-id", currentYipliConfig.playerInfo.playerId);
+        x.Add("age", int.Parse(currentYipliConfig.playerInfo.playerAge));
+        x.Add("points", (int)gamePoints);
+        x.Add("height", currentYipliConfig.playerInfo.playerHeight);
         x.Add("duration", (int)duration);
         x.Add("intensity", intensityLevel);
         x.Add("player-actions", playerActionCounts);
@@ -150,65 +386,24 @@ public class PlayerSession : MonoBehaviour
         return x;
     }
 
-    //Pass here name of the game
-    public void UpdateGameData(Dictionary<string, string> update)
-    {
-        if (update != null)
-        {
-            playerGameData = new Dictionary<string, string>();
-            playerGameData = update;
-        }
-    }
-
-    // Get player game data
-    public async Task<DataSnapshot> GetGameData(string gameId)
-    {
-        DataSnapshot dataSnapShot = await FirebaseDBHandler.GetGameData(
-            currentYipliConfig.userId,
-            currentYipliConfig.playerInfo.playerId,
-            gameId,
-            () => { Debug.Log("Got Game data successfully"); }
-        );
-        return dataSnapShot ?? null;
-    }
-
-    //First function to be called only once when the game starts()
-    public void StartSPSession(string GameId)
+    public void StartSPSession()
     {
         Debug.Log("Starting current player session.");
-        userId = currentYipliConfig.userId ?? "";
-        playerId = currentYipliConfig.playerInfo.playerId;
-        playerAge = currentYipliConfig.playerInfo.playerAge ?? "";
-        playerHeight = currentYipliConfig.playerInfo.playerHeight ?? "";
-        playerWeight = currentYipliConfig.playerInfo.playerWeight ?? "";
         playerActionCounts = new Dictionary<YipliUtils.PlayerActions, int>();
-        points = 0;
+        gamePoints = 0;
         duration = 0;
         bIsPaused = false;
-        ActionAndGameInfoManager.SetYipliGameInfo(GameId);
-        matId = currentYipliConfig.matInfo.matId;
-        matMacAddress = currentYipliConfig.matInfo.macAddress;
-    }
-
-    //To be used for error handling
-    //Call in case of exception while playing game.
-    public void CloseSPSession()
-    {
-        //Destroy current player session data
-        calories = 0;
-        fitnesssPoints = 0;
-        points = 0;
-        duration = 0;
-        Debug.Log("Aborting current player session.");
+        ActionAndGameInfoManager.SetYipliGameInfo(currentYipliConfig.gameId);
     }
 
     public void StoreSPSession(float gamePoints)
     {
         Debug.Log("Storing current player session to backend database.");
-        points = gamePoints;
-        
+        this.gamePoints = gamePoints;
+
         calories = YipliUtils.GetCaloriesBurned(getPlayerActionCounts());
         fitnesssPoints = YipliUtils.GetFitnessPoints(getPlayerActionCounts());
+        xp = YipliUtils.GetXP(Math.Ceiling(duration));
 
         if (0 == ValidateSessionBeforePosting())
         {
@@ -222,15 +417,18 @@ public class PlayerSession : MonoBehaviour
         }
     }
 
+
     //Function to validate all the session parameters before writing to DB
+    //To be called from GamePause function
+    //To be called from GameResume function
     private int ValidateSessionBeforePosting()
     {
-        if (gameId == null || gameId == "")
+        if (currentYipliConfig.gameId == null || currentYipliConfig.gameId == "")
         {
             Debug.Log("gameId is not set");
-            return -1;
+            return -1;  
         }
-        if (playerId == null || playerId == "")
+        if (currentYipliConfig.playerInfo.playerId == null || currentYipliConfig.playerInfo.playerId == "")
         {
             Debug.Log("playerId is not set");
             return -1;
@@ -252,32 +450,27 @@ public class PlayerSession : MonoBehaviour
         }
         return 0;
     }
-
-    //To be called from GamePause function
     public void PauseSPSession()
     {
         Debug.Log("Pausing current player session.");
         bIsPaused = true; // only set the paused flat to true. Fixed update will take care of halting the time counter
                           //Ble check
-        if (!YipliHelper.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        if (!YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
             Debug.Log("In PauseSPSession : Ble disconnected");
             if (!BleErrorPanel.activeSelf)
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
+                YipliBackgroundPanel.SetActive(true);
                 BleErrorPanel.SetActive(true);
             }
         }
     }
-
-    //To be called from GameResume function
     public void ResumeSPSession()
     {
         Debug.Log("Resuming current player session.");
         bIsPaused = false;
     }
-
-    //to be called from all the player movment actions handled script
     public void AddPlayerAction(YipliUtils.PlayerActions action, int count = 1)
     {
         Debug.Log("Adding action in current player session.");
@@ -287,145 +480,151 @@ public class PlayerSession : MonoBehaviour
             playerActionCounts.Add(action, count);
     }
 
-    //To be called from GameObject FixedUpdate
-    public void UpdateDuration()
-    {
-        Debug.Log("Updating duration for current player session.");
-        if (bIsPaused == false)
-        {
-            duration += Time.deltaTime;
-        }
+    #endregion
 
-        if (YipliHelper.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
-        {
-            Debug.Log("In UpdateDuration : Ble connected");
-            if (BleErrorPanel.activeSelf)
-            {
-                FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                BleErrorPanel.SetActive(false);
-            }
-        }
+    #region Multi Player Session Functions
+
+    public IDictionary<YipliUtils.PlayerActions, int> getMultiPlayerActionCounts(PlayerDetails playerDetails)
+    {
+        return playerDetails.playerActionCounts;
     }
-
-    private IEnumerator CheckBleRoutine()
+    public Dictionary<string, dynamic> GetMultiPlayerSessionDataJsonDic(PlayerDetails playerDetails, string mpSessionUUID)
     {
-        int autoRetryBleConnectionCount = 10;
-        while (true)
+        Debug.Log("UUID= " + mpSessionUUID);
+
+        Dictionary<string, dynamic> x;
+        x = new Dictionary<string, dynamic>();
+        x.Add("game-id", playerDetails.gameId);
+        x.Add("user-id", playerDetails.userId);
+        x.Add("mat-id", playerDetails.matId);
+        x.Add("mac-address", playerDetails.matMacAddress);
+        x.Add("player-id", playerDetails.playerId);
+        x.Add("age", int.Parse(playerDetails.playerAge));
+        x.Add("points", (int)playerDetails.points);
+        x.Add("height", playerDetails.playerHeight);
+        x.Add("duration", (int)playerDetails.duration);
+        x.Add("intensity", playerDetails.intensityLevel);
+        x.Add("player-actions", playerDetails.playerActionCounts);
+        x.Add("timestamp", ServerValue.Timestamp);
+        x.Add("mp-session-id", mpSessionUUID);
+        x.Add("calories", (int)playerDetails.calories);
+        x.Add("fitness-points", (int)playerDetails.fitnesssPoints);
+        x.Add("xp", xp);
+        if (playerGameData != null)
         {
-            yield return new WaitForSecondsRealtime(.15f);
-            string retStatus = YipliHelper.GetBleConnectionStatus();
-            Debug.Log("Bluetooth Status : " + retStatus);
-            if (!retStatus.Equals("Connected", StringComparison.OrdinalIgnoreCase))
+            if (playerGameData.Count > 0)
             {
-                if (autoRetryBleConnectionCount > 0)
-                {
-                    Debug.Log("Mat is disconnected. Trying to connect back : " + currentYipliConfig.matInfo.macAddress);
-                    try
-                    {
-                        InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress,0);
-                    }
-                    catch (Exception exp)
-                    {
-                        bleErrorText.text = "Unable to connect. Check your Mat.";
-                        Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
-                    }
-                    autoRetryBleConnectionCount--;
-                }
-                else
-                {
-                    //Exhausted auto reties
-                    Debug.Log("Setting the Error Panel Active");
-                    if (!BleErrorPanel.activeSelf)
-                    {
-                        bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
-                        FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
-                        BleErrorPanel.SetActive(true);
-                    }
-                }
+                x.Add("game-data", playerGameData);
             }
             else
             {
-                Debug.Log("Bluetooth connection is established.");
-                Debug.Log("Destroying Ble Error canvas prefab.");
-                if (BleErrorPanel.activeSelf)
-                {
-                    FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                    BleErrorPanel.SetActive(false);
-                }
-                autoRetryBleConnectionCount = 10;
+                Debug.Log("Game-data is empty");
             }
-        }
-    }
-
-    public void StartCoroutineForBleReConnection()
-    {
-        Debug.Log("In StartCoroutineForBleReConnection.");
-        if (!bIsBleConnectionCoroutineRunning)
-        {
-            StartCoroutine(ReconnectBleFromGame());
         }
         else
         {
-            Debug.Log("Coroutine : ReconnectBleFromGame is already running");
+            Debug.Log("Game-data is null");
         }
-    }
 
-    private IEnumerator ReconnectBleFromGame()
+        return x;
+    }
+    public void StartMPSession()
     {
-        Debug.Log("In ReconnectBleFromGame.");
-        Debug.Log("Setting bIsBleConnectionCoroutineRunning to true.");
-        bIsBleConnectionCoroutineRunning = true;
-        bleErrorText.text = "Retrying bluetooth connection...";
+        Debug.Log("Starting multi player session.");
+        playerActionCounts = new Dictionary<YipliUtils.PlayerActions, int>();
 
-        try
-        {
-            InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress, 0);
-        }
-        catch (Exception exp)
-        {
-            bleErrorText.text = "Unable to connect. Check your Mat.";
-            Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
-        }
+        ActionAndGameInfoManager.SetYipliMultiplayerGameInfo(currentYipliConfig.gameId);
 
-        yield return new WaitForSecondsRealtime(.35f);
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.points = 0;
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.points = 0;
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.duration = 0;
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.duration = 0;
 
-        bool bIsConnected = false;
-        int iTryCount = 10;
-        while (iTryCount > 0)
-        {
-            Debug.Log("In ReconnectBleFromGame while : " + iTryCount);
-            iTryCount--;
-            yield return new WaitForSecondsRealtime(.25f);
-            string strStatus = YipliHelper.GetBleConnectionStatus();
-            if (strStatus.Equals("connected", StringComparison.OrdinalIgnoreCase))
-            {
-                Debug.Log("Connected back");
-                bleErrorText.text = "Connected back successfully";
-                yield return new WaitForSecondsRealtime(.5f);
+        duration = 0;
 
-                if (BleErrorPanel.activeSelf)
-                {
-                    BleErrorPanel.SetActive(false);
-                    FindObjectOfType<YipliAudioManager>().Play("BLE_success");
-                }
-                bIsConnected = true;
-                iTryCount = 0;
-                break;
-            }
-        }
-
-        if (!bIsConnected)
-        {
-            //Function execution will come here only if the mat is not connected after the given no. of retries.
-            bleErrorText.text = "Bluetooth Connection lost. Make sure that the Yipli Mat(default) and your device bluetooth are turned on and ReCheck.";
-        }
-        Debug.Log("Setting bIsBleConnectionCoroutineRunning to false");
-        bIsBleConnectionCoroutineRunning = false;
+        bIsPaused = false;
     }
-
-    public void LoadingScreenSetActive(bool bOn)
+    public void StoreMPSession(float playerOneGamePoints, float playerTwoGamePoints)
     {
-        Debug.Log("Loading Screen : " + bOn);
-        LoadingScreen.SetActive(bOn);
+        Debug.LogError("Duration is " + duration);
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.duration = duration;
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.duration = duration;
+
+        Debug.Log("Storing current player session to backend database.");
+
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.calories = YipliUtils.GetCaloriesBurned(getMultiPlayerActionCounts(currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails));
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.fitnesssPoints = YipliUtils.GetFitnessPoints(getMultiPlayerActionCounts(currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails));
+
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.calories = YipliUtils.GetCaloriesBurned(getMultiPlayerActionCounts(currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails));
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.fitnesssPoints = YipliUtils.GetFitnessPoints(getMultiPlayerActionCounts(currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails));
+
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.points = playerOneGamePoints;
+        currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.points = playerTwoGamePoints;
+
+        string mpSessionUUID = Guid.NewGuid().ToString();
+
+        if (0 == ValidateMPSessionBeforePosting(currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails))
+        {
+            //Store the session data to backend.
+            FirebaseDBHandler.PostMultiPlayerSession(Instance, currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails, mpSessionUUID, () => { Debug.Log("Session stored in db"); });
+            Debug.Log("Player 1 session stored successfully.");
+        }
+        else
+        {
+            Debug.Log("Session not posted : Validation failed for sessoin data.");
+        }
+
+        if (0 == ValidateMPSessionBeforePosting(currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails))
+        {
+            //Store the session data to backend.
+            FirebaseDBHandler.PostMultiPlayerSession(Instance, currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails, mpSessionUUID, () => { Debug.Log("Session stored in db"); });
+            Debug.Log("Player 2 session stored successfully.");
+        }
+        else
+        {
+            Debug.Log("Session not posted : Validation failed for sessoin data.");
+        }
     }
+    private int ValidateMPSessionBeforePosting(PlayerDetails playerDetails)
+    {
+        if (playerDetails.gameId == null || playerDetails.gameId == "")
+        {
+            Debug.Log("gameId is not set");
+            return -1;
+        }
+        if (playerDetails.playerId == null || playerDetails.playerId == "")
+        {
+            Debug.Log("playerId is not set");
+            return -1;
+        }
+        if (playerDetails.playerActionCounts.Count == 0)
+        {
+            Debug.Log("playerActionCounts is not set");
+            return -1;
+        }
+        if (playerDetails.duration == 0)
+        {
+            Debug.Log("duration is 0");
+            return -1;
+        }
+        return 0;
+    }
+    public void PauseMPSession()
+    {
+        PauseSPSession();
+    }
+    public void ResumeMPSession()
+    {
+        ResumeSPSession();
+    }
+    public void AddMultiPlayerAction(YipliUtils.PlayerActions action, PlayerDetails playerDetails, int count = 1)
+    {
+        Debug.Log("Adding action in current player session.");
+        if (playerDetails.playerActionCounts.ContainsKey(action))
+            playerDetails.playerActionCounts[action] = playerDetails.playerActionCounts[action] + count;
+        else
+            playerDetails.playerActionCounts.Add(action, count);
+    }
+
+    #endregion
 }

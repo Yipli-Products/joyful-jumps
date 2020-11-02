@@ -5,14 +5,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Experimental;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Audio;
-using UnityEngine.Networking;
 using System.Threading.Tasks;
-using System.Threading;
-using Firebase.Storage;
 
 public class PlayerSelection : MonoBehaviour
 {
@@ -35,15 +29,23 @@ public class PlayerSelection : MonoBehaviour
     public TextMeshProUGUI noNetworkPanelText;
     public MatSelection matSelectionScript;
     public Image profilePicImage;
-                
-
-    private List<YipliPlayerInfo> players;
+    public GameObject RemotePlayCodePanel;
+    public TextMeshProUGUI RemotePlayCodeErrorText;
+    
     private string PlayerName;
-    private YipliPlayerInfo defaultPlayer;
+
     private List<GameObject> generatedObjects = new List<GameObject>();
     private bool bIsCheckingForIntents;
     private bool bIsProfilePicLoaded = false;
     private Sprite defaultProfilePicSprite;
+
+
+    //Delegates for Firebase Listeners
+    public delegate void OnUserFound();
+    public static event OnUserFound NewUserFound;
+
+    public delegate void OnPlayerChanged();
+    public static event OnPlayerChanged DefaultPlayerChanged;
 
     public void OnEnable()
     {
@@ -51,59 +53,48 @@ public class PlayerSelection : MonoBehaviour
     }
     // When the game starts
     public void Start()
-    {
-        //Read intents and Initialize defaults
+    {    
         CheckIntentsAndInitializePlayerEnvironment();
-
-        /*
-         Flag to support mobile gamePlay. Initialize to MatMode by default.
-         If the mat is skipped later on with the 'Skip' button, 
-         the flag will be set to false, and game could be played with mobile touch.
-         */
-        currentYipliConfig.matPlayMode = true;
-
-        // Disable screen dimming
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
     //Whenever the Yipli App launches the game, the user will be found and next flow will be called automatically.
     //No need to keep retrying.
     //Start this coroutine to check for intents till a valid user is not found.
-    IEnumerator KeepCheckingForIntents()
+    IEnumerator KeepFindingUserId()
     {
+        yield return new WaitForSeconds(.5f);
         Debug.Log("Started Coroutine : KeepCheckingForIntents");
-        yield return new WaitForSeconds(0.1f);
-#if UNITY_ANDROID
-        while (true)
+        while (currentYipliConfig.userId == null || currentYipliConfig.userId.Length < 1)
         {
-            bIsCheckingForIntents = true;
+            Debug.Log("Calling CheckIntentsAndInitializePlayerEnvironment()");
 
-            //If the given panel is active, means the game is not launched from Yipli App.
-            //Keep checking after every .5f Seconds if the app is launched from Yipli App.
-            if (LaunchFromYipliAppPanel.activeSelf)
-            {
-                CheckIntentsAndInitializePlayerEnvironment();
-            }
-            yield return new WaitForSeconds(0.5f);
+            // Read intents and Initialize defaults
+            CheckIntents();
 
-            bIsCheckingForIntents = false;
+            yield return new WaitForSeconds(0.2f);
         }
-#endif
+        Debug.Log("Ending Coroutine. UserId = " + currentYipliConfig.userId);
+        StartCoroutine(InitializeAndStartPlayerSelection());
     }
 
-    async public void playPhoneHolderTutorial()
+    private void CheckIntentsAndInitializePlayerEnvironment()
+    {
+        Debug.Log("In CheckIntentsAndInitializePlayerEnvironment()");
+
+        // Read intents and Initialize defaults
+        CheckIntents();
+
+        StartCoroutine(InitializeAndStartPlayerSelection());
+    }
+
+    public void playPhoneHolderTutorial()
     {
         TurnOffAllPanelsExceptLoading();
-        Debug.Log("Starting PhoneHolder Tutorial for " + defaultPlayer.playerName);
+        Debug.Log("Starting PhoneHolder Tutorial for " + currentYipliConfig.playerInfo.playerName);
         Debug.Log("Is profilePicLoaded = " + bIsProfilePicLoaded);
-        if (!bIsProfilePicLoaded)
-        {
-            LoadingPanel.SetActive(true);
-            bIsProfilePicLoaded = await loadProfilePicAsync(profilePicImage, defaultPlayer.profilePicUrl);
-            LoadingPanel.SetActive(false);
-        }
-        playerNameText.text = "Hi, " + defaultPlayer.playerName;
-        playerNameText.gameObject.SetActive(true);
+
+        StartCoroutine(ImageUploadAndPlayerUIInit());
+
         phoneHolderInfo.SetActive(true);
         StartCoroutine(ChangeTextMessage());
     }
@@ -130,43 +121,97 @@ public class PlayerSelection : MonoBehaviour
 
         //Depending upon if Main Yipli App is installed or not, take a decision to show No user panel / or Guest User Panel
         if (false == YipliHelper.IsYipliAppInstalled())
+        {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
             GuestUserPanel.SetActive(true);
+        }
         else
         {
-            //Currently User isnt found. Start a coroutine which keeps on checking for the user details.
-            if (false == bIsCheckingForIntents)
-                StartCoroutine(KeepCheckingForIntents());
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+            RemotePlayCodePanel.SetActive(true);
+#elif UNITY_ANDROID
+            Debug.Log("Calling RedirectToYipliAppForNoUserFound()");
+            //Automatically redirect to Yipli App
+            StartCoroutine(RedirectToYipliAppForNoUserFound());     
+#endif
+        }
+    }
 
-            LaunchFromYipliAppPanel.SetActive(true);
+    IEnumerator RedirectToYipliAppForNoUserFound()
+    {
+        Debug.Log("In RedirectToYipliAppForNoUserFound()");
+
+        LaunchFromYipliAppPanel.SetActive(true);
+        yield return new WaitForSecondsRealtime(1f);
+        FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
+        yield return new WaitForSecondsRealtime(1f);
+
+        LaunchFromYipliAppPanel.SetActive(false);
+        LoadingPanel.SetActive(true);
+
+        Debug.Log("Calling KeepFindingUserId()");
+        //Currently User isnt found. Start a coroutine which keeps on checking for the user details.
+        StartCoroutine(KeepFindingUserId());
+
+        Debug.Log("Redirecting to Yipli App");
+        YipliHelper.GoToYipli();
+    }
+
+    public async void OnEnterPressedAfterCodeInput()
+    {
+        string codeEntered = RemotePlayCodePanel.GetComponentInChildren<InputField>().text;
+        if (codeEntered.Length != 6)
+        {
+            FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
+            Debug.Log("Please enter valid 6 digit code. Code : " + codeEntered);
+            RemotePlayCodeErrorText.gameObject.SetActive(true);
+            RemotePlayCodeErrorText.text = "Enter valid 6 digit code";
+        }
+        else
+        {
+            RemotePlayCodeErrorText.text = "";
+            RemotePlayCodePanel.SetActive(false);
+            LoadingPanel.SetActive(true);
+            // Write logic to check the code with the backend and retrive the UserId
+            string UserId = await FirebaseDBHandler.GetUserIdFromCode(codeEntered);
+            LoadingPanel.SetActive(false);
+            Debug.Log("Got UserId : " + UserId);
+            currentYipliConfig.userId = UserId;
+            currentYipliConfig.playerInfo = new YipliPlayerInfo();
+            currentYipliConfig.matInfo = new YipliMatInfo();
+            PlayerSelectionFlow();
         }
     }
 
     //Here default player object is filled with the intents passed.
     //If no intents found, it is filled with the device persisted default player object.
-    private void InitializeDefaultPlayer()
+    private void InitDefaultPlayer()
     {
-        //Not storing Default player in scriptable object as it would be done later.
-
-        if (defaultPlayer != null)
+        if (currentYipliConfig.playerInfo != null)
         {
             //If PlayerInfo is found in the Intents as an argument.
             //This code block will be called when the game App is launched from the Yipli app.
-            UserDataPersistence.SavePlayerToDevice(defaultPlayer);
+            UserDataPersistence.SavePlayerToDevice(currentYipliConfig.playerInfo);
         }
         else
         {
             //If there is no PlayerInfo found in the Intents as an argument.
             //This code block will be called when the game App is not launched from the Yipli app.
-            defaultPlayer = UserDataPersistence.GetSavedPlayer();
+            currentYipliConfig.playerInfo = UserDataPersistence.GetSavedPlayer();
+        }
+
+        if (currentYipliConfig.playerInfo != null)
+        {
+            //Notify the listeners to start gathering the players gamedata
+            DefaultPlayerChanged();
         }
     }
 
     //Here default player object is filled with the intents passed.
     //If no intents found, it is filled with the device persisted default player object.
-    private void InitializeDefaultMat()
+    private void InitDefaultMat()
     {
         //Not storing Default player in scriptable object as it would be done later.
-
         if (currentYipliConfig.matInfo != null)
         {
             //If PlayerInfo is found in the Intents as an argument.
@@ -179,32 +224,34 @@ public class PlayerSelection : MonoBehaviour
             //This code block will be called when the game App is not launched from the Yipli app.
             currentYipliConfig.matInfo = UserDataPersistence.GetSavedMat();
         }
+
+        if (currentYipliConfig.matInfo != null)
+        {
+            // Initiate the mat Connection in advance as it takes time to connect.
+            matSelectionScript.ValidateAndInitiateMatConnection();
+        }
     }
 
-    private void InitializeUserId()
+    private void InitUserId()
     {
-        try
+        if (currentYipliConfig.userId != null && currentYipliConfig.userId.Length > 1)
         {
-
-            if (currentYipliConfig.userId != "")
-            {
-                //If UserId is found in the Intents as an argument.
-                //This code block will be called when the game App is launched from the Yipli app.
-                UserDataPersistence.SavePropertyValue("user-id", currentYipliConfig.userId);
-                //PlayerPrefs.Save();
-            }
-            else
-            {
-                //If there is no UserId found in the Intents as an argument.
-                //This code block will be called when the game App is not launched from the Yipli app.
-                currentYipliConfig.userId = UserDataPersistence.GetPropertyValue("user-id");
-            }
+            //If UserId is found in the Intents as an argument.
+            //This code block will be called when the game App is launched from the Yipli app.
+            UserDataPersistence.SavePropertyValue("user-id", currentYipliConfig.userId);
+            //PlayerPrefs.Save();
         }
-        catch (Exception exp)
+        else
         {
-            currentYipliConfig.userId = null;
-            Debug.Log("Exception in InitializeUserId() : " + exp.Message);
-            Debug.Log("Setting User ID to null.");
+            //If there is no UserId found in the Intents as an argument.
+            //This code block will be called when the game App is not launched from the Yipli app.
+            currentYipliConfig.userId = UserDataPersistence.GetPropertyValue("user-id");
+        }
+
+        if (currentYipliConfig.userId != null && currentYipliConfig.userId.Length > 1)
+        {
+            //Trigger the database listeners as sson as the user is found
+            NewUserFound();
         }
     }
 
@@ -220,7 +267,7 @@ public class PlayerSelection : MonoBehaviour
         if (currentYipliConfig.userId == null)
         {
             Debug.Log("Returning from readIntents as no userId found.");
-            return;
+            throw new Exception("UserId is not found");
         }
 
         string pId = extras.Call<string>("getString", "pId");
@@ -228,26 +275,21 @@ public class PlayerSelection : MonoBehaviour
         string pDOB = extras.Call<string>("getString", "pDOB");
         string pHt = extras.Call<string>("getString", "pHt");
         string pWt = extras.Call<string>("getString", "pWt");
+        string pic = extras.Call<string>("getString", "pPicUrl");
         string mId = extras.Call<string>("getString", "mId");
         string mMac = extras.Call<string>("getString", "mMac");
 
-        Debug.Log("Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac);
+        Debug.Log("Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pic);
 
         if (pId != null && pName != null)
         {
-            defaultPlayer = new YipliPlayerInfo(pId, pName, pDOB, pHt, pWt);
+            currentYipliConfig.playerInfo = new YipliPlayerInfo(pId, pName, pDOB, pHt, pWt, pic);
         }
 
         if (mId != null && mMac != null)
         {
             currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac);
         }
-    }
-
-    public void Retry()
-    {
-        TurnOffAllPanels();
-        CheckIntentsAndInitializePlayerEnvironment();
     }
 
     private void TurnOffAllPanels()
@@ -275,12 +317,12 @@ public class PlayerSelection : MonoBehaviour
         LaunchFromYipliAppPanel.SetActive(false);
     }
 
-    private void CheckIntentsAndInitializePlayerEnvironment()
+    private void CheckIntents()
     {
         try
         {
             Debug.Log("In player Selection Start()");
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_EDITOR
             ReadAndroidIntents();
 #endif
         }
@@ -290,102 +332,94 @@ public class PlayerSelection : MonoBehaviour
             Debug.Log(exp.Message);
 
             currentYipliConfig.userId = null;
-            defaultPlayer = null;
+            currentYipliConfig.playerInfo = null;
         }
 
-//Fill dummy data in user/player, for testing from Editor
+        //Fill dummy data in user/player, for testing from Editor
 #if UNITY_EDITOR
-        currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
-        defaultPlayer = new YipliPlayerInfo("-M2iG0P2_UNsE2VRcU5P", "rooo", "03-01-1999", "120", "49");
-        currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
+        //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
+        //currentYipliConfig.playerInfo = new YipliPlayerInfo("-M2iG0P2_UNsE2VRcU5P", "rooo", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg");
+        //currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
 #endif
+    }
 
+    private IEnumerator InitializeAndStartPlayerSelection()
+    {
         //Setting User Id in the scriptable Object
-        InitializeUserId();
-
-        //Setting default Player in the scriptable Object
-        InitializeDefaultPlayer();
+        InitUserId();
 
         //Setting Deafult mat
-        InitializeDefaultMat();
+        InitDefaultMat();
+
+        //Setting default Player in the scriptable Object
+        InitDefaultPlayer();
 
         if (currentYipliConfig.userId == null || currentYipliConfig.userId == "")
         {
+            Debug.Log("Calling NoUserFoundInGameFlow()");
             //This code block will be called when the game App is not launched from the Yipli app even once.
             NoUserFoundInGameFlow();
         }
         else
         {
-            //setBluetoothEnabled(); // Enable the bluetooth first
-            // Initiate the mat Connection in advance as it takes time to connect.
-            matSelectionScript.ValidateAndConnectMat(); //This async call is not awaited, hence mat connection runs in the background.
+            //Wait till the listeners are synced and the data has been populated
+            Debug.Log("Waiting for players query to complete");
+            while (firebaseDBListenersAndHandlers.GetPlayersQueryStatus() == QueryStatus.InProgress)
+                yield return new WaitForSecondsRealtime(0.05f);
+            
 
-            //Stop the Coroutine which keep schecking for the intents.
-            StopCoroutine(KeepCheckingForIntents());
-
-            //Uncomment following line to always start the flow from phoneHolder panel
-            //currentYipliConfig.bIsMatIntroDone = false;
-            if (!currentYipliConfig.bIsMatIntroDone && defaultPlayer != null)
-                playPhoneHolderTutorial();
+            Debug.Log("Sync players complete");
+            if (currentYipliConfig.bIsChangePlayerCalled == true)
+            {
+                currentYipliConfig.bIsChangePlayerCalled = false;
+                PlayerSelectionFlow();
+            }
             else
-                SwitchPlayerFlow();
+            {
+                //Uncomment following line to always start the flow from phoneHolder panel
+                if (!currentYipliConfig.bIsMatIntroDone && currentYipliConfig.playerInfo != null)
+                    playPhoneHolderTutorial();
+                else
+                    SwitchPlayerFlow();
+            }
         }
     }
 
-    public async void SwitchPlayerFlow()//Call this for every StartGame()/Game Session
+    public void SwitchPlayerFlow()//Call this for every StartGame()/Game Session
     {
         Debug.Log("Checking current player.");
 
         TurnOffAllPanels();
+        LoadingPanel.SetActive(true);
 
-        if (YipliHelper.checkInternetConnection())
-        {
-            LoadingPanel.SetActive(true);
-            //Get Current player details from userId
-            defaultPlayer = await FirebaseDBHandler.GetCurrentPlayerdetails(currentYipliConfig.userId, () => { Debug.Log("Got the current player details from db."); });
-            LoadingPanel.SetActive(false);
-        }
-
-        if (defaultPlayer != null)
+        if (currentYipliConfig.playerInfo != null)
         {
             //This means we have the default Player info from backend.
             //In this case we need to call the player change screen and not the player selection screen
-            Debug.Log("Found current player : " + defaultPlayer.playerName);
-            currentYipliConfig.playerInfo = defaultPlayer;
-            UserDataPersistence.SavePlayerToDevice(currentYipliConfig.playerInfo);
+            Debug.Log("Found current player : " + currentYipliConfig.playerInfo.playerName);
 
-            //Activate the PlayerName and Image display object
-            LoadingPanel.SetActive(true);
-            if (!bIsProfilePicLoaded)
-                bIsProfilePicLoaded = await loadProfilePicAsync(profilePicImage, defaultPlayer.profilePicUrl);
-            LoadingPanel.SetActive(false);
-            playerNameText.text = "Hi, " + defaultPlayer.playerName;
-            playerNameText.gameObject.SetActive(true);
+            StartCoroutine(ImageUploadAndPlayerUIInit());
 
-            //Initiate the player change flow
-            switchPlayerPanel.SetActive(true);
+            //Since default player is there, directly go to the mat selection flow
+            matSelectionScript.MatConnectionFlow();
         }
         else //Current player not found in Db.
         {
-            if (currentYipliConfig.playerInfo == null) // If current Player isn't set in memory
-            {
-                //Force to switch player as no default player found.
-                OnSwitchPlayerPress(true);
-            }
-            else //Current player is set, call PlayerChangeFlow
-            {
-                //This means we already have the Current Player info.
-                //In this case we need to call the player change screen and not the player selection screen
-                //continueOrSwitchPlayerText.text = "Press continue to play as " + currentYipliConfig.playerInfo.playerName + ".\nIf not " + currentYipliConfig.playerInfo.playerName + ", you can switch player.";
-                LoadingPanel.SetActive(true);
-                if (!bIsProfilePicLoaded)
-                    bIsProfilePicLoaded = await loadProfilePicAsync(profilePicImage, defaultPlayer.profilePicUrl);
-                LoadingPanel.SetActive(false);
-                playerNameText.text = "Hi, " + currentYipliConfig.playerInfo.playerName;
-                playerNameText.gameObject.SetActive(true);
-                switchPlayerPanel.SetActive(true);
-            }
+            //Force to switch player as no default player found.
+            OnSwitchPlayerPress(true);
         }
+    }
+
+    private IEnumerator ImageUploadAndPlayerUIInit()
+    {
+        //Activate the PlayerName and Image display object
+        //LoadingPanel.SetActive(true);
+        if (!bIsProfilePicLoaded)
+            yield return loadProfilePicAsync(profilePicImage, currentYipliConfig.playerInfo.profilePicUrl);
+        //LoadingPanel.SetActive(false);
+        playerNameText.text = "Hi, " + currentYipliConfig.playerInfo.playerName;
+        playerNameText.gameObject.SetActive(true);
+        yield return new WaitForSecondsRealtime(0.0001f);
     }
 
     public void PlayerSelectionFlow()
@@ -402,21 +436,21 @@ public class PlayerSelection : MonoBehaviour
             }
         }
 
-        if (players.Count != 0) //Atleast 1 player found for the corresponding userId
+        if (currentYipliConfig.allPlayersInfo != null && currentYipliConfig.allPlayersInfo.Count != 0) //Atleast 1 player found for the corresponding userId
         {
-            Debug.Log("Player/s found from firebase : " + players.Count);
+            Debug.Log("Player/s found from firebase : " + currentYipliConfig.allPlayersInfo.Count);
 
             try
             {
                 Quaternion spawnrotation = Quaternion.identity;
                 Vector3 playerTilePosition = PlayersContainer.transform.localPosition;
 
-                for (int i = 0; i < players.Count; i++)
+                for (int i = 0; i < currentYipliConfig.allPlayersInfo.Count; i++)
                 {
                     GameObject PlayerButton = Instantiate(PlayerButtonPrefab, playerTilePosition, spawnrotation) as GameObject;
                     generatedObjects.Add(PlayerButton);
-                    PlayerButton.name = players[i].playerName;
-                    PlayerButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = players[i].playerName;
+                    PlayerButton.name = currentYipliConfig.allPlayersInfo[i].playerName;
+                    PlayerButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = currentYipliConfig.allPlayersInfo[i].playerName;
                     PlayerButton.transform.SetParent(PlayersContainer.transform, false);
                     PlayerButton.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(SelectPlayer);
                 }
@@ -424,7 +458,7 @@ public class PlayerSelection : MonoBehaviour
             catch (Exception exp)
             {
                 Debug.Log("Exception in Adding player : " + exp.Message);
-                Application.Quit();
+                //Application.Quit();
             }
             TurnOffAllPanels();
             playerSelectionPanel.SetActive(true);
@@ -433,12 +467,11 @@ public class PlayerSelection : MonoBehaviour
         {
             Debug.Log("No player found from firebase.");
             TurnOffAllPanels();
-            //zeroPlayersText.text = "No players found. Create a player from the YIPLI app to continue playing.";
             zeroPlayersPanel.SetActive(true);
         }
     }
 
-    async public void SelectPlayer()
+    public void SelectPlayer()
     {
         playerSelectionPanel.SetActive(false);
         FindObjectOfType<YipliAudioManager>().Play("ButtonClick");
@@ -454,21 +487,25 @@ public class PlayerSelection : MonoBehaviour
 
         //Changing the currentSelected player in the Scriptable object
         //No Making this player persist in the device. This will be done on continue press.
-        defaultPlayer = GetPlayerInfoFromPlayerName(PlayerName);
-        LoadingPanel.SetActive(true);
-        bIsProfilePicLoaded = await loadProfilePicAsync(profilePicImage, defaultPlayer.profilePicUrl);
-        LoadingPanel.SetActive(false);
-        playerNameText.text = "Hi, " + PlayerName;
-        playerNameText.gameObject.SetActive(true);
+        currentYipliConfig.playerInfo = GetPlayerInfoFromPlayerName(PlayerName);
+
+        //Save the player to device
+        UserDataPersistence.SavePlayerToDevice(currentYipliConfig.playerInfo);
+
+        //Trigger the GetGameData for new player.
+        DefaultPlayerChanged();
+
+        StartCoroutine(ImageUploadAndPlayerUIInit());
 
         TurnOffAllPanels();
         switchPlayerPanel.SetActive(true);
     }
+
     private YipliPlayerInfo GetPlayerInfoFromPlayerName(string playerName)
     {
-        if (players.Count > 0)
+        if (currentYipliConfig.allPlayersInfo.Count > 0)
         {
-            foreach (YipliPlayerInfo player in players)
+            foreach (YipliPlayerInfo player in currentYipliConfig.allPlayersInfo)
             {
                 Debug.Log("Found player : " + player.playerName);
                 if (player.playerName == playerName)
@@ -485,65 +522,32 @@ public class PlayerSelection : MonoBehaviour
         return null;
     }
 
+
+    /* player selection is done. 
+     * This function takes the flow to Mat connection */
     public void OnContinuePress()
     {
         Debug.Log("Continue Pressed.");
         TurnOffAllPanels();
-
-        if (defaultPlayer != null)
-        {
-            if (defaultPlayer.playerId.Equals(currentYipliConfig.playerInfo.playerId))
-            {
-                //No need to change player in the backend, as its already the default player there.
-                Debug.Log("Continuing as " + currentYipliConfig.playerInfo.playerName);
-                Debug.Log("Not changing the default player in the backend, as it is the same");
-            }
-            else
-            {
-                currentYipliConfig.playerInfo = defaultPlayer;
-                UserDataPersistence.SavePlayerToDevice(currentYipliConfig.playerInfo);
-
-                //Make new default player persist to the backend as well, so that it gets reflected in the Yipli App as well.
-                if (YipliHelper.checkInternetConnection())
-                {
-                    Debug.Log("Chaning the defualt player in the backend to " + currentYipliConfig.playerInfo.playerName);
-                    FirebaseDBHandler.ChangeCurrentPlayerInBackend(currentYipliConfig.userId, currentYipliConfig.playerInfo.playerId, () => { Debug.Log("Changed the default player in the backend"); });
-                }
-            }
-        }
-        else
-        {
-            Debug.Log("Chaning the defualt player in the backend to " + currentYipliConfig.playerInfo.playerName);
-            //Make new default player persist to the backend as well, so that it gets reflected in the Yipli App as well.
-            if (YipliHelper.checkInternetConnection())
-            {
-                FirebaseDBHandler.ChangeCurrentPlayerInBackend(currentYipliConfig.userId, currentYipliConfig.playerInfo.playerId, () => { Debug.Log("Changed the default player in the backend"); });
-            }
-        }
         matSelectionScript.MatConnectionFlow();
     }
 
     public void OnJumpOnMat()
     {
-        LoadingPanel.SetActive(true);
         currentYipliConfig.bIsMatIntroDone = true;
         phoneHolderInfo.SetActive(false);
         StopCoroutine(ChangeTextMessage());
         SwitchPlayerFlow();
     }
 
-    public async void OnSwitchPlayerPress(bool isInternalCall = false /* If called internally that means no default player found.*/)
+    public void OnSwitchPlayerPress(bool isInternalCall = false /* If called internally that means no default player found.*/)
     {
         TurnOffAllPanels();
 
         if (!YipliHelper.checkInternetConnection())
         {
-            // Network not available. Only default player allowed to play.
-            Debug.Log("Network not available. Only default player allowed to play.");
-            players = null;
-
             //If default player also not available, then show no players panel.
-            if (defaultPlayer != null)
+            if (currentYipliConfig.playerInfo != null)
             {
                 //noNetworkPanelText.text = "No active network connection. Cannot switch player. Press continue to play as " + defaultPlayer.playerName;
                 noNetworkPanel.SetActive(true);
@@ -553,23 +557,17 @@ public class PlayerSelection : MonoBehaviour
                 //Default player is not there.
                 zeroPlayersPanel.SetActive(true);
             }
-
         }
         else//Active Network connection is available
         {
-            LoadingPanel.SetActive(true);
-            players = await FirebaseDBHandler.GetAllPlayerdetails(currentYipliConfig.userId, () => { Debug.Log("Got the player details from db"); });
-            LoadingPanel.SetActive(false);
-
             //In case of internall call
-            //This is to handle if the current-player-id is currupted in the backend
+            //This is to handle if the default player isn't set
             if (isInternalCall)
             {
-                //This means no default player is present.
-                //Show all the players for selection.
+                //This means no default player is present.Show all the players for selection.
                 //Whichever gets selected, will become the default player later.
                 //First check if the players count under userId is more than 0?
-                if (players != null && players.Count > 0)
+                if (currentYipliConfig.allPlayersInfo != null && currentYipliConfig.allPlayersInfo.Count > 0)
                 {
                     Debug.Log("Calling the PlayerSelectionFlow");
                     PlayerSelectionFlow();
@@ -583,7 +581,7 @@ public class PlayerSelection : MonoBehaviour
             else
             {
                 //First check if the players count under userId is more than 1 ?
-                if (players != null && players.Count > 1)
+                if (currentYipliConfig.allPlayersInfo != null && currentYipliConfig.allPlayersInfo.Count > 1)
                 {
                     PlayerSelectionFlow();
                 }
@@ -607,30 +605,29 @@ public class PlayerSelection : MonoBehaviour
         switchPlayerPanel.SetActive(true);
     }
 
-    public void setBluetoothEnabled()
-    {
-        using (AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity"))
-        {
-            try
-            {
-                using (var BluetoothManager = activity.Call<AndroidJavaObject>("getSystemService", "bluetooth"))
-                {
-                    using (var BluetoothAdapter = BluetoothManager.Call<AndroidJavaObject>("getAdapter"))
-                    {
-                        BluetoothAdapter.Call("enable");
-                    }
+    //public void setBluetoothEnabled()
+    //{
+    //    using (AndroidJavaObject activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity"))
+    //    {
+    //        try
+    //        {
+    //            using (var BluetoothManager = activity.Call<AndroidJavaObject>("getSystemService", "bluetooth"))
+    //            {
+    //                using (var BluetoothAdapter = BluetoothManager.Call<AndroidJavaObject>("getAdapter"))
+    //                {
+    //                    BluetoothAdapter.Call("enable");
+    //                }
+    //            }
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            Debug.Log(e);
+    //            Debug.Log("could not enable the bluetooth automatically");
+    //        }
+    //    }
+    //}
 
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-                Debug.Log("could not enable the bluetooth automatically");
-            }
-        }
-    }
-
-    async private Task<bool> loadProfilePicAsync(Image gameObj, string profilePicUrl)
+    async private Task loadProfilePicAsync(Image gameObj, string profilePicUrl)
     {
         if (profilePicUrl == null || profilePicUrl == "" || gameObj == null)
         {
@@ -646,7 +643,7 @@ public class PlayerSelection : MonoBehaviour
             if (downloadedSprite != null)
             {
                 gameObj.sprite = downloadedSprite;
-                return true;
+                bIsProfilePicLoaded = true;
             }
             else
             {
@@ -654,6 +651,6 @@ public class PlayerSelection : MonoBehaviour
                 gameObj.sprite = defaultProfilePicSprite;
             }
         }
-        return false;
+        bIsProfilePicLoaded = false;
     }
 }

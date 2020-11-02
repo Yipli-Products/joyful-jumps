@@ -23,7 +23,7 @@ public class PauseScreen : MonoBehaviour
 
     public virtual void ResumeGame()
     {
-        if (YipliHelper.GetBleConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        if (YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.ResumeSPSession();
@@ -31,7 +31,7 @@ public class PauseScreen : MonoBehaviour
             if (UnityFitmatBridge.Instance != null)
                 UnityFitmatBridge.Instance.EnableGameInput();
             Destroy(gameObject);
-        }
+        } 
     }
 
     public virtual void RestartGame()

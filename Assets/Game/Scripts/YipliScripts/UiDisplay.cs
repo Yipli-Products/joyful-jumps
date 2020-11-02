@@ -6,7 +6,7 @@ public class UiDisplay : MonoBehaviour
 {
     void Start()
     {
-        if (!PlayerSession.Instance.currentYipliConfig.matPlayMode)
+        if (!PlayerSession.Instance.currentYipliConfig.onlyMatPlayMode)
         {
             gameObject.SetActive(true);
         }

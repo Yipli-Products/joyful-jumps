@@ -15,6 +15,11 @@ public class MenuScreen : MonoBehaviour
 
     public PlayerGameData playerGameData;
 
+    private void Awake()
+    {
+        PlayerSession.Instance.SetGameId("joyfuljumps");
+    }
+
     private void OnEnable()
     {
         ResetGamePopup.OnGameReset += UpdateLevel;
@@ -25,12 +30,12 @@ public class MenuScreen : MonoBehaviour
         ResetGamePopup.OnGameReset -= UpdateLevel;
     }
 
-    private async void Start()
+    private void Start()
     {
         if (YipliHelper.checkInternetConnection())
         {
             PlayerSession.Instance.LoadingScreenSetActive(true);
-            PlayerGameData tempData = await GameDataHandler.GetPlayerData();
+            PlayerGameData tempData = GameDataHandler.GetPlayerData();
             print("Task recieved");
             playerGameData.SetTotalScore(tempData.GetTotalScore());
             playerGameData.SetCurrentLevel(tempData.GetCurrentLevel());
@@ -74,7 +79,7 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
-        if (YipliHelper.GetBleConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
             if (playerGameData.GetCurrentLevel() == 0)
                 LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
@@ -86,6 +91,7 @@ public class MenuScreen : MonoBehaviour
             PlayerData.JumpStep = 0;
             PlayerData.FallCount = 0;
         }
+
     }
 
     void UpdateLevel()

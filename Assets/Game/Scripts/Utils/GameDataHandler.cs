@@ -25,10 +25,10 @@ public class GameDataHandler
 
     //}
 
-    public static async Task<PlayerGameData> GetPlayerData()
+    public static PlayerGameData GetPlayerData()
     {
         PlayerGameData data = new PlayerGameData();
-        DataSnapshot dataSnapshot = await PlayerSession.Instance.GetGameData("joyfuljumps");
+        DataSnapshot dataSnapshot = PlayerSession.Instance.GetGameData();
         try
         {
             if (dataSnapshot.Value != null)
