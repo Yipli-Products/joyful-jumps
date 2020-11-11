@@ -131,10 +131,15 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             // Json parse FMResponse to get the input.
             FmDriverResponseInfo singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
 
-            if (FMResponseCount != singlePlayerResponse.count)
+            if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE)))
+            {
+                OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE));
+            }
+
+            if (PlayerSession.Instance.currentYipliConfig.oldFMResponseCount != singlePlayerResponse.count)
             {
                 Debug.Log("FMResponse " + fmActionData);
-                FMResponseCount = singlePlayerResponse.count;
+                PlayerSession.Instance.currentYipliConfig.oldFMResponseCount = singlePlayerResponse.count;
 
                 //Handle "Running" case seperately to read the exta properties sent.
                 if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING)))
@@ -164,6 +169,10 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                     }
                 }
                 OnGotActionFromBridge?.Invoke(singlePlayerResponse.playerdata[0].fmresponse.action_id);
+            }
+            else
+            {
+                OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
             }
         }
         catch(Exception exp)

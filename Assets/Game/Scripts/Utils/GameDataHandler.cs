@@ -33,7 +33,7 @@ public class GameDataHandler
         {
             if (dataSnapshot.Value != null)
             {
-                data.SetTotalScore(int.Parse(dataSnapshot.Child("reward-coins").Value?.ToString()));
+                data.SetTotalScore(int.Parse(dataSnapshot.Child("reward-points").Value?.ToString()));
                 data.SetCurrentLevel(int.Parse(dataSnapshot.Child("current-level").Value?.ToString()));
             }
             else

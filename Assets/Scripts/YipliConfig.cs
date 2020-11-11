@@ -39,4 +39,10 @@ public class YipliConfig : ScriptableObject
 
     [HideInInspector]
     public bool bIsInternetConnected;
+
+    [HideInInspector]
+    public YipliInventoryGameInfo gameInventoryInfo;
+
+    [HideInInspector]
+    public int oldFMResponseCount;
 }

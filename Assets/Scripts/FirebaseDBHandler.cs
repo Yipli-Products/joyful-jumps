@@ -21,6 +21,30 @@ public static class FirebaseDBHandler
     public delegate void PostUserCallback();
 
     /* The function call to be allowed only if network is available */
+    public static async Task<YipliInventoryGameInfo> GetGameInfo(string gameId)
+    {
+        YipliInventoryGameInfo gameInfo = new YipliInventoryGameInfo();
+        DataSnapshot snapshot = null;
+        try
+        {
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+            newUser.DisplayName, newUser.UserId);
+
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            snapshot = await reference.Child("inventory/games").Child(gameId).GetValueAsync();
+            gameInfo = new YipliInventoryGameInfo(snapshot);
+        }
+        catch (Exception exp)
+        {
+            Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+        }
+
+        return gameInfo ;
+    }
+
+    /* The function call to be allowed only if network is available */
     public static async Task<string> GetUserIdFromCode(string code)
     {
         string userId = "";
@@ -105,29 +129,6 @@ public static class FirebaseDBHandler
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             }));
-        });
-    }
-
-    public static async Task UpdateGameDataWithoutGamePlay(string strUserId, string strPlayerId, string strGameId, Dictionary<string, object> dGameData, PostUserCallback callback)
-    {
-        await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
-        {
-            if (task.IsCanceled)
-            {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
-                return;
-            }
-            if (task.IsFaulted)
-            {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
-                return;
-            }
-            Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
-            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
-            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
-            await reference.Child("profiles/users/" + strUserId).Child("players").Child(strPlayerId).Child("activity-statistics/games-statistics").Child(strGameId).Child("game-data").UpdateChildrenAsync(dGameData);
         });
     }
 
@@ -413,7 +414,7 @@ public static class FirebaseDBHandler
 
     /* The function to store game data to backend without gamePlay. 
     * This is to be called by your games shop manager module.*/
-    public static async Task UpdateStoreData(string strUserId, string strPlayerId, string strGameId, Dictionary<string, object> dStoreData, PostUserCallback callback)
+    public static async void UpdateStoreData(string strUserId, string strPlayerId, string strGameId, Dictionary<string, object> dStoreData, PostUserCallback callback)
     {
         await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
         {
@@ -432,7 +433,7 @@ public static class FirebaseDBHandler
                 newUser.DisplayName, newUser.UserId);
             FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
-            await reference.Child("profiles/users/" + strUserId).Child("players").Child(strPlayerId).Child("activity-statistics/games-statistics").Child(strGameId).Child("game-data").UpdateChildrenAsync(dStoreData);
+            await reference.Child("fgd/" + strUserId).Child(strPlayerId).Child(strGameId).UpdateChildrenAsync(dStoreData);
         });
     }
 

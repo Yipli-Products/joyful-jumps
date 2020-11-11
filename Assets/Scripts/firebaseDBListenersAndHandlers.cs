@@ -23,6 +23,9 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     //Track if the query exection is completed or not
     private static QueryStatus getDefaultMatQueryStatus = global::QueryStatus.NotStarted;
 
+    //Track if the query exection is completed or not
+    private static QueryStatus getGameInfoQueryStatus = global::QueryStatus.NotStarted;
+
     public static QueryStatus GetPlayersQueryStatus()
     {
         return getAllPlayersQureyStatus;
@@ -32,6 +35,12 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         return getDefaultMatQueryStatus;
     }
+
+    public static QueryStatus GetGameInfoQueryStatus()
+    {
+        return getGameInfoQueryStatus;
+    }
+
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -44,8 +53,30 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         PlayerSelection.DefaultPlayerChanged += addGameDataListener;
 
         PlayerSession.NewMatFound += addDefaultMatIdListener;
+        PlayerSelection.GetGameInfo += addListnerForGameInfo;
 
         StartCoroutine(TrackNetworkConnectivity());
+
+    }
+
+    private  async void addListnerForGameInfo()
+    {
+        Debug.Log("addGetPlayersListener invoked");
+        await anonAuthenticate();
+        FirebaseDatabase.DefaultInstance
+        .GetReference("inventory/games/" + currentYipliConfig.gameId)
+        .ValueChanged += HandleGameInfoValueChanged;
+    }
+
+    private void HandleGameInfoValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        getGameInfoQueryStatus = global::QueryStatus.InProgress;
+        if(e.Snapshot.Value != null)
+            currentYipliConfig.gameInventoryInfo = new YipliInventoryGameInfo(e.Snapshot);
+        {
+            Debug.Log("Invalid Game. Nothing found at specified path.");
+        }
+        getGameInfoQueryStatus = global::QueryStatus.Completed;
     }
 
     private IEnumerator TrackNetworkConnectivity()
@@ -162,7 +193,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
         if (!currentYipliConfig.gameId.Equals("default") || currentYipliConfig.gameId.Length > 1)
             FirebaseDatabase.DefaultInstance
-            .GetReference("profiles/users/" + currentYipliConfig.userId + "/players/" + currentYipliConfig.playerInfo.playerId + "/activity-statistics/games-statistics/" + currentYipliConfig.gameId + "/game-data")
+            .GetReference("fgd/" + currentYipliConfig.userId + "/" + currentYipliConfig.playerInfo.playerId + "/" + currentYipliConfig.gameId)
             .ValueChanged += HandleGameDataValueChanged;
     }
 

@@ -167,6 +167,7 @@ public class InputController : PersistentSingleton<InputController>
         {
             Debug.Log("Failed to get GameId : " + exp.Message);
         }
+
         if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.JUMP), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Jump);
@@ -176,7 +177,6 @@ public class InputController : PersistentSingleton<InputController>
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
         }
-
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Running);
@@ -192,15 +192,22 @@ public class InputController : PersistentSingleton<InputController>
             Debug.Log("Recieved Pause in InputController. Processing it.");
             SetMove(Move.KeyPause);
         }
-
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.LEFT), StringComparison.OrdinalIgnoreCase))
+        {
             SetKeyMove(MatKey.KeyLeft);
-
+        }
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RIGHT), StringComparison.OrdinalIgnoreCase))
+        {
             SetKeyMove(MatKey.KeyRight);
-
+        }
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.ENTER), StringComparison.OrdinalIgnoreCase))
+        {
             SetKeyMove(MatKey.KeyEnter);
+        }
+        else
+        {
+            SetMove(Move.StopRunning);
+        }
 
         _lastMatData = data;
     }
@@ -217,5 +224,10 @@ public class InputController : PersistentSingleton<InputController>
     protected virtual void SetKeyMove(MatKey move)
     {
         OnGotKey?.Invoke(move);
+    }
+
+    public void SetRunningStopMove()
+    {
+        SetMove(Move.StopRunning);
     }
 }

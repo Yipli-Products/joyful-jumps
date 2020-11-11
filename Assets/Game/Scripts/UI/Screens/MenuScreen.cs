@@ -48,7 +48,7 @@ public class MenuScreen : MonoBehaviour
         }
         
         levelIndex.text = "" + (playerGameData.GetCurrentLevel() + 1 );
-        coinsEarned.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
+        coinsEarned.text = string.Format("Points : {0}", playerGameData.GetTotalScore());
         playerName.text = PlayerSession.Instance.GetCurrentPlayer();
     }
 

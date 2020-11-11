@@ -31,10 +31,11 @@ SpriteAtlas:
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: c117a8d18d5456d44a8c30fff9e6ac56, type: 3}
-    totalSpriteSurfaceArea: 877447
+    totalSpriteSurfaceArea: 894281
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: 3cb77161f22fee44db27f54d6a751af9, type: 3}
   - {fileID: 21300000, guid: 60f80f22446258942ade6a0ca1b1393a, type: 3}
   - {fileID: 21300000, guid: 0319e9b33bae8414c9ca3e93b94d89af, type: 3}
   - {fileID: 21300000, guid: fef422146eeb2c84393ee44faea530c6, type: 3}
@@ -44,6 +45,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: d362d595df027bd4fb3b1e33de30f507, type: 3}
   - {fileID: 21300000, guid: fa60cde50515a334ab96754d5e13e4d7, type: 3}
   - {fileID: 21300000, guid: ecf58816c2608ec49b2fb5810a58f43f, type: 3}
+  - {fileID: 21300000, guid: 40549d86fa44b8b45924d657b45eac8e, type: 3}
   - {fileID: 21300000, guid: 134e529773da5ba419784481804badad, type: 3}
   - {fileID: 21300000, guid: a7549bb71b5b1bc4cac893edb164ad55, type: 3}
   - {fileID: 21300000, guid: 64cbfa099ae700d4bba8fb75a81ec1ab, type: 3}
@@ -65,6 +67,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 15b3ba0f34912b94288f814c1bb55168, type: 3}
   - {fileID: 21300000, guid: ff22bb9f4406dc348aeca3a0753321bd, type: 3}
   m_PackedSpriteNamesToIndex:
+  - Button_Tap new
   - Jump_Text
   - Pause
   - Button
@@ -74,6 +77,7 @@ SpriteAtlas:
   - LeftArrow
   - Button_Popup
   - Foot
+  - Button_Tap old
   - Mat
   - Settings
   - NextLevel

@@ -397,7 +397,7 @@ public class LevelManager : Singleton<LevelManager>
                 if (YipliHelper.checkInternetConnection())
                 {
                     Dictionary<string, string> gameData = new Dictionary<string, string>();
-                    gameData.Add("reward-coins", playerGameData.GetTotalScore().ToString());
+                    gameData.Add("reward-points", playerGameData.GetTotalScore().ToString());
                     gameData.Add("current-level", playerGameData.GetCurrentLevel().ToString());
                     PlayerSession.Instance.UpdateGameData(gameData);
                 }

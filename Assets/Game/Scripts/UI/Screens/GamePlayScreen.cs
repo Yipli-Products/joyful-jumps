@@ -42,7 +42,7 @@ public class GamePlayScreen : MonoBehaviour
     private void Start()
     {
         current_level_text.text = string.Format("Level : {0}", playerGameData.GetCurrentLevel() + 1);
-        current_reward_text.text = string.Format("Coins : {0}", playerGameData.GetTotalScore());
+        current_reward_text.text = string.Format("Points : {0}", playerGameData.GetTotalScore());
         StartCoroutine(BluetoothCheck());
     }
 
