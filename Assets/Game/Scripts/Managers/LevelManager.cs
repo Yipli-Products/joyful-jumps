@@ -1,11 +1,9 @@
 ﻿using Cinemachine;
-using Firebase.Database;
 using GodSpeedGames.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public enum Difficulty
@@ -421,7 +419,7 @@ public class LevelManager : Singleton<LevelManager>
 
         UiManager.Instance.LoadUI(UiManager.SCREEN.GameOverScreen);
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
 
         Player.ConditionState.ChangeState(CharacterStates.CharacterConditions.Normal);
         cutscene.PlayEndCutSceneJump();

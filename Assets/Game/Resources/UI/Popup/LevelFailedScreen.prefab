@@ -222,7 +222,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 112.8}
+  m_AnchoredPosition: {x: 0, y: -109}
   m_SizeDelta: {x: -108.5, y: -260.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &408669614813177341
@@ -263,7 +263,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00024414062, y: -84}
+  m_AnchoredPosition: {x: -0.00024414062, y: 24}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1627687556994048352
@@ -456,12 +456,12 @@ MonoBehaviour:
     rgba: 4293256677
   m_fontColor: {r: 0.8980393, g: 0.8980393, b: 0.8980393, a: 1}
   m_enableVertexGradient: 1
-  m_colorMode: 3
+  m_colorMode: 0
   m_fontColorGradient:
-    topLeft: {r: 0.39215687, g: 0.76862746, b: 0.8784314, a: 1}
-    topRight: {r: 0.39607844, g: 0.77254903, b: 0.8784314, a: 1}
-    bottomLeft: {r: 0, g: 0.015686275, b: 0.49019608, a: 1}
-    bottomRight: {r: 0, g: 0.019607844, b: 0.49411765, a: 1}
+    topLeft: {r: 0.20392159, g: 0.121568635, b: 0.41176474, a: 1}
+    topRight: {r: 0.20392159, g: 0.121568635, b: 0.41176474, a: 1}
+    bottomLeft: {r: 0.20392159, g: 0.121568635, b: 0.41176474, a: 1}
+    bottomRight: {r: 0.20392159, g: 0.121568635, b: 0.41176474, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -1466,8 +1466,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1712,8 +1712,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.000030517578, y: 0}
-  m_SizeDelta: {x: 180, y: 4}
+  m_AnchoredPosition: {x: 0.000030517578, y: 84}
+  m_SizeDelta: {x: 400, y: 4}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &2634858771021573498
 CanvasRenderer:
@@ -1846,8 +1846,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

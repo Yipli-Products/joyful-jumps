@@ -53,8 +53,8 @@ public class TutorialScreen : MonoBehaviour
         if (animparameter !=  "none")
         {
             if (!animationHolder.activeInHierarchy)
-                animationHolder.SetActive(true);
-            _animationAnimator.SetTrigger(animparameter);
+                animationHolder.SetActive(false);
+            //_animationAnimator.SetTrigger(animparameter);
         }
         else
         {

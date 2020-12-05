@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using yipli.Windows;
 
 public static class YipliHelper
 {
@@ -72,6 +73,8 @@ public static class YipliHelper
             Debug.Log(e);
             Application.OpenURL("market://details?id=" + yipliAppBundleId);
         }
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+        FileReadWrite.OpenYipliApp();
 #else
         Debug.Log("Unsupported os");
 #endif

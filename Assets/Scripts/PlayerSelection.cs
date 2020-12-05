@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using yipli.Windows;
 
 public class PlayerSelection : MonoBehaviour
 {
@@ -373,22 +374,29 @@ public class PlayerSelection : MonoBehaviour
 #if UNITY_ANDROID || UNITY_EDITOR
             ReadAndroidIntents();
 #endif
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            ReadFromWindowsFile();
+#endif
         }
         catch (System.Exception exp)// handling of game directing opening, without yipli app
         {
             Debug.Log("Exception occured in GetIntent!!!");
             Debug.Log(exp.Message);
-
             currentYipliConfig.userId = null;
             currentYipliConfig.playerInfo = null;
         }
-
         //Fill dummy data in user/player, for testing from Editor
 #if UNITY_EDITOR
-        currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
+        //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1";
         //currentYipliConfig.playerInfo = new YipliPlayerInfo("-M2iG0P2_UNsE2VRcU5P", "rooo", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg");
-        currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
+        //currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
 #endif
+    }
+
+    private void ReadFromWindowsFile()
+    {
+        currentYipliConfig.userId = FileReadWrite.ReadFromFile();
+        currentYipliConfig.playerInfo = null;
     }
 
     private IEnumerator InitializeAndStartPlayerSelection()

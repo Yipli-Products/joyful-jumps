@@ -51,20 +51,19 @@ public class MatSelection : MonoBehaviour
         bIsMatFlowInitialized = true;
         NoMatPanel.SetActive(false);
         StopCoroutine(ConnectMatAndLoadGameScene());
-
         //Bypass mat connection in Unity Editor
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            if (!bIsGameMainSceneLoading)
-                StartCoroutine(LoadMainGameScene());
-        }
-
+        /*
+#if UNITY_EDITOR
+        if (!bIsGameMainSceneLoading)
+            StartCoroutine(LoadMainGameScene());
+#endif
+        */
+#if UNITY_ANDROID
         if (currentYipliConfig.matInfo == null)
         {
             Debug.Log("Filling te current mat Info from Device saved MAT");
             currentYipliConfig.matInfo = UserDataPersistence.GetSavedMat();
         }
-
         if (currentYipliConfig.matInfo != null)
         {
             Debug.Log("Mac Address : " + currentYipliConfig.matInfo.macAddress);
@@ -79,11 +78,22 @@ public class MatSelection : MonoBehaviour
         }
         else //Current Mat not found in Db.
         {
+            loadingPanel.SetActive(false);
             Debug.Log("No Mat found in cache.");
             noMatText.text = "Register the YIPLI fitness mat from Yipli Hub to continue playing.";
             NoMatPanel.SetActive(true);
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
+#else
+        Debug.LogError("from MatConnectionFlow #else");
+        if (InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!bIsGameMainSceneLoading)
+                StartCoroutine(LoadMainGameScene());
+        }
+        else
+            StartCoroutine(ConnectMatAndLoadGameScene());
+#endif
     }
 
     public void ReCheckMatConnection()
@@ -226,10 +236,8 @@ public class MatSelection : MonoBehaviour
 
     private void InitiateMatConnection()
     {
-        Debug.Log("connecting to : " + currentYipliConfig.matInfo.matName);
-
         //Initiate the connection with the mat.
-        InitBLE.InitBLEFramework(currentYipliConfig.matInfo.macAddress, 0);
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
     }
 
     public void OnGoToYipliPress()

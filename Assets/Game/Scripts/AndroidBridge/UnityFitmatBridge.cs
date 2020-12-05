@@ -22,6 +22,8 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     private static bool normalInput = false;
 
+    private bool bIsInputRevieved = false;
+
 
     public void EnableGameInput()
     {
@@ -98,9 +100,12 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
     {
         try
         {
-            string fmActionData = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
+            string fmActionData = InitBLE.GetFMResponse();
 
-            Debug.Log("Json Data from Fmdriver : " + fmActionData);
+            Debug.LogError("ClusterID : " + YipliHelper.GetGameClusterId());
+            Debug.LogError("Json Data from Fmdriver : " + fmActionData);
+
+            ///if (fmActionData == "No input yet!") return;
 
             /* New FmDriver Response Format
                {
@@ -133,17 +138,20 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
             if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE)))
             {
-                OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE));
+                bIsInputRevieved = true;
+                   OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE));
             }
 
             if (PlayerSession.Instance.currentYipliConfig.oldFMResponseCount != singlePlayerResponse.count)
             {
+                bIsInputRevieved = true;
                 Debug.Log("FMResponse " + fmActionData);
                 PlayerSession.Instance.currentYipliConfig.oldFMResponseCount = singlePlayerResponse.count;
 
                 //Handle "Running" case seperately to read the exta properties sent.
                 if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING)))
                 {
+                    bIsInputRevieved = true;
                     ///CheckPoint for the running action properties.
                     if (singlePlayerResponse.playerdata[0].fmresponse.properties.ToString() != "null")
                     {
@@ -172,7 +180,9 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             }
             else
             {
-                OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
+                bIsInputRevieved = false;
+                StartCoroutine(ExecutePlayerStop());
+                //OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
             }
         }
         catch(Exception exp)
@@ -201,6 +211,18 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             }
         }
         */
+
+        // passed frame test
+        //Debug.LogError("total frames : " + (Time.frameCount % 5 == 0));
+    }
+
+    private IEnumerator ExecutePlayerStop()
+    {
+        yield return new WaitForSecondsRealtime(0.2f);
+        if (false == bIsInputRevieved)
+        {
+            OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
+        }
     }
 
     protected virtual void FixedUpdate()
