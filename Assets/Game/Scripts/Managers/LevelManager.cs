@@ -63,6 +63,9 @@ public class LevelManager : Singleton<LevelManager>
     private bool _startTimer = false;
     private bool _gameOver = false;
 
+    public bool isPlayerDiedByFalling = false;
+    public bool isTimerRunning = false;
+
     public PlayerGameData playerGameData;
 
     protected override void Awake()
@@ -152,6 +155,7 @@ public class LevelManager : Singleton<LevelManager>
         InputController.Instance.EnableInput();
 
         level_fresh_start = true;
+        isTimerRunning = true;
 
         while (!_gameOver)
         {
@@ -174,7 +178,6 @@ public class LevelManager : Singleton<LevelManager>
 
     protected virtual void Initialization()
     {
-
         EnableVirtualCameras();
         SetupLevelBlocks();
 
@@ -185,6 +188,7 @@ public class LevelManager : Singleton<LevelManager>
         CurrentCheckPoint = Checkpoints.Count > 0 ? Checkpoints[0] : null;
 
         _startTimer = false;
+        isPlayerDiedByFalling = false;
     }
 
     protected virtual void SetupLevelBlocks()
@@ -361,9 +365,9 @@ public class LevelManager : Singleton<LevelManager>
             OnGameEvent?.Invoke(GSGGameEvent.PlayerDead);
             characterHealth.Kill(isFloor);
 
-            StopCoroutine("RunGameTimer");
-            StopCoroutine("SoloModeRestart");
-            StartCoroutine("SoloModeRestart");
+            StopCoroutine(RunGameTimer());
+            StopCoroutine(SoloModeRestart());
+            StartCoroutine(SoloModeRestart());
         }
     }
 
@@ -390,6 +394,10 @@ public class LevelManager : Singleton<LevelManager>
             int totalRewardPoint = playerGameData.GetTotalScore() + tracker.totalPointsEarned;
             playerGameData.SetTotalScore(totalRewardPoint);
             playerGameData.SetCurrentLevel(playerGameData.GetCurrentLevel() + 1);
+
+            StopCoroutine(PlayEndCutScene());
+            StartCoroutine(PlayEndCutScene());
+
             if (PlayerSession.Instance != null)
             {
                 if (YipliHelper.checkInternetConnection())
@@ -399,11 +407,16 @@ public class LevelManager : Singleton<LevelManager>
                     gameData.Add("current-level", playerGameData.GetCurrentLevel().ToString());
                     PlayerSession.Instance.UpdateGameData(gameData);
                 }
+
+                // add running action here
+                if (PlayerSession.Instance != null)
+                {
+                    PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
+                    UnityFitmatBridge.Instance.CurrentStepCount = 0;
+                }
+
                 PlayerSession.Instance.StoreSPSession(tracker.totalPointsEarned);
             }
-
-            StopCoroutine("PlayEndCutScene");
-            StartCoroutine("PlayEndCutScene");
         }
     }
 
@@ -461,12 +474,11 @@ public class LevelManager : Singleton<LevelManager>
     /// <returns>The player co.</returns>
     protected virtual IEnumerator SoloModeRestart()
     {
-
         //TODO: check for maximum lives and game over
 
         InputController.Instance.DisableInput();
 
-        yield return new WaitForSeconds(RespawnDelay);
+        yield return new WaitForSecondsRealtime(RespawnDelay);
 
         DisableVirtualCameras();
         LoadingManager.Instance.ShowFadeInFadeOut();
@@ -482,13 +494,31 @@ public class LevelManager : Singleton<LevelManager>
             CurrentCheckPoint.SpawnPlayer(Player);
         }
 
+        Debug.LogError("isPlayerDiedByFalling : " + isPlayerDiedByFalling);
+
+        /*
+        if (isPlayerDiedByFalling)
+        {
+            //Initialization();
+        }
+
+        while (isPlayerDiedByFalling)
+        {
+            Debug.LogError("waitng for isPlayerDiedByFalling to turn false : " + isPlayerDiedByFalling);
+            yield return new WaitForSecondsRealtime(0.1f);
+        }
+        */
+
         EnableVirtualCameras();
         OnGameEvent?.Invoke(GSGGameEvent.PlayerRespawn);
-        if (!testBlockFuntions)
-            StartCoroutine("RunGameTimer");
+
+        if (!testBlockFuntions && !isTimerRunning)
+        {
+            StartCoroutine(RunGameTimer());
+        }
 
         yield return new WaitForSeconds(1.5f);
-        // InputController.Instance.EnableInput();
+        InputController.Instance.EnableInput();
     }
 
     protected virtual void SpawnCharacter()

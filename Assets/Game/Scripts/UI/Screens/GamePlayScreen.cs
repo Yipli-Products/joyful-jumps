@@ -62,6 +62,7 @@ public class GamePlayScreen : MonoBehaviour
 
     public void ClickOnPause()
     {
+        UnityFitmatBridge.Instance.IsGamePaused = true;
         UiManager.Instance.LoadPopup(UiManager.Popup.PauseScreen);
     }
 

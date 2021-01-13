@@ -14,10 +14,13 @@ public class PauseScreen : MonoBehaviour
     {
         Debug.Log("In Start of PauseScreen");
         Time.timeScale = .00000001f;
+
         if (UnityFitmatBridge.Instance != null)
             UnityFitmatBridge.Instance.DisableGameInput();
+
         if (PlayerSession.Instance != null)
             PlayerSession.Instance.PauseSPSession();
+
         SetSoundImage();
     }
 
@@ -28,6 +31,7 @@ public class PauseScreen : MonoBehaviour
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.ResumeSPSession();
             Time.timeScale = 1;
+            UnityFitmatBridge.Instance.IsGamePaused = false;
             if (UnityFitmatBridge.Instance != null)
                 UnityFitmatBridge.Instance.EnableGameInput();
             Destroy(gameObject);
@@ -37,6 +41,7 @@ public class PauseScreen : MonoBehaviour
     public virtual void RestartGame()
     {
         Time.timeScale = 1;
+        UnityFitmatBridge.Instance.IsGamePaused = false;
 
         LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
         Destroy(gameObject);

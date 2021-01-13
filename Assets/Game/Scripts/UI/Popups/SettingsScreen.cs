@@ -40,4 +40,9 @@ public class SettingsScreen : MonoBehaviour
         else
             _soundText.text = "Sound Off";
     }
+
+    public void RetakeMatTutorial()
+    {
+        PlayerSession.Instance.RetakeMatControlsTutorial();
+    }
 }

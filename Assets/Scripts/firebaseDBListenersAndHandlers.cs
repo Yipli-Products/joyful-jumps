@@ -25,6 +25,19 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     //Track if the query exection is completed or not
     private static QueryStatus getGameInfoQueryStatus = global::QueryStatus.NotStarted;
+    
+    //Track if the query exection is completed or not
+    private static QueryStatus getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.NotStarted;
+
+    public static QueryStatus GetGameDataForCurrenPlayerQueryStatus()
+    {
+        return getGameDataForCurrentPlayerQueryStatus;
+    }
+
+    public static void SetGameDataForCurrenPlayerQueryStatus(QueryStatus queryStatus)
+    {
+        getGameDataForCurrentPlayerQueryStatus = queryStatus;
+    }
 
     public static QueryStatus GetPlayersQueryStatus()
     {
@@ -47,16 +60,15 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         //Add listeners to the Firebase backend for all the DB Calls
         Debug.Log("Add listeners to the Firebase backend for all the DB Calls");
         PlayerSelection.NewUserFound += addGetPlayersListener;
+
+#if UNITY_ANDROID
         PlayerSelection.NewUserFound += addDefaultMatIdListener;
-
-        PlayerSession.NewPlayerFound += addGameDataListener;
-        PlayerSelection.DefaultPlayerChanged += addGameDataListener;
-
         PlayerSession.NewMatFound += addDefaultMatIdListener;
+#endif
+        PlayerSelection.DefaultPlayerChanged += addGameDataListener;
         PlayerSelection.GetGameInfo += addListnerForGameInfo;
 
         StartCoroutine(TrackNetworkConnectivity());
-
     }
 
     private  async void addListnerForGameInfo()
@@ -83,7 +95,6 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         yield return anonAuthenticate();
         FirebaseDatabase.DefaultInstance.GetReference(".info/connected").ValueChanged += HandleConnectedChanged;
-        //FirebaseDatabase.DefaultInstance.GetReference(".info/serverTimeOffset").ValueChanged += HandleServerTimeOffsetChanged;
     }
 
     private void HandleConnectedChanged(object sender, ValueChangedEventArgs e)
@@ -96,9 +107,13 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         //Remove the events to avoid memory leaks
         PlayerSelection.NewUserFound -= addGetPlayersListener;
-        PlayerSession.NewPlayerFound -= addGameDataListener;
-        PlayerSelection.NewUserFound -= addDefaultMatIdListener;
         PlayerSelection.DefaultPlayerChanged -= addGameDataListener;
+        PlayerSelection.GetGameInfo -= addListnerForGameInfo;
+
+#if UNITY_ANDROID
+        PlayerSelection.NewUserFound -= addDefaultMatIdListener;
+        PlayerSession.NewMatFound -= addDefaultMatIdListener;
+#endif
     }
 
     private async void addDefaultMatIdListener()
@@ -140,8 +155,8 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         Debug.Log("Syncing data from the Firebase backend");
         Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-        Debug.LogFormat("User signed in successfully: {0} ({1})",
+        Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+        Debug.LogFormat("Dummy user signed in successfully: {0} ({1})",
         newUser.DisplayName, newUser.UserId);
 
         Firebase.FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -167,8 +182,10 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
             return;
         }
 
-        if (currentYipliConfig.allPlayersInfo == null)
-            currentYipliConfig.allPlayersInfo = new List<YipliPlayerInfo>();
+        bool isDefaultPlayerPresent = false;
+        bool isSavedPlayerInfoAvailabe = currentYipliConfig.playerInfo == null ? false : true;
+
+        currentYipliConfig.allPlayersInfo = new List<YipliPlayerInfo>();
 
         foreach (var childSnapshot in args.Snapshot.Children)
         {
@@ -176,12 +193,29 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
             if (playerInstance.playerId != null)
             {
                 currentYipliConfig.allPlayersInfo.Add(playerInstance);
+
+                if (isSavedPlayerInfoAvailabe && playerInstance.playerId.Equals(currentYipliConfig.playerInfo.playerId))
+                {
+                    isDefaultPlayerPresent = true;
+                }
             }
             else
             {
                 Debug.Log("Skipping this instance of player, backend seems corrupted.");
             }
         }
+
+        if (currentYipliConfig.gameType != GameType.MULTIPLAYER_GAMING && (!isDefaultPlayerPresent || !isSavedPlayerInfoAvailabe))
+        {
+            Debug.Log("Removing saved player as it don't exist.");
+            UserDataPersistence.ClearDefaultPlayer(currentYipliConfig);
+
+            if (PlayerSession.Instance != null)
+            {
+                PlayerSession.Instance.ChangePlayer();
+            }
+        }
+
         Debug.Log("All players data got successfully.");
         getAllPlayersQureyStatus = global::QueryStatus.Completed;
     }
@@ -199,7 +233,9 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     void HandleGameDataValueChanged(object sender, ValueChangedEventArgs args)
     {
+        getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.InProgress;
         Debug.Log("HandleGameDataValueChanged invoked");
         currentYipliConfig.gameDataForCurrentPlayer = args.Snapshot;
+        getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.Completed;
     }
 }

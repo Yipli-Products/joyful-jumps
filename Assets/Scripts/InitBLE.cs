@@ -1,6 +1,7 @@
 ﻿#if UNITY_STANDALONE_WIN
 using com.fitmat.fitmatdriver.Producer.Connection;
 #endif
+
 using System;
 using UnityEngine;
 public class InitBLE
@@ -85,14 +86,13 @@ public class InitBLE
 
     public static string getMatConnectionStatus()
     {
-        //if (Application.platform == RuntimePlatform.WindowsEditor)
-       //     return "connected";
         try
         {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && UNITY_EDITOR
+            return "CONNECTED";
+#elif UNITY_ANDROID
             return BLEStatus;
-#elif UNITY_STANDALONE_WIN
-
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
             return DeviceControlActivity._IsDeviceConnected() == 1 ? "CONNECTED" : "DISCONNECTED";
 #endif
         }
@@ -212,7 +212,7 @@ public class InitBLE
         try
         {
 #if UNITY_ANDROID
-                return PluginInstance.CallStatic<int>("_getGameID");
+                return PluginInstance.Call<int>("_getGameID");
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
             return DeviceControlActivity._getGameID();
 #endif
@@ -238,6 +238,39 @@ public class InitBLE
         {
             Debug.Log("Exception in Driver Version" + exp.Message);
             return null;
+        }
+    }
+
+    public static void setGameClusterID(int P1_gameID, int P2_gameID)
+    {
+        try
+        {
+#if UNITY_ANDROID
+            PluginInstance.Call("_setGameID", P1_gameID, P2_gameID);
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+                DeviceControlActivity._setGameID(P1_gameID, P2_gameID);
+#endif
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Exception in setGameClusterID() : " + e.Message);
+        }
+    }
+
+    public static int getGameClusterID(int playerID)
+    {
+        try
+        {
+#if UNITY_ANDROID
+            return PluginInstance.Call<int>("_getGameID", playerID);
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+                return DeviceControlActivity._getGameID(playerID);
+#endif
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Exception in getGameClusterID() : " + e.Message);
+            return 1000;//1000 will be flagged as an invalid GameId on game side.
         }
     }
 }

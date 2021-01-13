@@ -52,6 +52,12 @@ public class MenuScreen : MonoBehaviour
         playerName.text = PlayerSession.Instance.GetCurrentPlayer();
     }
 
+    private void Update()
+    {
+        Debug.Log("Game Data current level : " + playerGameData.GetCurrentLevel());
+        Debug.Log("Game Data total score : " + playerGameData.GetTotalScore());
+    }
+
     private void SetLevelData()
     {
         levelIndex.text = "" + (playerGameData.GetCurrentLevel() + 1 );

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using YipliFMDriverCommunication;
 
 public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
@@ -22,8 +23,16 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     private static bool normalInput = false;
 
-    private bool bIsInputRevieved = false;
+    public bool bIsInputRevieved = false;
 
+    private bool isGamePaused = false;
+
+    private int currentStepCount = 0;
+
+    // this is to track the step the step count between running && (runningStopped || pause).
+    public int CurrentStepCount { get => currentStepCount; set => currentStepCount = value; }
+
+    public bool IsGamePaused { get => isGamePaused; set => isGamePaused = value; }
 
     public void EnableGameInput()
     {
@@ -100,6 +109,8 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
     {
         try
         {
+            if (SceneManager.GetActiveScene().name == "yipli_lib_scene") return;
+
             string fmActionData = InitBLE.GetFMResponse();
 
             Debug.LogError("ClusterID : " + YipliHelper.GetGameClusterId());
@@ -136,10 +147,18 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             // Json parse FMResponse to get the input.
             FmDriverResponseInfo singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
 
-            if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE)))
+            if (!IsGamePaused && singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE)))
             {
                 bIsInputRevieved = true;
-                   OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE));
+
+                // add running action here
+                if (PlayerSession.Instance != null)
+                {
+                    PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, CurrentStepCount);
+                    CurrentStepCount = 0;
+                }
+
+                OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE));
             }
 
             if (PlayerSession.Instance.currentYipliConfig.oldFMResponseCount != singlePlayerResponse.count)
@@ -148,41 +167,42 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                 Debug.Log("FMResponse " + fmActionData);
                 PlayerSession.Instance.currentYipliConfig.oldFMResponseCount = singlePlayerResponse.count;
 
-                //Handle "Running" case seperately to read the exta properties sent.
                 if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING)))
                 {
-                    bIsInputRevieved = true;
+                    UnityFitmatBridge.Instance.bIsInputRevieved = true;
                     ///CheckPoint for the running action properties.
                     if (singlePlayerResponse.playerdata[0].fmresponse.properties.ToString() != "null")
                     {
                         string[] tokens = singlePlayerResponse.playerdata[0].fmresponse.properties.Split(',');
 
-                        if(tokens.Length > 0)
+                        if (tokens.Length > 0)
                         {
                             //Split the property value pairs:
-                            string[] totalStepsCountKeyValue = tokens[0].Split('=');
-                            if(totalStepsCountKeyValue[0].Equals("totalStepsCount"))
+                            string[] totalStepsCountKeyValue = tokens[0].Split(':');
+                            if (totalStepsCountKeyValue[0].Equals("totalStepsCount"))
                             {
-                                Debug.Log("Adding steps : " + totalStepsCountKeyValue[1]);
                                 PlayerData.FootStep += int.Parse(totalStepsCountKeyValue[1]);
-                                Debug.Log("Total footSteps : " + PlayerData.FootStep);
+                                Debug.LogError("Total footSteps : " + PlayerData.FootStep);
+
+                                Debug.LogError("Adding steps : " + totalStepsCountKeyValue[1]);
+                                CurrentStepCount = int.Parse(totalStepsCountKeyValue[1]);
                             }
 
-                            string[] speedKeyValue = tokens[1].Split('=');
-                            if(speedKeyValue[0].Equals("speed"))
+                            string[] speedKeyValue = tokens[1].Split(':');
+                            if (speedKeyValue[0].Equals("speed"))
                             {
                                 //TODO : Do some handling if speed parameter needs to be used to adjust the running speed in the game.
                             }
                         }
                     }
                 }
+
                 OnGotActionFromBridge?.Invoke(singlePlayerResponse.playerdata[0].fmresponse.action_id);
             }
-            else
+            else if (Application.platform == RuntimePlatform.Android)
             {
                 bIsInputRevieved = false;
                 StartCoroutine(ExecutePlayerStop());
-                //OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
             }
         }
         catch(Exception exp)
@@ -218,8 +238,19 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     private IEnumerator ExecutePlayerStop()
     {
-        yield return new WaitForSecondsRealtime(0.2f);
-        if (false == bIsInputRevieved)
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Debug.LogError("Runtime platform is A : " + Application.platform);
+            yield return new WaitForSecondsRealtime(0.2f);
+        }
+        else
+        {
+            Debug.LogError("Runtime platform is W : " + Application.platform);
+            yield return new WaitForSecondsRealtime(1f);
+        }
+
+        if (false == bIsInputRevieved && YipliHelper.GetGameClusterId() != 0)
         {
             OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
         }

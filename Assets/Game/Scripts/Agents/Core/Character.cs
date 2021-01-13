@@ -114,8 +114,8 @@ public class Character : MonoBehaviour
     public virtual void CollisionsOff(bool floorKill)
     {
         _collider.enabled = false;
-       // if (!floorKill)
-          //  _controller.enabled = false;
+        if (!floorKill)
+            _controller.enabled = false;
     }
 
     public virtual void CollisionsOn()

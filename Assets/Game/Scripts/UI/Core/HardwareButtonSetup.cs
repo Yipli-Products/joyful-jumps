@@ -54,14 +54,6 @@ public class HardwareButtonSetup : MonoBehaviour
             
             if (buttons[_currentButtonIndex].GetComponent<Animator>())
             {
-                /*if (buttons[_currentButtonIndex].name == "selectAvatar" || buttons[_currentButtonIndex].name == "changeProfile" || buttons[_currentButtonIndex].name == "GoToYipli" || buttons[_currentButtonIndex].name == "settings")
-                {
-                    buttons[_currentButtonIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().enabled = true;
-                }
-                else
-                {
-                    buttons[_currentButtonIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().enabled = true;
-                }*/
                 buttons[_currentButtonIndex].transform.GetChild(1).gameObject.SetActive(true);
                 buttons[_currentButtonIndex].GetComponent<Animator>().enabled = true;
             }
@@ -73,14 +65,7 @@ public class HardwareButtonSetup : MonoBehaviour
             {
                 if (buttons[i].GetComponent<Animator>())
                 {
-                    /*if (buttons[i].name == "selectAvatar" || buttons[i].name == "changeProfile" || buttons[i].name == "GoToYipli" || buttons[i].name == "settings")
-                    {
-                        buttons[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().enabled = false;
-                    }
-                    else
-                    {
-                        buttons[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().enabled = false;
-                    }*/
+                    buttons[i].transform.GetChild(1).gameObject.SetActive(false);
                     buttons[i].transform.GetChild(1).gameObject.SetActive(false);
                     buttons[i].GetComponent<Animator>().enabled = false;
                     buttons[i].transform.localScale = new Vector3(1, 1, 1);

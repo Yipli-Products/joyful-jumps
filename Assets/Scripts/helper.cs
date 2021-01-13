@@ -1,14 +1,25 @@
 ﻿using System;
 using UnityEngine;
+#if UNITY_STANDALONE_WIN || UNITY_WDITOR
 using yipli.Windows;
+#endif
 
 public static class YipliHelper
 {
     private static string yipliAppBundleId = "com.yipli.app"; //todo: Change this later
 
+    public static string userName = "bhansali.saurabh20@gmail.com";
+    public static string password = "abcdefg123456789";
+
     public static int GetGameClusterId()
     {
         return InitBLE.getGameClusterID();
+    }
+
+    // based on player
+    public static int GetGameClusterId(int playerID)
+    {
+        return InitBLE.getGameClusterID(playerID);
     }
 
     public static string GetFMDriverVersion()
@@ -21,6 +32,12 @@ public static class YipliHelper
         InitBLE.setGameClusterID(gameClusterId);
     }
 
+    // for 2 players
+    public static void SetGameClusterId(int p1gameClusterId, int p2gameClusterId)
+    {
+        InitBLE.setGameClusterID(p1gameClusterId, p2gameClusterId);
+    }
+
     public static void SetGameMode(int gameMode)
     {
         Debug.Log("GameMode: " + gameMode);
@@ -29,12 +46,15 @@ public static class YipliHelper
 
     public static bool checkInternetConnection()
     {
-        bool bIsNetworkAvailable = true;
-        if (Application.internetReachability == NetworkReachability.NotReachable)
+        try
         {
-            bIsNetworkAvailable = false;
+            return PlayerSession.Instance.currentYipliConfig.bIsInternetConnected;
         }
-        return bIsNetworkAvailable;
+        catch(Exception e )
+        {
+            Debug.LogError("Exception in check Internet : " + e.Message);
+            return false;
+        }
     }
 
     public static string GetMatConnectionStatus()
@@ -84,7 +104,9 @@ public static class YipliHelper
     //Returns true if YipliApp is installed, else returns false
     public static bool IsYipliAppInstalled()
     {
-#if UNITY_ANDROID
+#if UNITY_EDITOR
+        return true;
+#elif UNITY_ANDROID
         AndroidJavaObject launchIntent = null;
         try
         {
@@ -110,13 +132,46 @@ public static class YipliHelper
         Debug.Log("Yipli App is Installed. Returning true.");
         return true;
 
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR // TODO : Handle Windows flow
         Debug.Log("Yipli App validation for windows isnt required. Returning true");
-        return true;
+        return FileReadWrite.IsYipliPcIsInstalled();
 #else
         Debug.Log("OS not supported. Returnin false.");
         return false;
 #endif
+    }
+
+    public static int convertGameVersionToBundleVersionCode(string gameVersion)
+    {
+        int versionCode;
+
+        string[] strVersionCode = gameVersion.Split('.');
+
+        string finalVersion = "";
+        foreach (var word in strVersionCode)
+        {
+            finalVersion += word;
+        }
+
+        versionCode = int.Parse(finalVersion);
+
+        Debug.Log("Returning version Code : " + versionCode);
+
+        return versionCode;
+    }
+
+    public static int StringToIntConvert(string text)
+    {
+        try
+        {
+            int convertedVal = int.Parse(text);
+            return convertedVal;
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log("String to int conversion error : " + e.Message);
+            return 0;
+        }
     }
 }
 

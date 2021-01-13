@@ -8,6 +8,6 @@ public class GameInitializer : MonoBehaviour
     private void Awake()
     {
         currentYipliConfig.gameId = "joyfuljumps";
-        //currentYipliConfig.currentGameType = YipliUtils.GameType.FITNESS_GAMING;
+        currentYipliConfig.gameType = GameType.FITNESS_GAMING;
     }
 }

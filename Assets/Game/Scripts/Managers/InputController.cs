@@ -89,8 +89,8 @@ public class InputController : PersistentSingleton<InputController>
         {
             isRunning = true;
             SetMove(Move.Running);
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
+            /*if (PlayerSession.Instance != null)
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);*/
         }
         else if (isRunning)
         {
@@ -116,8 +116,10 @@ public class InputController : PersistentSingleton<InputController>
         {
             isRunning = true;
             SetMove(Move.Running);
+            /*
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
+            */
         }
         else if (isRunning)
         {
@@ -180,12 +182,22 @@ public class InputController : PersistentSingleton<InputController>
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.Running);
+            /*
             if (PlayerSession.Instance != null)
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING);
+            */
+
         }
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED), StringComparison.OrdinalIgnoreCase))
         {
             SetMove(Move.StopRunning);
+
+            // add running action here
+            if (PlayerSession.Instance != null)
+            {
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
+                UnityFitmatBridge.Instance.CurrentStepCount = 0;
+            }
         }
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE), StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
         {

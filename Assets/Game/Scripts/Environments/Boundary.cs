@@ -8,6 +8,7 @@ public class Boundary : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider collider)
     {
+        LevelManager.Instance.isPlayerDiedByFalling = true;
 
         if (!ignoredObjetLayer.Contains(collider.gameObject)) {
             collider.gameObject.SetActive(false);
@@ -16,6 +17,8 @@ public class Boundary : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        LevelManager.Instance.isPlayerDiedByFalling = true;
+
         if (!ignoredObjetLayer.Contains(collision.gameObject))
         {
             collision.gameObject.SetActive(false);
