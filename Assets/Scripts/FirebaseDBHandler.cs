@@ -497,7 +497,7 @@ public static class FirebaseDBHandler
         Uri appUpdateUrl = null;
         try
         {
-            StorageReference reference = yipliStorage.GetReferenceFromUrl(StoragePath + "YipliApp_Setup.exe");
+            StorageReference reference = yipliStorage.GetReferenceFromUrl(StoragePath + "Yipli_Setup.exe");
             appUpdateUrl = await reference.GetDownloadUrlAsync();
         }
         catch (Exception exp)

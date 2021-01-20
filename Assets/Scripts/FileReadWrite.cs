@@ -74,7 +74,7 @@ namespace yipli.Windows
         
         public static void OpenYipliApp()
         {
-            string yipliAppExeLoc = GetApplictionInstallPath("yipliapp") + "\\" + "YipliApp.exe";
+            string yipliAppExeLoc = GetApplictionInstallPath("yipliapp") + "\\" + "Yipli.exe";
             
             if (ValidateFile(yipliAppExeLoc))
             {
