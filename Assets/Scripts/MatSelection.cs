@@ -31,6 +31,8 @@ public class MatSelection : MonoBehaviour
 
     private bool bIsGameMainSceneLoading = false;
 
+    private bool bIsRetryConnectionCalled = false;
+
     private bool bIsMatFlowInitialized = false;
     private void Start()
     {
@@ -92,6 +94,8 @@ public class MatSelection : MonoBehaviour
     // during gamelib scene processes keep checking for mat ble connection in android devices.
     private IEnumerator MatConnectionCheck()
     {
+        yield return new WaitForSecondsRealtime(1f);
+
         while (true)
         {
             yield return new WaitForSecondsRealtime(0.5f);
@@ -140,7 +144,7 @@ public class MatSelection : MonoBehaviour
 #elif UNITY_STANDALONE_WIN
         if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
-            StartCoroutine(ConnectMat());
+            StartCoroutine(ConnectMat(true));
         }
 #endif
     }
@@ -168,15 +172,22 @@ public class MatSelection : MonoBehaviour
         }
     }
 
-
-    private IEnumerator ConnectMat()
+    
+    private IEnumerator ConnectMat(bool bIsReconnectMatNeeded = false)
     {
         int iTryCount = 0;
 
         //Initiate the connection with the mat.  
         try
         {
-            InitiateMatConnection();
+            if (bIsReconnectMatNeeded)
+            {
+                RetryMatConnectionOnPC();
+            }
+            else
+            {
+                InitiateMatConnection();
+            }
         }
         catch (Exception e)
         {
@@ -212,7 +223,15 @@ public class MatSelection : MonoBehaviour
 #if UNITY_ANDROID
                 noMatText.text = ProductMessages.Err_mat_connection_mat_off;
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
-            noMatText.text = ProductMessages.Err_mat_connection_mat_off;
+            if (PortTestings.CheckAvailableComPorts() == 0)
+            {
+                noMatText.text = ProductMessages.Err_mat_connection_no_ports;
+            }
+            else
+            {
+                noMatText.text = ProductMessages.Err_mat_connection_mat_off;
+            }
+
 #endif
 
             NoMatPanel.SetActive(true);
@@ -265,6 +284,7 @@ public class MatSelection : MonoBehaviour
 
         while (firebaseDBListenersAndHandlers.GetGameDataForCurrenPlayerQueryStatus() != QueryStatus.Completed)
         {
+            Debug.Log("waiting to finish new player's game data");
             yield return new WaitForSecondsRealtime(0.1f);
         }
 
@@ -298,6 +318,13 @@ public class MatSelection : MonoBehaviour
     {
         //Initiate the connection with the mat.
         InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
+    }
+
+    private void RetryMatConnectionOnPC()
+    {
+        //Initiate the connection with the mat.
+        //InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
+        InitBLE.reconnectMat();
     }
 
     public void OnGoToYipliPress()

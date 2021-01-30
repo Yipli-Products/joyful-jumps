@@ -30,9 +30,15 @@ public class TutorialManagerGL : MonoBehaviour
     [Header("NonInteractive tutorial components")]
     [SerializeField] TextMeshProUGUI instructionsText;
 
+    [Header("NI Animations")]
     [SerializeField] RawImage standAnimationImg;
-    [SerializeField] RawImage leftTapAnimationImg;
+    //[SerializeField] RawImage leftTapAnimationImg;
+    [SerializeField] Image leftTapAnimationImg;
     [SerializeField] RawImage rightTapAnimationImg;
+
+    [Header("I Animations")]
+    [SerializeField] GameObject tapsCornerAnimation;
+    [SerializeField] GameObject jumpsCornerAnimation;
 
     [Header("Tutorial Panels")]
     [SerializeField] GameObject interactiveTutPanel;
@@ -48,6 +54,38 @@ public class TutorialManagerGL : MonoBehaviour
     [Header("current yipli config")]
     public YipliConfig currentYipliConfig;
 
+    [Header("Audio Players")]
+    public AudioSource sfxPlayer;
+    public AudioSource voicePlayer;
+
+    [Header("SFX Audios")]
+    public AudioClip clapAndCheerSfx;
+    public AudioClip tapsSfx;
+    public AudioClip successSfx;
+    public AudioClip typingSfx;
+
+    [Header("Voice Audios")]
+    public AudioClip welcomeToMatDemo;
+    public AudioClip startWithTaps;
+    public AudioClip firstSeeHowItIsDone;
+    public AudioClip threeLRTaps;
+    public AudioClip completeThreeLRTaps;
+    public AudioClip letsTryIt;
+    public AudioClip toNavigateUseLeftRight;
+    public AudioClip letsTrySelecting;
+    public AudioClip jumpOnAnyButtonToSelect;
+    public AudioClip wellDoneOnTapsDone;
+    public AudioClip pauseGameVoice;
+    public AudioClip controlEverythingFromMat;
+    public AudioClip allActionsCanBeDone;
+
+    [Header("Voice reming Audios")]
+    public AudioClip needToNavigateAndSelectButtons;
+    public AudioClip needToCompleteTaps;
+
+    [Header("Punishment Time")]
+    [SerializeField] int punishmentTime = 15;
+
     const string LEFT = "left";
     const string RIGHT = "right";
     const string ENTER = "enter";
@@ -56,6 +94,8 @@ public class TutorialManagerGL : MonoBehaviour
     int totalLeftTaps = 0;
     int totalRightTaps = 0;
 
+    public float currentPassedTime = 0;
+
     YipliUtils.PlayerActions detectedAction;
 
     bool tappingsDone = false;
@@ -63,6 +103,11 @@ public class TutorialManagerGL : MonoBehaviour
     bool buttonOneClicked = false;
     bool buttonTwoClicked = false;
     bool buttonThreeClicked = false;
+    bool startCheckingForPunishment = false;
+    bool firstTapIsDone = false;
+    bool firstButtonIsClicked = false;
+    public bool calculateNoActionTime = false;
+    bool teachJumpCoroutineStarted = false;
 
     char[] textToDisplayArray = null;
 
@@ -93,6 +138,9 @@ public class TutorialManagerGL : MonoBehaviour
 
     private void TurnOffInteractiveTutorialChildren()
     {
+        tapsCornerAnimation.SetActive(false);
+        jumpsCornerAnimation.SetActive(false);
+
         leftTaps.transform.localScale = new Vector3(0f, 0f, 0f);
 
         for (int i = 0; i < leftTaps.transform.childCount; i++)
@@ -137,6 +185,11 @@ public class TutorialManagerGL : MonoBehaviour
         {
             GetMatUIKeyboardInputs();
             ManageMatActions();
+
+            if (startCheckingForPunishment)
+            {
+                PlayPunishmentSound();
+            }
         }
     }
 
@@ -153,16 +206,20 @@ public class TutorialManagerGL : MonoBehaviour
         leftTapAnimationImg.gameObject.SetActive(false);
         rightTapAnimationImg.gameObject.SetActive(false);
 
-        textToDisplayArray = "MAT Controls Demo".ToCharArray();
+        textToDisplayArray = "Let's Watch".ToCharArray();
         panelTitleText.text = "";
 
         foreach (char c in textToDisplayArray)
         {
             panelTitleText.text += c.ToString();
+            PlaySFX(typingSfx);
             yield return new WaitForSecondsRealtime(0.1f);
         }
 
-        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "___________________";
+        PlayVoice(welcomeToMatDemo);
+        yield return new WaitForSecondsRealtime(welcomeToMatDemo.length);
+
+        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "_____________";
 
         standAnimationImg.gameObject.SetActive(true);
         nonInteractiveTutPanel.SetActive(true);
@@ -170,15 +227,19 @@ public class TutorialManagerGL : MonoBehaviour
         instructionsText.text = "Stand comfortably on the MAT";
 
         // second part
-        instructionsText.text = "To navigate - left/right taps";
+        //instructionsText.text = "To navigate - left/right taps";
+        instructionsText.text = "";
 
         standAnimationImg.gameObject.SetActive(false);
 
         leftTapAnimationImg.gameObject.SetActive(true);
         rightTapAnimationImg.gameObject.SetActive(false);
 
-        // wait for tap animations to finish 1 time. 1 is 9 seconds
-        yield return new WaitForSecondsRealtime(9f);
+        PlayVoice(firstSeeHowItIsDone);
+
+        // wait for tap animations to finish 1 time. 1 is 6 seconds speed is 0.5
+        yield return new WaitForSecondsRealtime(12f);
+
 
         // final part
         panelInstructionTitleText.text = "";
@@ -196,16 +257,23 @@ public class TutorialManagerGL : MonoBehaviour
 
     private IEnumerator AnimateInteractiveTutorialIntro()
     {
-        textToDisplayArray = "MAT Controls Training".ToCharArray();
+        tapsCornerAnimation.SetActive(true);
+        jumpsCornerAnimation.SetActive(false);
+
+        textToDisplayArray = "Let's Try".ToCharArray();
         panelTitleText.text = "";
+        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "___________";
 
         foreach (char c in textToDisplayArray)
         {
             panelTitleText.text += c.ToString();
+            PlaySFX(typingSfx);
             yield return new WaitForSecondsRealtime(0.1f);
         }
 
-        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "_____________________";
+        PlayVoice(letsTryIt);
+        yield return new WaitForSecondsRealtime(letsTryIt.length);
+
 
         interactiveTutPanel.SetActive(true);
 
@@ -214,6 +282,9 @@ public class TutorialManagerGL : MonoBehaviour
 
         leftTaps.gameObject.SetActive(true);
         rightTaps.gameObject.SetActive(true);
+
+        PlayVoice(toNavigateUseLeftRight);
+        yield return new WaitForSecondsRealtime(toNavigateUseLeftRight.length);
 
         while (leftTaps.transform.localScale.x < 1)
         {
@@ -256,8 +327,10 @@ public class TutorialManagerGL : MonoBehaviour
             }
         }
 
-
         ActivateITutorial();
+
+        PlayVoice(threeLRTaps);
+        yield return new WaitForSecondsRealtime(threeLRTaps.length);
     }
 
     private void ChangeLeftRighttext()
@@ -268,6 +341,9 @@ public class TutorialManagerGL : MonoBehaviour
     public void ActivateITutorial()
     {
         matInputController.IsTutorialRunning = true;
+
+        startCheckingForPunishment = true;
+        calculateNoActionTime = true;
 
         currentButtonIndex = 1;
         ChangeButtonText();
@@ -418,31 +494,35 @@ public class TutorialManagerGL : MonoBehaviour
     {
         if((providedAction == LEFT || providedAction == RIGHT) && !tappingsDone)
         {
+            currentPassedTime = 0;
+
             if (providedAction == LEFT)
             {
                 totalLeftTaps++;
-                //instructionOne.text = "";
-                //instructionTwo.text = "";
 
-                //allowChangeText = false;
-                //StopCoroutine(ChangeLeftRighttext());
+                if (!firstTapIsDone)
+                {
+                    firstTapIsDone = true;
+
+                    PlayVoice(completeThreeLRTaps);
+                }
 
                 instructionOne.GetComponent<Animator>().enabled = false;
-                //instructionTwo.text = LeftTapsText[Random.Range(0, LeftTapsText.Length)];
 
                 ProgressCheckMarks(totalLeftTaps, leftTaps.gameObject);
             }
             else
             {
                 totalRightTaps++;
-                //instructionOne.text = "";
-                //instructionTwo.text = "";
 
-               // allowChangeText = false;
-               // StopCoroutine(ChangeLeftRighttext());
+                if (!firstTapIsDone)
+                {
+                    firstTapIsDone = true;
+
+                    PlayVoice(completeThreeLRTaps);
+                }
 
                 instructionOne.GetComponent<Animator>().enabled = false;
-                //instructionTwo.text = RightTapsText[Random.Range(0, RightTapsText.Length)];
 
                 ProgressCheckMarks(totalRightTaps, rightTaps.gameObject);
             }
@@ -452,7 +532,12 @@ public class TutorialManagerGL : MonoBehaviour
                 instructionOne.text = "";
                 instructionTwo.text = "";
 
-                StartCoroutine(TeachJump());
+                if (!teachJumpCoroutineStarted)
+                {
+                    teachJumpCoroutineStarted = true;
+                    calculateNoActionTime = false;
+                    StartCoroutine(TeachJump());
+                }
             }
         }
         else if (providedAction == ENTER && tappingsDone)
@@ -496,25 +581,39 @@ public class TutorialManagerGL : MonoBehaviour
 
     private IEnumerator TeachJump()
     {
+        PlayVoice(wellDoneOnTapsDone);
+        yield return new WaitForSecondsRealtime(wellDoneOnTapsDone.length);
+
         leftTaps.gameObject.SetActive(false);
         rightTaps.gameObject.SetActive(false);
+
+        tapsCornerAnimation.SetActive(false);
+        jumpsCornerAnimation.SetActive(false);
 
         foreach (Button b in tuorialButtons)
         {
             b.gameObject.SetActive(false);
         }
 
-        textToDisplayArray = "2. To select - ".ToCharArray();
+        textToDisplayArray = "2. To Select - ".ToCharArray();
 
         instructionTwo.text = "";
+
+        PlayVoice(letsTrySelecting);
+        yield return new WaitForSecondsRealtime(letsTrySelecting.length);
 
         foreach (char c in textToDisplayArray)
         {
             instructionTwo.text += c.ToString();
+            PlaySFX(typingSfx);
             yield return new WaitForSecondsRealtime(0.1f);
         }
+
         instructionOne.text = "Jump";
         instructionOne.GetComponent<Animator>().enabled = false;
+        
+        tapsCornerAnimation.SetActive(false);
+        jumpsCornerAnimation.SetActive(true);
 
         yield return new WaitForSecondsRealtime(1f);
 
@@ -525,7 +624,6 @@ public class TutorialManagerGL : MonoBehaviour
             b.gameObject.SetActive(true);
             b.GetComponentInChildren<TextMeshProUGUI>().text = "Select\nMe";
         }
-
 
         buttonClicks.gameObject.SetActive(true);
 
@@ -546,27 +644,44 @@ public class TutorialManagerGL : MonoBehaviour
 
         ManageCurrentButton();
 
+        PlayVoice(jumpOnAnyButtonToSelect);
+        yield return new WaitForSecondsRealtime(jumpOnAnyButtonToSelect.length);
+
         tappingsDone = true;
+        calculateNoActionTime = true;
     }
 
     public void ButtonOneClick()
     {
+        if (!firstButtonIsClicked)
+        {
+            firstButtonIsClicked = true;
+            PlayVoice(needToNavigateAndSelectButtons);
+        }
+
         instructionOne.text = "and Select all buttons";
-        instructionTwo.text = "3. Now, Navigate";
+        instructionTwo.text = "Now, Navigate";
 
         buttonOneImg.color = Color.green;
         buttonOneImg.transform.GetChild(0).gameObject.SetActive(true);
         buttonOneImg.transform.parent.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "";
         
         StartCoroutine(FillImage(buttonClicks.transform.GetChild(0).GetComponent<Image>(), buttonClicks.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>()));
-        
+
+        currentPassedTime = 0;
         buttonOneClicked = true;
     }
 
     public void ButtonTwoClick()
     {
+        if (!firstButtonIsClicked)
+        {
+            firstButtonIsClicked = true;
+            PlayVoice(needToNavigateAndSelectButtons);
+        }
+
         instructionOne.text = "and Select all buttons";
-        instructionTwo.text = "3. Now, Navigate";
+        instructionTwo.text = "Now, Navigate";
 
         buttonTwoImg.color = Color.green;
         buttonTwoImg.transform.GetChild(0).gameObject.SetActive(true);
@@ -574,13 +689,20 @@ public class TutorialManagerGL : MonoBehaviour
 
         StartCoroutine(FillImage(buttonClicks.transform.GetChild(1).GetComponent<Image>(), buttonClicks.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>()));
 
+        currentPassedTime = 0;
         buttonTwoClicked = true;
     }
 
     public void ButtonThreeClick()
     {
+        if (!firstButtonIsClicked)
+        {
+            firstButtonIsClicked = true;
+            PlayVoice(needToNavigateAndSelectButtons);
+        }
+
         instructionOne.text = "and Select all buttons";
-        instructionTwo.text = "3. Now, Navigate";
+        instructionTwo.text = "Now, Navigate";
 
         buttonThreeImg.color = Color.green;
         buttonThreeImg.transform.GetChild(0).gameObject.SetActive(true);
@@ -588,6 +710,7 @@ public class TutorialManagerGL : MonoBehaviour
 
         StartCoroutine(FillImage(buttonClicks.transform.GetChild(2).GetComponent<Image>(), buttonClicks.transform.GetChild(2).transform.GetChild(0).GetComponent<Image>()));
 
+        currentPassedTime = 0;
         buttonThreeClicked = true;
     }
 
@@ -606,6 +729,8 @@ public class TutorialManagerGL : MonoBehaviour
 
     private IEnumerator FillImage(Image squreBox, Image rightArrow)
     {
+        PlaySFX(successSfx);
+
         rightArrow.fillAmount = 0;
 
         while (rightArrow.fillAmount < 1f)
@@ -625,6 +750,10 @@ public class TutorialManagerGL : MonoBehaviour
 
     private void StartEndPartOfTheTutorial()
     {
+        startCheckingForPunishment = false;
+        calculateNoActionTime = false;
+        currentPassedTime = 0;
+
         StartCoroutine(EndTutorial());
     }
 
@@ -677,6 +806,9 @@ public class TutorialManagerGL : MonoBehaviour
 
     private IEnumerator EndTutorial()
     {
+        tapsCornerAnimation.SetActive(false);
+        jumpsCornerAnimation.SetActive(false);
+
         instructionOne.text = "";
         instructionOne.GetComponent<Animator>().enabled = false;
         instructionTwo.text = "";
@@ -690,27 +822,39 @@ public class TutorialManagerGL : MonoBehaviour
         rightTaps.gameObject.SetActive(false);
         buttonClicks.gameObject.SetActive(false);
 
-        panelTitleText.text = "MAT Controls Training";
-        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "_____________________";
+        panelTitleText.text = "LEt's Try";
+        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "___________";
         finalInstruction.gameObject.SetActive(true);
 
         pauseAnimationOBJ.SetActive(true);
         pauseAnimationOBJ.transform.GetChild(0).gameObject.SetActive(true);
-        finalInstruction.text = "4. To Pause game : step out of the MAT";
+        finalInstruction.text = "3. To Pause game : step out of the MAT";
         finalInstruction.transform.localPosition = new Vector3(0f, 50f, 0f);
 
-        // wait for pause animation to finish 2 times. 1 is 2.5 seconds
-        yield return new WaitForSecondsRealtime(5f);
+        PlayVoice(pauseGameVoice);
+        yield return new WaitForSecondsRealtime(pauseGameVoice.length);
 
         pauseAnimationOBJ.SetActive(false);
         finalInstruction.transform.localPosition = new Vector3(0f, -50f, 0f);
 
-        panelTitleText.text = "Congratulations";
-        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "_______________";
-        finalInstruction.text = "You have completed \"MAT Controls Tutorial\"\nAll set !!!";
+        panelTitleText.text = "Congrats Champ";
+        panelTitleText.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "________________";
+        finalInstruction.text = "\"Your MAT Training\" is done.\n\nYipli Mat is your Handsfree gamepad !!!";
         finalInstruction.fontSize = 36;
 
-        yield return new WaitForSecondsRealtime(5f);
+        PlayVoice(controlEverythingFromMat);
+        yield return new WaitForSecondsRealtime(controlEverythingFromMat.length);
+
+        finalInstruction.text = "This is a good headstart!\nTry the extensive library of Yipli Games where you can Run, Jump, hopp , squat and do much more to experience infinite fun.. \nEnjoy!.";
+        finalInstruction.fontSize = 26;
+
+        PlayVoice(allActionsCanBeDone);
+        yield return new WaitForSecondsRealtime(allActionsCanBeDone.length);
+        
+        // handle all actions display here
+
+        PlaySFX(clapAndCheerSfx);
+        yield return new WaitForSecondsRealtime(clapAndCheerSfx.length);
 
         // tutorial is ended and moving to player selection
         TutorialDone();
@@ -722,6 +866,51 @@ public class TutorialManagerGL : MonoBehaviour
 
         //FirebaseDBHandler.UpdateTutStatusData(currentYipliConfig.userId, currentYipliConfig.playerInfo.playerId, 1);
 
+        startCheckingForPunishment = false;
+
         FindObjectOfType<PlayerSelection>().OnTutorialContinuePress();
+    }
+
+    private void PlayVoice(AudioClip clip)
+    {
+        voicePlayer.clip = clip;
+        voicePlayer.Play();
+    }
+
+    private void PlaySFX(AudioClip clip)
+    {
+        sfxPlayer.clip = clip;
+        sfxPlayer.Play();
+    }
+
+    public void PlayAnimationTaps()
+    {
+        PlaySFX(tapsSfx);
+    }
+
+    private void PlayPunishmentSound()
+    {
+        if (calculateNoActionTime)
+        {
+            currentPassedTime += Time.deltaTime;
+
+            if (currentPassedTime > punishmentTime)
+            {
+                if (totalLeftTaps <= 0 || totalRightTaps <= 0 || !tappingsDone)
+                {
+                    PlayVoice(needToCompleteTaps);
+                }
+                else
+                {
+                    PlayVoice(needToNavigateAndSelectButtons);
+                }
+
+                currentPassedTime = 0;
+            }
+        }
+        else
+        {
+            currentPassedTime = 0;
+        }
     }
 }

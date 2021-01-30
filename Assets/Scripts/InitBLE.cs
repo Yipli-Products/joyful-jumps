@@ -248,7 +248,7 @@ public class InitBLE
 #if UNITY_ANDROID
             PluginInstance.Call("_setGameID", P1_gameID, P2_gameID);
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
-                //DeviceControlActivity._setGameID(P1_gameID, P2_gameID);
+                DeviceControlActivity._setGameID(P1_gameID, P2_gameID);
 #endif
         }
         catch (Exception e)
@@ -264,8 +264,7 @@ public class InitBLE
 #if UNITY_ANDROID
             return PluginInstance.Call<int>("_getGameID", playerID);
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
-                //return DeviceControlActivity._getGameID(playerID);
-                return 1001;
+                return DeviceControlActivity._getGameID(playerID);
 #endif
         }
         catch (Exception e)

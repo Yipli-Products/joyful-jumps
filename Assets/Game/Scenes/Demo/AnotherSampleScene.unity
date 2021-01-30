@@ -412,7 +412,7 @@ MonoBehaviour:
   backgroundMusic:
     mixerGroup: {fileID: -4380900092806532690, guid: 67e79a93a0ce9ef4e900f320c8aaa97a,
       type: 2}
-    clip: {fileID: 8300000, guid: 318b9223664e4ff43abf6f79ec4ac210, type: 3}
+    clip: {fileID: 8300000, guid: acec13b2b748a8040b55acc8c3c31bc2, type: 3}
     duration: 0
 --- !u!4 &407171902
 Transform:
@@ -1377,6 +1377,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.4}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -1704,6 +1705,8 @@ MonoBehaviour:
   _currentLevelDifficulty:
     difficulty: 0
     lenght: 0
+  isPlayerDiedByFalling: 0
+  isTimerRunning: 0
   playerGameData: {fileID: 11400000, guid: c81a9f84ada7c3e4484791082bfaf960, type: 2}
 --- !u!4 &2062986712
 Transform:

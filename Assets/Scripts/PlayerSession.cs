@@ -56,6 +56,8 @@ public class PlayerSession : MonoBehaviour
 
     private void Awake()
     {
+        SetMatPlayMode();
+
         if (_instance != null && _instance != this)
         {
             Debug.Log("Destroying current instance of playersession and reinitializing");
@@ -255,7 +257,11 @@ public class PlayerSession : MonoBehaviour
         {
             //Initiate mat connection with last set GameCluterId
             Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
+#if UNITY_ANDROID
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0);
+#else
+            InitBLE.reconnectMat();
+#endif
         }
         catch (Exception exp)
         {
@@ -293,7 +299,7 @@ public class PlayerSession : MonoBehaviour
         YipliHelper.GoToYipli();
     }
 
-    #region Single Player Session Functions
+#region Single Player Session Functions
 
     public void ReInitializeSPSession()
     {
@@ -324,6 +330,7 @@ public class PlayerSession : MonoBehaviour
         x.Add("timestamp", ServerValue.Timestamp);
         x.Add("calories", (int)GetCaloriesBurned());
         x.Add("fitness-points", (int)GetFitnessPoints());
+
         if (playerGameData != null)
         {
             if (playerGameData.Count > 0)
@@ -340,10 +347,13 @@ public class PlayerSession : MonoBehaviour
             Debug.Log("Game-data is null");
         }
 
+        x.Add("os", Application.platform);
+        x.Add("game-version", GetDriverAndGameVersion());
+
         //Removed following, since mat-id and mac-address couldnt be got on windows
         //x.Add("mat-id", currentYipliConfig.matInfo.matId);
         //x.Add("mac-address", currentYipliConfig.matInfo.macAddress);
-        
+
         return x;
     }
 
@@ -450,9 +460,9 @@ public class PlayerSession : MonoBehaviour
         Calories += YipliUtils.GetCaloriesPerAction(action) * count;
     }
 
-    #endregion
+#endregion
 
-    #region Multi Player Session Functions
+#region Multi Player Session Functions
 
     public IDictionary<YipliUtils.PlayerActions, int> getMultiPlayerActionCounts(PlayerDetails playerDetails)
     {
@@ -598,7 +608,7 @@ public class PlayerSession : MonoBehaviour
         playerDetails.fitnesssPoints += YipliUtils.GetFitnessPointsPerAction(action) * count * UnityEngine.Random.Range(0.92f, 1.04f); // this is to hide direct mapping between calories and fitnesspoint. small random multiplier is added fitness points to keep it random on single action level
     }
 
-    #endregion
+#endregion
 
     // get game and driver version
     public string GetDriverAndGameVersion()
@@ -664,5 +674,17 @@ public class PlayerSession : MonoBehaviour
         _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
         currentYipliConfig.bIsRetakeTutorialFlagActivated = true;
         SceneManager.LoadScene("yipli_lib_scene");
+    }
+
+    // set mat play mode
+    public void SetMatPlayMode()
+    {
+#if UNITY_EDITOR
+        currentYipliConfig.onlyMatPlayMode = false;
+#elif UNITY_ANDROID
+        currentYipliConfig.onlyMatPlayMode = true;
+#elif UNITY_STANDALONE_WIN
+        currentYipliConfig.onlyMatPlayMode = true;   
+#endif
     }
 }

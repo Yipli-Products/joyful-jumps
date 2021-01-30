@@ -710,7 +710,7 @@ MonoBehaviour:
   backgroundMusic:
     mixerGroup: {fileID: 0}
     clip: {fileID: 0}
-    duration: 0
+    duration: 10
 --- !u!4 &1313525502
 Transform:
   m_ObjectHideFlags: 0

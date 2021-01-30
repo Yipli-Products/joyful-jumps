@@ -56,7 +56,8 @@ public static class FirebaseDBHandler
         DataSnapshot snapshot = null;
         try
         {
-            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
             Debug.LogFormat("User signed in successfully: {0} ({1})",
             newUser.DisplayName, newUser.UserId);
 
@@ -76,7 +77,8 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void PostPlayerSession(PlayerSession session, PostUserCallback callback)
     {
-        auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInAnonymouslyAsync was canceled.");
@@ -108,7 +110,8 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void PostMultiPlayerSession(PlayerSession session,PlayerDetails playerDetails,string mpSessionUUID, PostUserCallback callback)
     {
-        auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInAnonymouslyAsync was canceled.");
@@ -421,7 +424,8 @@ public static class FirebaseDBHandler
     * This is to be called by your games shop manager module.*/
     public static async void UpdateStoreData(string strUserId, string strPlayerId, string strGameId, Dictionary<string, object> dStoreData, PostUserCallback callback)
     {
-        await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        //await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
         {
             if (task.IsCanceled)
             {
@@ -449,7 +453,8 @@ public static class FirebaseDBHandler
         DataSnapshot snapshot = null;
         try
         {
-            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
             Debug.LogFormat("User signed in successfully: {0} ({1})",
             newUser.DisplayName, newUser.UserId);
 
@@ -469,7 +474,8 @@ public static class FirebaseDBHandler
     /* The function to store mat tutorial status to backend. */
     public static async void UpdateTutStatusData(string strUserId, string strPlayerId, int tutStatus)
     {
-        await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        //await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
         {
             if (task.IsCanceled)
             {
@@ -512,7 +518,8 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void _T_PostDummyPlayerSession(Dictionary<string, dynamic> tempData)
     {
-        auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
+        auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
                 Debug.LogError("SignInAnonymouslyAsync was canceled.");

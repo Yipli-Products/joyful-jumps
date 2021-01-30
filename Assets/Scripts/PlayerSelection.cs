@@ -55,6 +55,9 @@ public class PlayerSelection : MonoBehaviour
     private bool isSkipUpdateCalled = false;
     private bool isTutorialDoneWithoutPlayerInfo = false;
 
+    private float currentTimePassed = 0;
+    private bool allowPhoneHolderAudioPlay = false;
+
     //Delegates for Firebase Listeners
     public delegate void OnUserFound();
     public static event OnUserFound NewUserFound;
@@ -98,6 +101,11 @@ public class PlayerSelection : MonoBehaviour
     private void Update()
     {
         CheckInternectConnection();
+
+        if (allowPhoneHolderAudioPlay)
+        {
+            PlayComeAndJumpAudio();
+        }
     }
 
     // turn of all devicespecific tutorial objects invisible
@@ -177,6 +185,11 @@ public class PlayerSelection : MonoBehaviour
 
         phoneHolderInfo.SetActive(true);
 
+        if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+            phoneHolderInfo.GetComponent<AudioSource>().Play();
+
+        allowPhoneHolderAudioPlay = true;
+
 #if UNITY_ANDROID
         //StartCoroutine(ChangeTextMessageAndoridPhone());
         ChangeTextMessageAndoridPhone();
@@ -184,6 +197,19 @@ public class PlayerSelection : MonoBehaviour
         //StartCoroutine(ChangeTextMessageWindowsPC());
         ChangeTextMessageWindowsPC();
 #endif
+    }
+
+    private void PlayComeAndJumpAudio()
+    {
+        if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            currentTimePassed += Time.deltaTime;
+
+            if (currentTimePassed > 30f)
+            {
+                phoneHolderInfo.GetComponent<AudioSource>().Play();
+            }
+        }
     }
 
     void ChangeTextMessageAndoridPhone()
@@ -461,7 +487,7 @@ public class PlayerSelection : MonoBehaviour
 #if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
             currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
             //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
-            //currentYipliConfig.playerInfo = new YipliPlayerInfo("-M3HbYi8E7R-8A5aQwIe", "kauva biryani", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg");
+            currentYipliConfig.playerInfo = new YipliPlayerInfo("-MQHc-Ija9odZdIXkFYB", "kauva biryani", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg"); // vismay user
             currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
 #endif
         }
@@ -776,6 +802,8 @@ public class PlayerSelection : MonoBehaviour
     public void OnJumpOnMat()
     {
         // activate mat tutorial here
+        allowPhoneHolderAudioPlay = false;
+
         TurnOffAllPanels();
         TutorialPanel.SetActive(true);
         TutorialPanel.GetComponent<TutorialManagerGL>().ActivateTutorial();

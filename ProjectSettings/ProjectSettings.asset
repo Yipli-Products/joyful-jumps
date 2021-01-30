@@ -126,7 +126,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1.00.092
+  bundleVersion: 2.00.094
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -173,7 +173,7 @@ PlayerSettings:
     Android: com.YIPLI.JoyfulJumps
     Standalone: com.yipli.joyfuljumps
   buildNumber: {}
-  AndroidBundleVersionCode: 100089
+  AndroidBundleVersionCode: 200094
   AndroidMinSdkVersion: 19
   AndroidTargetSdkVersion: 30
   AndroidPreferredInstallLocation: 1
@@ -250,7 +250,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: C:/Users/User/Documents/Fitmat_Workspace/Data/SigningKeys/JJ/joyfuljumps_key.keystore
+  AndroidKeystoreName: D:/WorkSpace/Data/SigningKeys/JJ/joyfuljumps_key.keystore
   AndroidKeyaliasName: unitygames
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 1

@@ -155,7 +155,8 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         Debug.Log("Syncing data from the Firebase backend");
         Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+        //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+        Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
         Debug.LogFormat("Dummy user signed in successfully: {0} ({1})",
         newUser.DisplayName, newUser.UserId);
 
