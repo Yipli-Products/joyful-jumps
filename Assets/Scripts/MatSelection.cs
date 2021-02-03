@@ -7,7 +7,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if UNITY_STANDALONE_WIN
 using yipli.Windows;
+#endif
 
 public class MatSelection : MonoBehaviour
 {
