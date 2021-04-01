@@ -412,6 +412,7 @@ public class LevelManager : Singleton<LevelManager>
                 if (PlayerSession.Instance != null)
                 {
                     PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
+                    Debug.LogError("CurrentStepCount from level success : " + UnityFitmatBridge.Instance.CurrentStepCount);
                     UnityFitmatBridge.Instance.CurrentStepCount = 0;
                 }
 

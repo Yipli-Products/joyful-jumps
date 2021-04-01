@@ -101,8 +101,8 @@ public class InputController : PersistentSingleton<InputController>
         if (Input.GetKeyDown(KeyCode.Space))
         {
             SetMove(Move.Jump);
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
+            /*if (PlayerSession.Instance != null)
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP); */
         }
         else if (Input.GetKeyDown(KeyCode.Escape))
             SetMove(Move.KeyPause);
@@ -130,8 +130,8 @@ public class InputController : PersistentSingleton<InputController>
         if (button == GSGButtons.ButtonType.Jump)
         {
             SetMove(Move.Jump);
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);
+            /*if (PlayerSession.Instance != null)
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.JUMP);*/
         }
     }
 
@@ -196,6 +196,7 @@ public class InputController : PersistentSingleton<InputController>
             if (PlayerSession.Instance != null)
             {
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
+                Debug.LogError("CurrentStepCount from RunningStop : " + UnityFitmatBridge.Instance.CurrentStepCount);
                 UnityFitmatBridge.Instance.CurrentStepCount = 0;
             }
         }

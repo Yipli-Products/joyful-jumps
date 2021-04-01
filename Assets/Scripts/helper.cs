@@ -75,25 +75,48 @@ public static class YipliHelper
 #endif
     }
 
-    public static void GoToYipli()
+    public static void GoToYipli(string direction = "NoDir")
     {
-#if UNITY_ANDROID
-        try
-        {
-            AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
-            AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
+        // add ios part also
+#if UNITY_ANDROID || UNITY_IOS
 
-            AndroidJavaObject launchIntent = null;
-            launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", yipliAppBundleId);
-            ca.Call("startActivity", launchIntent);
-        }
-        catch (AndroidJavaException e)
+        switch(direction)
         {
-            Debug.Log(e);
-            Application.OpenURL("market://details?id=" + yipliAppBundleId);
+            case ProductMessages.noMatCase:
+                Debug.LogError("case : " + ProductMessages.noMatCase);
+                Application.OpenURL(ProductMessages.AddMatAppPageUrl);
+                break;
+
+            case ProductMessages.noUserFound:
+                Debug.LogError("case : " + ProductMessages.noUserFound);
+                Application.OpenURL(ProductMessages.UserFoundAppPageUrl);
+                break;
+
+            case ProductMessages.noPlayerAdded:
+                Debug.LogError("case : " + ProductMessages.noPlayerAdded);
+                Application.OpenURL(ProductMessages.AddPlayerAppPageUrl);
+                break;
+
+            default:
+                Debug.LogError("case : default");
+                try
+                {
+                    AndroidJavaClass up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                    AndroidJavaObject ca = up.GetStatic<AndroidJavaObject>("currentActivity");
+                    AndroidJavaObject packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
+
+                    AndroidJavaObject launchIntent = null;
+                    launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", yipliAppBundleId);
+                    ca.Call("startActivity", launchIntent);
+                }
+                catch (AndroidJavaException e)
+                {
+                    Debug.Log(e);
+                    Application.OpenURL("market://details?id=" + yipliAppBundleId);
+                }
+                break;
         }
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN && UNITY_EDITOR
         FileReadWrite.OpenYipliApp();
 #else
         Debug.Log("Unsupported os");

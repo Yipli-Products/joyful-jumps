@@ -155,6 +155,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                 if (PlayerSession.Instance != null)
                 {
                     PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, CurrentStepCount);
+                    Debug.LogError("CurrentStepCount from pause : " + CurrentStepCount);
                     CurrentStepCount = 0;
                 }
 

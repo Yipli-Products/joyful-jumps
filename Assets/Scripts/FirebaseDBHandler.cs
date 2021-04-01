@@ -514,6 +514,42 @@ public static class FirebaseDBHandler
         return appUpdateUrl.ToString();
     }
 
+    /* The function call to be allowed only if network is available 
+       Get yipli pc app url from backend */
+    public static async Task UploadLogsFileToDB(string userID, List<string> fileNames, List<string> filePaths)
+    {
+        StorageReference storageRef = yipliStorage.RootReference;
+
+        string storageChildRef = "customer-tickets/" + userID + "/" + DateTime.Now.Day + DateTime.Now.Month + DateTime.Now.Year + "/" + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + "/";
+
+        for (int i = 0; i < fileNames.Count; i++)
+        {
+            StorageReference fmResponseLogRef = storageRef.Child(storageChildRef + fileNames[i]);
+
+            await fmResponseLogRef.PutFileAsync(filePaths[i]).ContinueWith((Task<StorageMetadata> task) => {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    Debug.Log(task.Exception.ToString());
+                    // Uh-oh, an error occurred!
+                }
+                else
+                {
+                    // Metadata contains file metadata such as size, content-type, and download URL.
+                    StorageMetadata metadata = task.Result;
+                    string md5Hash = metadata.Md5Hash;
+                    Debug.Log("Finished uploading...");
+                    Debug.Log("md5 hash = " + md5Hash);
+                }
+            });
+        }
+    }
+
+    // only foir IOS get mac address from fb
+    public static string GetMacAddressFromMatID(string MatID)
+    {
+        return "A4:DA:32:4F:C2:54";
+    }
+
     //************************ Test Harness code. Do Not modify (- Saurabh) ***************************
     // Adds a PlayerSession to the Firebase Database
     public static void _T_PostDummyPlayerSession(Dictionary<string, dynamic> tempData)

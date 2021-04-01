@@ -7,9 +7,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+
 #if UNITY_STANDALONE_WIN
 using yipli.Windows;
 #endif
+
 
 public class MatSelection : MonoBehaviour
 {
@@ -36,6 +38,7 @@ public class MatSelection : MonoBehaviour
     public GameObject installDriverButton;
 
     int retriesDone = 0;
+    const int totalMatConnectionRetriesOnRecheck = 5;
 
     private bool autoSkipMatConnection;
 
@@ -95,6 +98,11 @@ public class MatSelection : MonoBehaviour
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
 #elif UNITY_STANDALONE_WIN
+        if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            StartCoroutine(ConnectMat());
+        }
+#elif UNITY_IOS
         if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
             StartCoroutine(ConnectMat());
@@ -159,6 +167,11 @@ public class MatSelection : MonoBehaviour
         {
             StartCoroutine(ConnectMat(true));
         }
+#elif UNITY_IOS
+        if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            StartCoroutine(ConnectMat(true));
+        }
 #endif
     }
 
@@ -171,15 +184,23 @@ public class MatSelection : MonoBehaviour
         else
             EstablishMatConnection();
 
-#if UNITY_STANDALONE_WIN
         retriesDone++;
 
-        if (retriesDone > 2)
+        if (retriesDone > totalMatConnectionRetriesOnRecheck)
         {
-            //EnableTroubleshootButton();
-            TroubleshootButton();
+            EnableTroubleshootButton();// ask users if they wants to start it.
         }
-#endif
+        /*
+        #if UNITY_STANDALONE_WIN
+                retriesDone++;
+
+                if (retriesDone > totalMatConnectionRetriesOnRecheck)
+                {
+                    //EnableTroubleshootButton();// ask users if they wants to start it.
+                    TroubleshootButton();
+                }
+        #endif
+        */
     }
 
 
@@ -231,7 +252,11 @@ public class MatSelection : MonoBehaviour
         while (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase)
             && iTryCount < MaxBleCheckCount)
         {
+#if UNITY_IOS
+            yield return new WaitForSecondsRealtime(1f);
+#else
             yield return new WaitForSecondsRealtime(0.25f);
+#endif
             iTryCount++;
         }
 
@@ -244,9 +269,9 @@ public class MatSelection : MonoBehaviour
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
             Debug.Log("Mat not reachable.");
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IOS
                 noMatText.text = ProductMessages.Err_mat_connection_mat_off;
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
+#elif UNITY_STANDALONE_WIN && UNITY_EDITOR
             if (PortTestings.CheckAvailableComPorts() == 0)
             {
                 noMatText.text = ProductMessages.Err_mat_connection_no_ports;
@@ -306,10 +331,13 @@ public class MatSelection : MonoBehaviour
         loadingPanel.gameObject.GetComponentInChildren<Text>().text = "launching game..";
         loadingPanel.SetActive(true);
 
-        while (firebaseDBListenersAndHandlers.GetGameDataForCurrenPlayerQueryStatus() != QueryStatus.Completed)
+        if (currentYipliConfig.gameType != GameType.MULTIPLAYER_GAMING)
         {
-            Debug.Log("waiting to finish new player's game data");
-            yield return new WaitForSecondsRealtime(0.1f);
+            while (firebaseDBListenersAndHandlers.GetGameDataForCurrenPlayerQueryStatus() != QueryStatus.Completed)
+            {
+                Debug.Log("waiting to finish new player's game data");
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
         }
 
 
@@ -420,6 +448,12 @@ public class MatSelection : MonoBehaviour
         installDriverButton.SetActive(true);
     }
 #endif
+
+    // TroubleShoot System
+    public void TroubleShootSystemFromMS()
+    {
+        SceneManager.LoadScene("Troubleshooting");
+    }
 }
 
 //Register the YIPLI fitness mat from Yipli Hub to continue playing.

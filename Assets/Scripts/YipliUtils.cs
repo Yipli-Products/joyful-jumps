@@ -15,21 +15,21 @@ public class YipliUtils
     }
     */
 
-/* ******Gamification*******
-* Function to be called after the gameplay for Report card screen for every game
-* Calculations are aligned to actual cloud functions formulas which gets stored to the player backend
-*/
-/*
-    public static float GetFitnessPointsWithRandomization(IDictionary<PlayerActions, int> playerActionCounts)
-    {
-        float fp = 0.0f;
-        foreach (KeyValuePair<PlayerActions, int> action in playerActionCounts)
+    /* ******Gamification*******
+    * Function to be called after the gameplay for Report card screen for every game
+    * Calculations are aligned to actual cloud functions formulas which gets stored to the player backend
+    */
+    /*
+        public static float GetFitnessPointsWithRandomization(IDictionary<PlayerActions, int> playerActionCounts)
         {
-            fp += GetFitnessPointsPerAction(action.Key) * action.Value;
+            float fp = 0.0f;
+            foreach (KeyValuePair<PlayerActions, int> action in playerActionCounts)
+            {
+                fp += GetFitnessPointsPerAction(action.Key) * action.Value;
+            }
+            return fp * Random.Range(0.92f, 1.04f);
         }
-        return fp * Random.Range(0.92f, 1.04f);
-    }
-*/
+    */
 
     /* ******Gamification*******
     * Function to be called after the gameplay for Experience Points for every game
@@ -245,12 +245,21 @@ public class YipliUtils
                 break;
 
             case PlayerActions.LEFT_TAP:
-                fp = 10.0f;
+                fp = 4.0f;
                 break;
 
             case PlayerActions.RIGHT_TAP:
-                fp = 10.0f;
+                fp = 4.0f;
                 break;
+
+            case PlayerActions.LEFT_TOUCH:
+                fp = 3.0f;
+                break;
+
+            case PlayerActions.RIGHT_TOUCH:
+                fp = 3.0f;
+                break;
+
             default:
                 Debug.Log("Invalid action found while calculating the FP. FP returned would be 0.");
                 break;
@@ -323,7 +332,10 @@ public class YipliUtils
         BASIC2, // Running, Running Stop
         BASIC3, // High-knee
         BASIC4, // skier-jack
+        LEFT_TOUCH,
+        RIGHT_TOUCH,
         INVALID_ACTION,
+        TROUBLESHOOTING
     }
 
     /* 
@@ -475,6 +487,12 @@ public class YipliUtils
                 break;
             case PlayerActions.RIGHT_TAP:
                 calories = 0.04f;
+                break;
+            case PlayerActions.LEFT_TOUCH:
+                calories = 0.03f;
+                break;
+            case PlayerActions.RIGHT_TOUCH:
+                calories = 0.03f;
                 break;
             default:
                 Debug.Log("Invalid action found while calculating the calories. Calories returned would be 0.");
