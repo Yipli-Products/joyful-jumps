@@ -174,6 +174,14 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.Jump);
 
+            // add running action here as jump is detected
+            if (PlayerSession.Instance != null)
+            {
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
+                Debug.LogError("Calories : CurrentStepCount from Jump : " + UnityFitmatBridge.Instance.CurrentStepCount);
+                UnityFitmatBridge.Instance.CurrentStepCount = 0;
+            }
+
             int jump = PlayerData.JumpStep;
             PlayerData.JumpStep = jump + 1;
             if (PlayerSession.Instance != null)
@@ -196,7 +204,7 @@ public class InputController : PersistentSingleton<InputController>
             if (PlayerSession.Instance != null)
             {
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
-                Debug.LogError("CurrentStepCount from RunningStop : " + UnityFitmatBridge.Instance.CurrentStepCount);
+                Debug.LogError("Calories : CurrentStepCount from RunningStop : " + UnityFitmatBridge.Instance.CurrentStepCount);
                 UnityFitmatBridge.Instance.CurrentStepCount = 0;
             }
         }

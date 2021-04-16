@@ -3,7 +3,6 @@ namespace BLEFramework.Unity
     using UnityEngine;
     using System.Collections;
     using System.Collections.Generic;
-    using BLEFramework.MiniJSON;
 
     public class BLEControllerEventHandler : MonoBehaviour
     {
@@ -48,6 +47,10 @@ namespace BLEFramework.Unity
         public static void OnBleDidConnect(string message)
         {
             string errorMessage = message != "Success" ? message : null;
+#if UNITY_IPHONE
+                //Debug.Log("calling BLEStatus");
+                InitBLE.setMatConnectionStatus("CONNECTED");
+#endif
             OnBleDidConnectEvent?.Invoke(errorMessage);
         }
 
@@ -58,6 +61,10 @@ namespace BLEFramework.Unity
         public static void OnBleDidDisconnect(string message)
         {
             string errorMessage = message != "Success" ? message : null;
+#if UNITY_IPHONE
+                //Debug.Log("calling BLEStatus");
+                InitBLE.setMatConnectionStatus("DISCONNECTED");
+#endif
             OnBleDidDisconnectEvent?.Invoke(errorMessage);
         }
 
@@ -113,30 +120,39 @@ namespace BLEFramework.Unity
             OnBleDidCompletePeripheralScanEvent?.Invoke(peripheralJsonList, errorMessage);
         }
 
-        static void HandleOnBleDidCompletePeripheralScanEvent(string peripherals, string errorMessage)
+
+        static async void HandleOnBleDidCompletePeripheralScanEvent(string peripherals, string errorMessage)
         {
             if (errorMessage == null)
             {
                 if (InitBLE.isInitActive)
                 {
+                    /*********************************************************************
+                         Received String 
+                         A4:DA:32:4F:C2:54|YIPLI,F4:BF:80:63:E3:7A|honor Band 4-37A,F5:FB:4A:55:76:22|Mi Smart Band 4
+                    **********************************************************************/
                     string[] allBleDevices = peripherals.Split(',');
                     for (int i = 0; i < allBleDevices.Length; i++)
                     {
+
+
                         string[] tempSplits = allBleDevices[i].Split('|');
 
-                        Debug.Log(tempSplits[0] + " " + tempSplits[1]);
+                        Debug.Log("Mac : " + tempSplits[0] + " Device Name:" + tempSplits[1]);
                         if (tempSplits[1].Contains("YIPLI") && tempSplits[1].Length > 5)
                         {
                             string[] matID = tempSplits[1].Split('-');
-                            //TODO
-                            //Get data from FB for matID
+
+                            /***********************************
+                            // FOR Batch of 250 
+                            // MAT NAME - YIPLI-001
+                            /**********************************/
+
                             Debug.Log("Fetching data of Mat ID: " + matID[1]);
 
                             //MAC received from FB based on MAT ID
-                            //string macAddress = "A4:DA:32:4F:C2:54";
-                            string macAddress = FirebaseDBHandler.GetMacAddressFromMatID(matID[1]);
+                            string macAddress = await FirebaseDBHandler.GetMacAddressFromMatIDAsync(matID[1]);
 
-                            //string macAddress = "A4:34:F1:A5:99:18";
                             Debug.Log(macAddress + " " + InitBLE.MAC_ADDRESS);
                             if (InitBLE.MAC_ADDRESS == macAddress)
                             {
@@ -146,15 +162,25 @@ namespace BLEFramework.Unity
                         else if (tempSplits[1].Contains("YIPLI") && tempSplits[1].Length == 5)
                         {
 
-                            //------------
+                            /***********************************
                             // FOR NRF Boards and Batch 1 boards
-                            //-----------
+                            // MAT NAME - YIPLI
+                            /**********************************/
 
-                            //string[] matID = tempSplits[1].Split('-');
 
-                            //Debug.Log("Fetching data of Mat ID: "+matID[1]);
-                            string macAddress = "A4:DA:32:4F:C2:54";
-                            //string macAddress = "A4:34:F1:A5:99:18";
+                            //----------
+                            // Directly connect to MAT ID if valid mac address 
+                            // FOR BATCH-1 BOARDS
+                            //----------
+                            string macAddress = tempSplits[0];
+
+                            //----------
+                            // Get MacAddress from GATT 
+                            // FOR NRF BOARDS
+                            //----------
+                            // ~ TODO ~
+
+
                             Debug.Log(macAddress + " " + InitBLE.MAC_ADDRESS);
                             if (InitBLE.MAC_ADDRESS == macAddress)
                             {

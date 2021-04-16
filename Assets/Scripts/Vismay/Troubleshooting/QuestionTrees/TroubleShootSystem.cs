@@ -445,6 +445,10 @@ public class TroubleShootSystem : MonoBehaviour
             // ble is not shown
             SetMatSolutionText(4, 0);
 
+            // generate ticket here for ble module
+            string desc = "Bluetooth module is not working";
+            FmResponseFile.GenerateFilesAndUpload(null, FlowInfo, TroubleshootManager.CurrentAlgorithmID, CurrentYipliConfig, desc, TroubleshootManager.GetTroubleShootScriptableJson());
+
             // if question is asked or solution is provided that return;
             if (StopFurtherProcesses()) yield break;
         }
@@ -990,6 +994,8 @@ public class TroubleShootSystem : MonoBehaviour
 
         TroubleshootManager.CurrentAlgorithmID = 7;
         // start ticket system flow
+        string desc = "Mat is not getting started";
+        FmResponseFile.GenerateFilesAndUpload(null, FlowInfo, TroubleshootManager.CurrentAlgorithmID, currentYipliConfig, desc, TroubleshootManager.GetTroubleShootScriptableJson());
 
         TurnOffLoadingPanel();
     }
@@ -1001,6 +1007,8 @@ public class TroubleShootSystem : MonoBehaviour
 
         TroubleshootManager.CurrentAlgorithmID = 8;
         // start ticket system flow
+        string desc = "Full trouble shoot is requested";
+        FmResponseFile.GenerateFilesAndUpload(null, FlowInfo, TroubleshootManager.CurrentAlgorithmID, currentYipliConfig, desc, TroubleshootManager.GetTroubleShootScriptableJson());
 
         TurnOffLoadingPanel();
     }
@@ -1225,14 +1233,40 @@ public class TroubleShootSystem : MonoBehaviour
         }
     }
 
-#endregion
+    #endregion
 
     #region Test functions
 
     public void TestYipliList()
     {
         // test code
-        //FmResponseFile.WriteFlowsToFile(FindObjectOfType<CreateTicket>().SetTicketData());
+        /*
+        Debug.LogError("Systeminfo batterylevel : " + SystemInfo.batteryLevel);
+        Debug.LogError("Systeminfo batteryStatus : " + SystemInfo.batteryStatus);
+        Debug.LogError("Systeminfo deviceModel : " + SystemInfo.deviceModel);
+        Debug.LogError("Systeminfo deviceName : " + SystemInfo.deviceName);
+        Debug.LogError("Systeminfo deviceType : " + SystemInfo.deviceType);
+        Debug.LogError("Systeminfo deviceUniqueIdentifier : " + SystemInfo.deviceUniqueIdentifier);
+        Debug.LogError("Systeminfo graphicsDeviceID : " + SystemInfo.graphicsDeviceID);
+        Debug.LogError("Systeminfo graphicsDeviceName : " + SystemInfo.graphicsDeviceName);
+        Debug.LogError("Systeminfo graphicsDeviceType : " + SystemInfo.graphicsDeviceType);
+        Debug.LogError("Systeminfo graphicsDeviceVendor : " + SystemInfo.graphicsDeviceVendor);
+        Debug.LogError("Systeminfo graphicsDeviceVendorID : " + SystemInfo.graphicsDeviceVendorID);
+        Debug.LogError("Systeminfo graphicsDeviceVersion : " + SystemInfo.graphicsDeviceVersion);
+        Debug.LogError("Systeminfo graphicsMemorySize : " + SystemInfo.graphicsMemorySize);
+        Debug.LogError("Systeminfo graphicsMultiThreaded : " + SystemInfo.graphicsMultiThreaded);
+        Debug.LogError("Systeminfo graphicsShaderLevel : " + SystemInfo.graphicsShaderLevel);
+        Debug.LogError("Systeminfo hasDynamicUniformArrayIndexingInFragmentShaders : " + SystemInfo.hasDynamicUniformArrayIndexingInFragmentShaders);
+        Debug.LogError("Systeminfo hasHiddenSurfaceRemovalOnGPU : " + SystemInfo.hasHiddenSurfaceRemovalOnGPU);
+        Debug.LogError("Systeminfo hasMipMaxLevel : " + SystemInfo.hasMipMaxLevel);
+        Debug.LogError("Systeminfo operatingSystem : " + SystemInfo.operatingSystem);
+        Debug.LogError("Systeminfo operatingSystemFamily : " + SystemInfo.operatingSystemFamily);
+        Debug.LogError("Systeminfo processorCount : " + SystemInfo.processorCount);
+        Debug.LogError("Systeminfo processorFrequency : " + SystemInfo.processorFrequency);
+        Debug.LogError("Systeminfo processorType : " + SystemInfo.processorType);
+        */
+
+        Debug.LogError("ts json : " + TroubleshootManager.GetTroubleShootScriptableJson());
     }
 
     #endregion

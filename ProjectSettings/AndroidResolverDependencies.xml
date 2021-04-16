@@ -1,5 +1,6 @@
 <dependencies>
   <packages>
+    <package>com.google.android.gms:play-services-appinvite:18.0.0</package>
     <package>com.google.firebase:firebase-analytics:17.2.1</package>
     <package>com.google.firebase:firebase-analytics:17.4.1</package>
     <package>com.google.firebase:firebase-app-unity:6.15.2</package>
@@ -8,6 +9,7 @@
     <package>com.google.firebase:firebase-common:19.3.0</package>
     <package>com.google.firebase:firebase-database:19.3.0</package>
     <package>com.google.firebase:firebase-database-unity:6.15.2</package>
+    <package>com.google.firebase:firebase-dynamic-links-unity:6.15.2</package>
     <package>com.google.firebase:firebase-functions:19.0.1</package>
     <package>com.google.firebase:firebase-functions-unity:6.8.1</package>
     <package>com.google.firebase:firebase-storage:19.1.1</package>
@@ -42,6 +44,7 @@
     <file>Assets/Plugins/Android/androidx.versionedparcelable.versionedparcelable-1.0.0.aar</file>
     <file>Assets/Plugins/Android/androidx.viewpager.viewpager-1.0.0.aar</file>
     <file>Assets/Plugins/Android/com.google.android.gms.play-services-ads-identifier-17.0.0.aar</file>
+    <file>Assets/Plugins/Android/com.google.android.gms.play-services-appinvite-18.0.0.aar</file>
     <file>Assets/Plugins/Android/com.google.android.gms.play-services-base-17.1.0.aar</file>
     <file>Assets/Plugins/Android/com.google.android.gms.play-services-basement-17.0.0.aar</file>
     <file>Assets/Plugins/Android/com.google.android.gms.play-services-measurement-17.4.1.aar</file>
@@ -63,6 +66,8 @@
     <file>Assets/Plugins/Android/com.google.firebase.firebase-database-19.3.0.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-database-collection-17.0.1.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-database-unity-6.15.2.aar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-dynamic-links-18.0.0.aar</file>
+    <file>Assets/Plugins/Android/com.google.firebase.firebase-dynamic-links-unity-6.15.2.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-functions-19.0.1.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-functions-unity-6.8.1.aar</file>
     <file>Assets/Plugins/Android/com.google.firebase.firebase-iid-20.1.5.aar</file>

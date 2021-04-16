@@ -13,6 +13,7 @@ public static class FirebaseDBHandler
     // Get a reference to the storage service, using the default Firebase App
     static Firebase.Storage.FirebaseStorage yipliStorage = Firebase.Storage.FirebaseStorage.DefaultInstance;
     public static Firebase.Storage.StorageReference profilepic_storage_ref = yipliStorage.GetReferenceFromUrl("gs://yipli-project.appspot.com/profile-pics/");
+
     private static string profilePicRootUrl = "gs://yipli-project.appspot.com/profile-pics/";
 
     static Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
@@ -77,6 +78,8 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void PostPlayerSession(PlayerSession session, PostUserCallback callback)
     {
+        Debug.Log("Calories Pushing data to backend: " + JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic()));
+
         //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
@@ -516,7 +519,7 @@ public static class FirebaseDBHandler
 
     /* The function call to be allowed only if network is available 
        Get yipli pc app url from backend */
-    public static async Task UploadLogsFileToDB(string userID, List<string> fileNames, List<string> filePaths)
+    public static async Task<string> UploadLogsFileToDB(string userID, List<string> fileNames, List<string> filePaths)
     {
         StorageReference storageRef = yipliStorage.RootReference;
 
@@ -542,12 +545,113 @@ public static class FirebaseDBHandler
                 }
             });
         }
+
+        return storageChildRef;
     }
 
     // only foir IOS get mac address from fb
-    public static string GetMacAddressFromMatID(string MatID)
+    public static async Task<string> GetMacAddressFromMatIDAsync(string MatID)
     {
+        string macAddress = string.Empty;
+        DataSnapshot snapshot = null;
+        try
+        {
+            //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
+            Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
+
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            snapshot = await reference.Child("/inventory/mats/").Child(MatID).Child("mac-address").GetValueAsync();
+            macAddress = snapshot.Value.ToString();
+        }
+        catch (Exception exp)
+        {
+            Debug.LogError("Failed to tutstatus : " + exp.Message);
+        }
+
+        //return macAddress;
+
         return "A4:DA:32:4F:C2:54";
+    }
+
+    /* The function to store mat tutorial status to backend. */
+    public static async void SetTicketData(string strUserId, string ticketID, Dictionary<string, object> ticketData)
+    {
+        //await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                return;
+            }
+            Firebase.Auth.FirebaseUser newUser = task.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+                newUser.DisplayName, newUser.UserId);
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            await reference.Child("/customer-tickets/").Child(strUserId).Child(ticketID).SetValueAsync(ticketData);
+        });
+    }
+
+    /* The function to store ticket data to backend for this user. 
+    * This is to be called by your games shop manager module.*/
+    public static async void UpdateCurrentTicketData(string strUserId, Dictionary<string, object> ticketData, PostUserCallback callback)
+    {
+        //await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(async task =>
+        await auth.SignInAnonymouslyAsync().ContinueWith(async task =>
+        {
+            if (task.IsCanceled)
+            {
+                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                return;
+            }
+            if (task.IsFaulted)
+            {
+                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                return;
+            }
+            Firebase.Auth.FirebaseUser newUser = task.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+                newUser.DisplayName, newUser.UserId);
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            await reference.Child("customer-tickets/" + strUserId).Child("open/current_tkt/").UpdateChildrenAsync(ticketData);
+        });
+    }
+
+    //Get Email from user id
+    /* The function call to be allowed only if network is available */
+    public static async Task<string> GetEmailFromUserID(string receivedUserID)
+    {
+        string email = "";
+        DataSnapshot snapshot = null;
+        try
+        {
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+            newUser.DisplayName, newUser.UserId);
+
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            snapshot = await reference.Child("profiles/users").Child(receivedUserID).Child("email").GetValueAsync();
+
+            //Debug.LogError("Player's email : " + snapshot.Value);
+
+            email = snapshot.Value.ToString();
+        }
+        catch (Exception exp)
+        {
+            Debug.LogError("Failed to GetPlayer's email : " + exp.Message);
+        }
+
+        return email;
     }
 
     //************************ Test Harness code. Do Not modify (- Saurabh) ***************************

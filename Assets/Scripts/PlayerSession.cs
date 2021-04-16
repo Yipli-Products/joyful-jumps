@@ -120,7 +120,11 @@ public class PlayerSession : MonoBehaviour
     public void Update()
     {
         Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
-        CheckMatConnection();
+
+        if (SceneManager.GetActiveScene().name != "Troubleshooting")
+        {
+            CheckMatConnection();
+        }
     }
 
     public string GetCurrentPlayer()
@@ -448,7 +452,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (count < 1) return;
 
-        Debug.Log("Adding action in current player session.");
+        Debug.Log("Calories : Adding action " + action.ToString() + " in current player session.");
         if (playerActionCounts.ContainsKey(action))
         {
             playerActionCounts[action] = playerActionCounts[action] + count;
@@ -460,6 +464,8 @@ public class PlayerSession : MonoBehaviour
 
         FitnesssPoints += YipliUtils.GetFitnessPointsPerAction(action) * count * UnityEngine.Random.Range(0.92f, 1.04f); // this is to hide direct mapping between calories and fitnesspoint. small random multiplier is added fitness points to keep it random on single action level
         Calories += YipliUtils.GetCaloriesPerAction(action) * count;
+
+        Debug.Log("Calories : " + Calories + " added for action : " + action.ToString());
     }
 
     #endregion
@@ -632,6 +638,9 @@ public class PlayerSession : MonoBehaviour
     // get calories
     public float GetCaloriesBurned()
     {
+        Debug.Log("Calories Player actions : " + playerActionCounts);
+        Debug.Log("Calories Current : " + Calories);
+
         if (Calories < 1f)
         {
             return 1f;
@@ -699,5 +708,16 @@ public class PlayerSession : MonoBehaviour
     public void TroubleShootSystem()
     {
         SceneManager.LoadScene("Troubleshooting");
+    }
+
+    // Ticket system
+    // Update current ticket data.
+    public void UpdateCurrentTicketData(Dictionary<string, object> currentTicketData)
+    {
+        FirebaseDBHandler.UpdateCurrentTicketData(
+            currentYipliConfig.userId,
+            currentTicketData,
+            () => { Debug.Log("Ticket Generated successfully"); }
+        );
     }
 }

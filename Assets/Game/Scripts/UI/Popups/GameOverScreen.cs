@@ -47,16 +47,16 @@ public class GameOverScreen : MonoBehaviour
     public void SetData()
     {
         int currentLevel = playerGameData.GetCurrentLevel() ;
-        float calories = (int)PlayerSession.Instance.GetCaloriesBurned();
-        float fitnessPoints = (int)PlayerSession.Instance.GetFitnessPoints();
+        float calories = PlayerSession.Instance.GetCaloriesBurned();
+        float fitnessPoints = PlayerSession.Instance.GetFitnessPoints();
 
         //titleHeading.text = string.Format("Well Done. Level {0} Complete", (currentLevel));
         titleHeading.text = reportCardMessages[Random.Range(0,4)];
 
         totalTimeTaken.text = "Total Time : "+GameManager.FormatTime(tracker.timeElapsed);
         coinTaken.text = string.Format("Rewards Earned : {0}", tracker.totalPointsEarned);
-        caloriesBurned.text = "Calories burned : " + calories;
-        FitnessPointsEarned.text = "Fitness points : " + fitnessPoints;
+        caloriesBurned.text = "Calories burned : " + calories.ToString("n2");
+        FitnessPointsEarned.text = "Fitness points : " + fitnessPoints.ToString("n2");
 
         tracker.timeElapsed = 0;
 

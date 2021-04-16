@@ -11,9 +11,9 @@ public class InitBLE
 {
     static AndroidJavaClass _pluginClass;
     static AndroidJavaObject _pluginInstance;
-    //const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
-    const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";
-    static string BLEStatus = "";
+    // const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
+    const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";// This is used only  for android. No dependency on other platforms
+    public static string BLEStatus = "";
     public static bool isInitActive = false;
     public static string MAC_ADDRESS = "";
 
@@ -142,7 +142,6 @@ public class InitBLE
         {
 #if UNITY_IOS
                 string ver = _getFMResponse();
-                Debug.Log("Driver Version Received: " + ver);
                 return ver;
 #elif UNITY_ANDROID
             return PluginInstance.Call<string>("_getFMResponse");
@@ -178,6 +177,11 @@ public class InitBLE
             return "disconnected";
         }
         //return "error";
+    }
+
+    public static void setMatConnectionStatus(string status)
+    {
+        BLEStatus = status;
     }
 
     public static void reconnectMat()

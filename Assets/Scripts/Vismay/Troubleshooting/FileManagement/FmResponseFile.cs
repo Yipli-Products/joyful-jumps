@@ -10,10 +10,13 @@ public static class FmResponseFile
     private static string fileFlowName;
     private static string fileFlowPath;
 
+    private static string storagePath = string.Empty;
+
     public static string FileLogName { get => fileLogName; set => fileLogName = value; }
     public static string FileLogPath { get => fileLogPath; set => fileLogPath = value; }
     public static string FileFlowName { get => fileFlowName; set => fileFlowName = value; }
     public static string FileFlowPath { get => fileFlowPath; set => fileFlowPath = value; }
+    public static string StoragePath { get => storagePath; set => storagePath = value; }
 
     #region LogFile
     private static void CreateLogFile()
@@ -60,7 +63,7 @@ public static class FmResponseFile
 
         if (File.Exists(FileLogPath))
         {
-            await FirebaseDBHandler.UploadLogsFileToDB(userID, fileNames, filePaths);
+            StoragePath = await FirebaseDBHandler.UploadLogsFileToDB(userID, fileNames, filePaths);
         }
 
         Debug.Log("File Upload Finished");
@@ -96,7 +99,7 @@ public static class FmResponseFile
 
     #region management Stuff
 
-    public static async void GenerateFilesAndUpload(List<string> fmResponseList, string flowInfo, int troubleShootAlgoId, string userID)
+    public static async void GenerateFilesAndUpload(List<string> fmResponseList, string flowInfo, int troubleShootAlgoId, YipliConfig currentYipliConfig, string decription, string questionsAnswers)
     {
         FlowDetails fd = new FlowDetails();
 
@@ -104,13 +107,50 @@ public static class FmResponseFile
         fd.date = DateTime.Now.ToString();
         fd.algorithmID = troubleShootAlgoId.ToString();
         fd.flowStructure = flowInfo;
+        fd.scriptableValues = questionsAnswers;
 
-        WriteResponseToFile(fmResponseList);
+        if (fmResponseList != null)
+        {
+            WriteResponseToFile(fmResponseList);
+        }
 
         WriteFlowsToFile(fd.GetJson());
 
         // now upload files
-        await UploadLogsAsync(userID);
+        await UploadLogsAsync(currentYipliConfig.userId);
+
+        Dictionary<string, object> currentTicket = new Dictionary<string, object>();
+
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            if (!currentYipliConfig.thisUserTicketInfo.bleTest.Equals("done", StringComparison.OrdinalIgnoreCase))
+            {
+                currentTicket.Add("ble-test", "done");
+            }
+            else
+            {
+                currentTicket.Add("ble-test", "notDone");
+            }
+        }
+
+        currentTicket.Add("description", decription);
+        currentTicket.Add("file-storage-location", StoragePath);
+        currentTicket.Add("time-created", DateTime.UtcNow.ToString());
+        currentTicket.Add("user-email", await FirebaseDBHandler.GetEmailFromUserID(currentYipliConfig.userId));
+
+        if (Application.platform == RuntimePlatform.WindowsPlayer)
+        {
+            if (!currentYipliConfig.thisUserTicketInfo.usbTest.Equals("done", StringComparison.OrdinalIgnoreCase))
+            {
+                currentTicket.Add("usb-test", "done");
+            }
+            else
+            {
+                currentTicket.Add("usb-test", "notDone");
+            }
+        }
+
+        FreshDeskManager.SetTicketDataAndGenerate(currentTicket);
     }
 
     #endregion
@@ -123,6 +163,7 @@ public static class FmResponseFile
         public string date = string.Empty;
         public string algorithmID = string.Empty;
         public string flowStructure = string.Empty;
+        public string scriptableValues = string.Empty;
 
         public string GetJson()
         {

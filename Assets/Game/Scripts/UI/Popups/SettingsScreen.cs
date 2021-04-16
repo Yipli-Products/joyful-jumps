@@ -45,4 +45,9 @@ public class SettingsScreen : MonoBehaviour
     {
         PlayerSession.Instance.RetakeMatControlsTutorial();
     }
+
+    public void TroubleShootSystem()
+    {
+        PlayerSession.Instance.TroubleShootSystem();
+    }
 }

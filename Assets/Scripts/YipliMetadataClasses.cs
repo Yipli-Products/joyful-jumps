@@ -159,6 +159,12 @@ public class YipliInventoryGameInfo
     public string displayName;
     public string gamePackageId;
     public string gameVersion;
+    public int isGameUnderMaintenance = 0;
+    public string androidMinVersion;
+    public string iosMinVersion;
+    public string winMinVersion;
+    public string versionUpdateMessage;
+    public string maintenanceMessage;
 
     YipliInventoryGameInfo(string gameId)
     {
@@ -176,6 +182,13 @@ public class YipliInventoryGameInfo
                 displayName = snapshot.Child("name").Value?.ToString() ?? "";
                 gamePackageId = snapshot.Child("android-url").Value?.ToString() ?? "";
                 gameVersion = snapshot.Child("current-version").Value?.ToString() ?? "";
+
+                isGameUnderMaintenance = YipliHelper.StringToIntConvert(snapshot.Child("is-game-under-maintenance").Value.ToString());
+                androidMinVersion = snapshot.Child("android-min-version").Value.ToString();
+                iosMinVersion = snapshot.Child("ios-min-version").Value.ToString();
+                winMinVersion = snapshot.Child("win-min-version").Value.ToString();
+                maintenanceMessage = snapshot.Child("maintenance-message").Value.ToString();
+                versionUpdateMessage = snapshot.Child("version-update-message").Value.ToString();
             }
             else
             {
@@ -195,3 +208,50 @@ public class YipliInventoryGameInfo
     }
 }
 
+public class YipliThisUserTicketInfo
+{
+    public string bleTest;
+    public string description;
+    public string fileStorageLocation;
+    public string timeCreated;
+    public string usbTest;
+    public int ticketStatus;
+
+    public YipliThisUserTicketInfo(DataSnapshot snapshot)
+    {
+        try
+        {
+            if (snapshot != null)
+            {
+                Debug.Log("filling the Ticket info from Snapshot.");
+
+                bleTest = snapshot.Child("ble-test").Value?.ToString() ?? "";
+                description = snapshot.Child("description").Value?.ToString() ?? "";
+                fileStorageLocation = snapshot.Child("file-storage-location").Value?.ToString() ?? "";
+                timeCreated = snapshot.Child("time-created").Value.ToString();
+                usbTest = snapshot.Child("usb-test").Value.ToString();
+                ticketStatus = YipliHelper.StringToIntConvert(snapshot.Child("ticket-status").Value.ToString());
+            }
+            else
+            {
+                Debug.Log("DataSnapshot is null. Can't create UserTicketInfo instance.");
+                bleTest = string.Empty;
+                description = string.Empty;
+                fileStorageLocation = string.Empty;
+                timeCreated = string.Empty;
+                usbTest = string.Empty;
+                ticketStatus = 0;
+            }
+        }
+        catch (Exception exp)
+        {
+            Debug.Log("Exception in creating UserTicketInfo object from DataSnapshot : " + exp.Message);
+            bleTest = string.Empty;
+            description = string.Empty;
+            fileStorageLocation = string.Empty;
+            timeCreated = string.Empty;
+            usbTest = string.Empty;
+            ticketStatus = 0;
+        }
+    }
+}

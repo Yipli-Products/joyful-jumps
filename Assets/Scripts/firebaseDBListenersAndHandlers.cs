@@ -25,9 +25,18 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     //Track if the query exection is completed or not
     private static QueryStatus getGameInfoQueryStatus = global::QueryStatus.NotStarted;
-    
+
+    //Track if the query exection is completed or not
+    private static QueryStatus getThisUserTicketInfoQueryStatus = global::QueryStatus.NotStarted;
+
     //Track if the query exection is completed or not
     private static QueryStatus getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.NotStarted;
+
+    //Track if the query exection is completed or not
+    private static QueryStatus getGameBlockDataForCurrentPlayerQueryStatus = global::QueryStatus.NotStarted;
+
+    public static QueryStatus GetGameBlockDataForCurrentPlayerQueryStatus { get => getGameBlockDataForCurrentPlayerQueryStatus; set => getGameBlockDataForCurrentPlayerQueryStatus = value; }
+    public static QueryStatus GetThisUserTicketInfoQueryStatus { get => getThisUserTicketInfoQueryStatus; set => getThisUserTicketInfoQueryStatus = value; }
 
     public static QueryStatus GetGameDataForCurrenPlayerQueryStatus()
     {
@@ -67,6 +76,8 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 #endif
         PlayerSelection.DefaultPlayerChanged += addGameDataListener;
         PlayerSelection.GetGameInfo += addListnerForGameInfo;
+
+        PlayerSelection.TicketData += addListnerForThisUserTicketDataInfo;
 
         StartCoroutine(TrackNetworkConnectivity());
     }
@@ -114,6 +125,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         PlayerSelection.NewUserFound -= addDefaultMatIdListener;
         PlayerSession.NewMatFound -= addDefaultMatIdListener;
 #endif
+        PlayerSelection.TicketData -= addListnerForThisUserTicketDataInfo;
     }
 
     private async void addDefaultMatIdListener()
@@ -238,5 +250,24 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         Debug.Log("HandleGameDataValueChanged invoked");
         currentYipliConfig.gameDataForCurrentPlayer = args.Snapshot;
         getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.Completed;
+    }
+
+    // ticket data info
+    private async void addListnerForThisUserTicketDataInfo()
+    {
+        Debug.Log("addListnerForThisUserTicketDataInfo invoked");
+        await anonAuthenticate();
+        //FirebaseDatabase.DefaultInstance.GetReference("customer-tickets/" + currentYipliConfig.userId + "/").ValueChanged += HandleThisUserTicketDataInfoValueChanged;
+        FirebaseDatabase.DefaultInstance.GetReference("customer-tickets/")
+            .Child(currentYipliConfig.userId).Child("open/current_tkt").ValueChanged += HandleThisUserTicketDataInfoValueChanged;
+    }
+
+    private void HandleThisUserTicketDataInfoValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        GetThisUserTicketInfoQueryStatus = global::QueryStatus.InProgress;
+
+        currentYipliConfig.thisUserTicketInfo = new YipliThisUserTicketInfo(e.Snapshot);
+
+        GetThisUserTicketInfoQueryStatus = global::QueryStatus.Completed;
     }
 }

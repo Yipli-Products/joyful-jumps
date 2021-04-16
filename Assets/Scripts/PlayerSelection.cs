@@ -69,6 +69,9 @@ public class PlayerSelection : MonoBehaviour
     public delegate void OnGameLaunch();
     public static event OnUserFound GetGameInfo;
 
+    public delegate void OnTicketData();
+    public static event OnTicketData TicketData;
+
     // link informations
     string uId = string.Empty;
     string pId = string.Empty;
@@ -488,6 +491,7 @@ public class PlayerSelection : MonoBehaviour
         {
             //Trigger the database listeners as sson as the user is found
             NewUserFound();
+            TicketData();
         }
     }
 
@@ -580,9 +584,11 @@ public class PlayerSelection : MonoBehaviour
         try
         {
             Debug.Log("In player Selection Start()");
-#if UNITY_ANDROID || UNITY_IOS
-            //ReadAndroidIntents();
-            //SetLinkData();
+#if UNITY_ANDROID
+            if (currentYipliConfig.userId == null || currentYipliConfig.userId == "")
+            {
+                ReadAndroidIntents();
+            }
 #elif UNITY_STANDALONE_WIN && UNITY_EDITOR
             ReadFromWindowsFile();
             /*
@@ -593,6 +599,13 @@ public class PlayerSelection : MonoBehaviour
             */
 
 #endif
+            //Fill dummy data in user/player, for testing from Editor
+#if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
+            currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
+            //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
+            //currentYipliConfig.playerInfo = new YipliPlayerInfo("-MQHc-Ija9odZdIXkFYB", "kauva biryani", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg"); // vismay user
+            currentYipliConfig.matInfo = new YipliMatInfo("-MRJhboehK2o7TVyjzTb", "A4:DA:32:4F:C2:54");
+#endif
         }
         catch (System.Exception exp)// handling of game directing opening, without yipli app
         {
@@ -602,14 +615,6 @@ public class PlayerSelection : MonoBehaviour
             currentYipliConfig.userId = null;
             currentYipliConfig.playerInfo = null;
             currentYipliConfig.matInfo = null;
-
-            //Fill dummy data in user/player, for testing from Editor
-#if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
-            currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
-            //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
-            currentYipliConfig.playerInfo = new YipliPlayerInfo("-MQHc-Ija9odZdIXkFYB", "kauva biryani", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg"); // vismay user
-            currentYipliConfig.matInfo = new YipliMatInfo("-M3HgyBMOl9OssN8T6sq", "54:6C:0E:20:A0:3B");
-#endif
         }
 
 #if UNITY_STANDALONE_WIN
