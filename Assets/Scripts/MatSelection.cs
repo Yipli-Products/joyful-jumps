@@ -188,7 +188,7 @@ public class MatSelection : MonoBehaviour
 
         if (retriesDone > totalMatConnectionRetriesOnRecheck)
         {
-            EnableTroubleshootButton();// ask users if they wants to start it.
+            //EnableTroubleshootButton();// ask users if they wants to start it.
         }
         /*
         #if UNITY_STANDALONE_WIN
@@ -369,13 +369,23 @@ public class MatSelection : MonoBehaviour
     private void InitiateMatConnection()
     {
         //Initiate the connection with the mat.
+#if UNITY_IOS
+        // connection part for ios
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
+#else
         InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
+#endif
     }
 
     private void RetryMatConnectionOnPC()
     {
         //Initiate the connection with the mat.
+#if UNITY_IOS
+        // connection part for ios
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
+#else
         InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
+#endif
         //InitBLE.reconnectMat();
     }
 

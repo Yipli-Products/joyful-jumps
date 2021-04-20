@@ -346,7 +346,7 @@ public class YipliUtils
      */
     public static float GetCaloriesPerAction(PlayerActions playerAction)
     {
-        //Debug.Log("GetCaloriesPerAction() called for " + playerAction);
+        Debug.Log("GetCaloriesPerAction() called for " + playerAction);
         float calories = 0.0f;
         switch (playerAction)
         {

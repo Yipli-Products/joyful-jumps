@@ -82,6 +82,7 @@ public class PlayerSelection : MonoBehaviour
     string pPicUrl = string.Empty;
     string mId = string.Empty;
     string mMac = string.Empty;
+    string mName = string.Empty;
     string pTutDone = string.Empty;
 
     bool dataSetsAreFilled = false;
@@ -105,7 +106,7 @@ public class PlayerSelection : MonoBehaviour
         {
             var dynamicLinkEventArgs = args as ReceivedDynamicLinkEventArgs;
             string dynamicLinkOrig = dynamicLinkEventArgs.ReceivedDynamicLink.Url.OriginalString;
-            Debug.Log("Received dynamic link : " + dynamicLinkOrig);
+            Debug.Log("Deep link : Received dynamic link : " + dynamicLinkOrig);
 
             dynamicLinkOrig.Remove(0, dynamicLinkOrig.IndexOf("?"));
 
@@ -123,6 +124,7 @@ public class PlayerSelection : MonoBehaviour
                 {
                     case "uId":
                         uId = tempSplits[1];
+                        currentYipliConfig.userId = uId;
                         break;
 
                     case "pId":
@@ -157,6 +159,10 @@ public class PlayerSelection : MonoBehaviour
                         mMac = tempSplits[1];
                         break;
 
+                    case "mName":
+                        mName = tempSplits[1];
+                        break;
+
                     case "pTutDone":
                         pTutDone = tempSplits[1];
                         break;
@@ -168,7 +174,7 @@ public class PlayerSelection : MonoBehaviour
             }
 
             dataSetsAreFilled = true;
-            Debug.Log("Data sets are filled : " + dataSetsAreFilled);
+            Debug.Log("Deep link : Data sets are filled : " + dataSetsAreFilled);
 
             SetLinkData();
         }
@@ -442,13 +448,27 @@ public class PlayerSelection : MonoBehaviour
         {
             //If there is no PlayerInfo found in the Intents as an argument.
             //This code block will be called when the game App is not launched from the Yipli app.
-            currentYipliConfig.playerInfo = UserDataPersistence.GetSavedPlayer();
+            //currentYipliConfig.playerInfo = UserDataPersistence.GetSavedPlayer();
+
+            // seting player form all player list based on received pId
+            foreach (YipliPlayerInfo thisListCurrentPlayerInfo in currentYipliConfig.allPlayersInfo)
+            {
+                if (thisListCurrentPlayerInfo.playerId == pId)
+                {
+                    //currentYipliConfig.playerInfo = new YipliPlayerInfo(pId, pName, pDOB, pHt, pWt, pPicUrl, YipliHelper.StringToIntConvert(pTutDone));
+                    currentYipliConfig.playerInfo = thisListCurrentPlayerInfo;
+                }
+            }
         }
 
         if (currentYipliConfig.playerInfo != null)
         {
             //Notify the listeners to start gathering the players gamedata
             DefaultPlayerChanged();
+        }
+        else
+        {
+            Debug.Log("Deep link : currentYipliConfig.playerInfo is still null");
         }
     }
 
@@ -473,6 +493,7 @@ public class PlayerSelection : MonoBehaviour
 
     private void InitUserId()
     {
+        /*
         if (currentYipliConfig.userId != null && currentYipliConfig.userId.Length > 1)
         {
             //If UserId is found in the Intents as an argument.
@@ -486,6 +507,7 @@ public class PlayerSelection : MonoBehaviour
             //This code block will be called when the game App is not launched from the Yipli app.
             //currentYipliConfig.userId = UserDataPersistence.GetPropertyValue("user-id");
         }
+        */
 
         if (currentYipliConfig.userId != null && currentYipliConfig.userId.Length > 1)
         {
@@ -497,7 +519,7 @@ public class PlayerSelection : MonoBehaviour
 
     private void ReadAndroidIntents()
     {
-        Debug.Log("Reading intents.");
+        Debug.Log("Deep link : Reading intents.");
         AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
         AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
@@ -506,8 +528,8 @@ public class PlayerSelection : MonoBehaviour
         currentYipliConfig.userId = extras.Call<string>("getString", "uId");
         if (currentYipliConfig.userId == null)
         {
-            Debug.Log("Returning from readIntents as no userId found.");
-            throw new Exception("UserId is not found");
+            Debug.Log("Deep link : Returning from readIntents as no userId found.");
+            throw new Exception("Deep link : UserId is not found");
         }
 
         string pId = extras.Call<string>("getString", "pId");
@@ -520,7 +542,7 @@ public class PlayerSelection : MonoBehaviour
         string mMac = extras.Call<string>("getString", "mMac");
         string pTutDone = extras.Call<string>("getString", "pTutDone");
 
-        Debug.Log("Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pic);
+        Debug.Log("Deep link : Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pic);
 
         if (pId != null && pName != null)
         {
@@ -535,16 +557,35 @@ public class PlayerSelection : MonoBehaviour
 
     private void SetLinkData()
     {
-        Debug.Log("Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pPicUrl);
+        //Debug.Log("Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pPicUrl);
 
+        /*
         if (pId != null && pName != null)
         {
             currentYipliConfig.playerInfo = new YipliPlayerInfo(pId, pName, pDOB, pHt, pWt, pPicUrl, YipliHelper.StringToIntConvert(pTutDone));
         }
+        */
 
         if (mId != null && mMac != null)
         {
-            currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac);
+            if (mName != null && mName != string.Empty)
+            {
+                currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac, mName);
+            }
+            else
+            {
+                currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac);
+            }
+        }
+
+        // logs only
+        if (mName != null && mName != string.Empty)
+        {
+            Debug.Log("Deep link : Found intents with mName : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + mName + "," + pPicUrl);
+        }
+        else
+        {
+            Debug.Log("Deep link : Found intents without mName : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pPicUrl);
         }
     }
 
@@ -583,16 +624,21 @@ public class PlayerSelection : MonoBehaviour
     {
         try
         {
-            Debug.Log("In player Selection Start()");
+            Debug.Log("Deep link : In player Selection Start()");
 #if UNITY_ANDROID
             if (currentYipliConfig.userId == null || currentYipliConfig.userId == "")
             {
+                Debug.Log("Deep link : Reading intents as currentyipliConfig is empty");
                 ReadAndroidIntents();
+            }
+            else
+            {
+                Debug.Log("Deep link : no need to read intents as currentYipliConfig has data");
             }
 #elif UNITY_STANDALONE_WIN && UNITY_EDITOR
             ReadFromWindowsFile();
-            /*
 #elif UNITY_IOS
+            /*
             currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
             currentYipliConfig.playerInfo = new YipliPlayerInfo("-MSX--0uyqI7KgKmNOIY", "Nasha Mukti kendra", "07-01-1990", "172", "64", "-MSX--0uyqI7KgKmNOIY.jpg"); // vismay user
             currentYipliConfig.matInfo = new YipliMatInfo("-MUMyYuLTeqXB_K7RT_L", "A4:DA:32:4F:C2:54");
@@ -601,10 +647,10 @@ public class PlayerSelection : MonoBehaviour
 #endif
             //Fill dummy data in user/player, for testing from Editor
 #if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
-            currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
+            //currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
             //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
             //currentYipliConfig.playerInfo = new YipliPlayerInfo("-MQHc-Ija9odZdIXkFYB", "kauva biryani", "03-01-1999", "120", "49", "-MH0mCgEUMVBHxqwSQXj.jpg"); // vismay user
-            currentYipliConfig.matInfo = new YipliMatInfo("-MRJhboehK2o7TVyjzTb", "A4:DA:32:4F:C2:54");
+            //currentYipliConfig.matInfo = new YipliMatInfo("-MRJhboehK2o7TVyjzTb", "A4:DA:32:4F:C2:54");
 #endif
         }
         catch (System.Exception exp)// handling of game directing opening, without yipli app
@@ -626,6 +672,12 @@ public class PlayerSelection : MonoBehaviour
     {
         //Setting User Id in the scriptable Object
         InitUserId();
+
+        //First get all the players
+        while (firebaseDBListenersAndHandlers.GetPlayersQueryStatus() != QueryStatus.Completed)
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+        }
 
 #if UNITY_ANDROID || UNITY_IOS
         //Setting Deafult mat
@@ -689,10 +741,7 @@ public class PlayerSelection : MonoBehaviour
                 //Wait till the listeners are synced and the data has been populated
                 Debug.Log("Waiting for players query to complete");
                 LoadingPanel.gameObject.GetComponentInChildren<Text>().text = "Getting all players...";
-                while (firebaseDBListenersAndHandlers.GetPlayersQueryStatus() != QueryStatus.Completed)
-                {
-                    yield return new WaitForSecondsRealtime(0.1f);
-                }
+
 
                 //Mat coection would be required for Mat tutorials and Gamelib Navigation
                 matSelectionScript.EstablishMatConnection();

@@ -117,6 +117,7 @@ public class YipliMatInfo
     public string matName;
     public string matId;
     public string macAddress;
+    public string matAdvertisingName;
 
     public YipliMatInfo() { }
 
@@ -124,6 +125,13 @@ public class YipliMatInfo
     {
         this.matId = matId;
         this.macAddress = macAddress;
+    }
+
+    public YipliMatInfo(string matId, string macAddress, string matAdvertisingName)
+    {
+        this.matId = matId;
+        this.macAddress = macAddress;
+        this.matAdvertisingName = matAdvertisingName;
     }
 
     public YipliMatInfo(DataSnapshot snapshot, string key)

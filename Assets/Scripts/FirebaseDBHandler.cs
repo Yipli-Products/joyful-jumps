@@ -78,8 +78,6 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void PostPlayerSession(PlayerSession session, PostUserCallback callback)
     {
-        Debug.Log("Calories Pushing data to backend: " + JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic()));
-
         //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)

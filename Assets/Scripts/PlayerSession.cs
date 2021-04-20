@@ -120,11 +120,7 @@ public class PlayerSession : MonoBehaviour
     public void Update()
     {
         Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
-
-        if (SceneManager.GetActiveScene().name != "Troubleshooting")
-        {
-            CheckMatConnection();
-        }
+        CheckMatConnection();
     }
 
     public string GetCurrentPlayer()
@@ -264,6 +260,8 @@ public class PlayerSession : MonoBehaviour
             Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
 #if UNITY_ANDROID
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0);
+#elif UNITY_IOS
+            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
 #else
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
             //InitBLE.reconnectMat();
@@ -452,7 +450,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (count < 1) return;
 
-        Debug.Log("Calories : Adding action " + action.ToString() + " in current player session.");
+        Debug.Log("Adding action in current player session.");
         if (playerActionCounts.ContainsKey(action))
         {
             playerActionCounts[action] = playerActionCounts[action] + count;
@@ -464,8 +462,6 @@ public class PlayerSession : MonoBehaviour
 
         FitnesssPoints += YipliUtils.GetFitnessPointsPerAction(action) * count * UnityEngine.Random.Range(0.92f, 1.04f); // this is to hide direct mapping between calories and fitnesspoint. small random multiplier is added fitness points to keep it random on single action level
         Calories += YipliUtils.GetCaloriesPerAction(action) * count;
-
-        Debug.Log("Calories : " + Calories + " added for action : " + action.ToString());
     }
 
     #endregion
@@ -638,9 +634,6 @@ public class PlayerSession : MonoBehaviour
     // get calories
     public float GetCaloriesBurned()
     {
-        Debug.Log("Calories Player actions : " + playerActionCounts);
-        Debug.Log("Calories Current : " + Calories);
-
         if (Calories < 1f)
         {
             return 1f;
