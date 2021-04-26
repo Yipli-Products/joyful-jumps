@@ -203,6 +203,8 @@ public class PlayerSession : MonoBehaviour
 
     private void CheckMatConnection()
     {
+        if (SceneManager.GetActiveScene().name.Equals("Troubleshooting", StringComparison.OrdinalIgnoreCase)) return;
+
         Debug.Log("Before Processing : BleErrorPanel.activeSelf = " + BleErrorPanel.activeSelf);
 
         if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
