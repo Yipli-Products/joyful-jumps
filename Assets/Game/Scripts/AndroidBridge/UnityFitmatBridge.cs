@@ -28,11 +28,13 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
     private bool isGamePaused = false;
 
     private int currentStepCount = 0;
+    private int previousStepCount = 0;
 
     // this is to track the step the step count between running && (runningStopped || pause).
     public int CurrentStepCount { get => currentStepCount; set => currentStepCount = value; }
 
     public bool IsGamePaused { get => isGamePaused; set => isGamePaused = value; }
+    public int PreviousStepCount { get => previousStepCount; set => previousStepCount = value; }
 
     public void EnableGameInput()
     {
@@ -58,53 +60,6 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         _previousTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
-    /*protected virtual void Update()
-    {
-        _currentTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if ((_currentTime - _previousTime) >= 1000 || normalInput)
-        {
-            string FMResponse = InitBLE.PluginClass.CallStatic<string>("_getFMResponse");
-
-            string[] FMTokens = FMResponse.Split('.');
-
-            if (FMTokens.Length > 0 && !FMTokens[0].Equals(FMResponseCount))
-            {
-                Debug.Log("FMResponse " + FMResponse);
-                FMResponseCount = FMTokens[0];
-
-                if (FMTokens.Length > 1)
-                {
-                    string[] whiteSpace = FMTokens[1].Split(' ');
-
-                    if (whiteSpace.Length > 1)
-                    {
-                        int n;
-                        bool isNumeric = int.TryParse(whiteSpace[1], out n);
-
-                        if (isNumeric)
-                        {
-                            _latestFootSteps = n;
-                        }
-                        else
-                        {
-                            int step = PlayerData.FootStep;
-                            PlayerData.FootStep = step + _latestFootSteps;
-
-                            whiteSpace[0] = FMTokens[1];
-
-                            _latestFootSteps = 0;
-                        }
-                    }
-
-                    OnGotActionFromBridge?.Invoke(whiteSpace[0]);
-                }
-            }
-
-            _previousTime = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        }
-    }*/
-
     protected virtual void Update()
     {
         try
@@ -118,30 +73,25 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
             ///if (fmActionData == "No input yet!") return;
 
-            /* New FmDriver Response Format
-               {
-                  "count": 1,                 # Updates every time new action is detected
-                  "timestamp": 1597237057689, # Time at which response was packaged/created by Driver
-                  "playerdata": [                      # Array containing player data
+            /*
+            
+            packageFMResponse: 
+            { "count":53, 
+              "timestamp":1619501976556, 
+              "playerdata":
+                [
                     {
-                      "id": 1,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
-                      "count" :12,
-            "fmresponse": {
-                        "action_id": "9D6O",           # Action ID-Unique ID for each action. Refer below table for all action IDs
-                        "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
-                        "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
-                      }
-                    },
-                   {
-                      "id": 2,                         # Player ID (For Single-player-1 , Multiplayer it could be 1 or 2 )
-                      "fmresponse": {
-                        "action_id": "9D6O",           # Action ID-Unique ID for each action. Refer below table for all action IDs
-                        "action_name": "Jump",         # Action Name for debugging (Gamers should strictly check action ID)
-                        "properties": "null"           # Any properties action has - ex. Running could have Step Count, Speed
-                      }
+                        "id":1, 
+                        "fmresponse":
+                            {
+                                "action_id": "SWLO", 
+                                "action_name" : "Running", 
+                                "properties": "speed:4.499460, totalStepsCount:7"
+                            }
                     }
-                  ]
-                }
+                ]
+            }
+            
             */
 
             // Json parse FMResponse to get the input.
@@ -152,7 +102,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                 bIsInputRevieved = true;
 
                 // add running action here
-                if (PlayerSession.Instance != null)
+                if (PlayerSession.Instance != null && CurrentStepCount != 0)
                 {
                     PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, CurrentStepCount);
                     Debug.LogError("CurrentStepCount from pause : " + CurrentStepCount);
@@ -174,18 +124,26 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                     ///CheckPoint for the running action properties.
                     if (singlePlayerResponse.playerdata[0].fmresponse.properties.ToString() != "null")
                     {
+                        //"properties": "speed:4.499460, totalStepsCount:7"
+                        //                  0                   1
                         string[] tokens = singlePlayerResponse.playerdata[0].fmresponse.properties.Split(',');
 
                         if (tokens.Length > 0)
                         {
                             //Split the property value pairs:
-                            string[] totalStepsCountKeyValue = tokens[0].Split(':');
+                            string[] totalStepsCountKeyValue = tokens[1].Split(':');
                             if (totalStepsCountKeyValue[0].Equals("totalStepsCount"))
                             {
                                 PlayerData.FootStep += int.Parse(totalStepsCountKeyValue[1]);
                                 Debug.LogError("Total footSteps : " + PlayerData.FootStep);
 
                                 Debug.LogError("Adding steps : " + totalStepsCountKeyValue[1]);
+
+                                if (PreviousStepCount != int.Parse(totalStepsCountKeyValue[1]))
+                                {
+
+                                }
+
                                 CurrentStepCount = int.Parse(totalStepsCountKeyValue[1]);
                             }
 

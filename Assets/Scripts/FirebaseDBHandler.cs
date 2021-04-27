@@ -78,6 +78,8 @@ public static class FirebaseDBHandler
     // Adds a PlayerSession to the Firebase Database
     public static void PostPlayerSession(PlayerSession session, PostUserCallback callback)
     {
+        Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic()));
+
         //auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password).ContinueWith(task => {
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
@@ -650,6 +652,32 @@ public static class FirebaseDBHandler
         }
 
         return email;
+    }
+
+    // get user's current mat details
+    public static async Task<DataSnapshot> GetMatDetailsOfUserId(string userID, string currentMatID)
+    {
+        DataSnapshot snapshot = null;
+        try
+        {
+            //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
+            Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
+            Debug.LogFormat("User signed in successfully: {0} ({1})",
+            newUser.DisplayName, newUser.UserId);
+
+            FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
+            DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
+            snapshot = await reference.Child("profiles/users").Child(userID).Child("current-mat-id").GetValueAsync();
+            currentMatID = snapshot.Value.ToString();
+
+            snapshot = await reference.Child("profiles/users").Child(userID).Child("mats").Child(currentMatID).GetValueAsync();
+        }
+        catch (Exception exp)
+        {
+            Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+        }
+
+        return snapshot;
     }
 
     //************************ Test Harness code. Do Not modify (- Saurabh) ***************************
