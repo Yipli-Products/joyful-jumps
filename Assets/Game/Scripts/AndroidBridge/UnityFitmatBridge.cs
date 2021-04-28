@@ -33,8 +33,9 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
     // this is to track the step the step count between running && (runningStopped || pause).
     public int CurrentStepCount { get => currentStepCount; set => currentStepCount = value; }
 
-    public bool IsGamePaused { get => isGamePaused; set => isGamePaused = value; }
     public int PreviousStepCount { get => previousStepCount; set => previousStepCount = value; }
+
+    public bool IsGamePaused { get => isGamePaused; set => isGamePaused = value; }
 
     public void EnableGameInput()
     {
@@ -101,6 +102,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             {
                 bIsInputRevieved = true;
 
+                
                 // add running action here
                 if (PlayerSession.Instance != null && CurrentStepCount != 0)
                 {
@@ -139,12 +141,15 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
                                 Debug.LogError("Adding steps : " + totalStepsCountKeyValue[1]);
 
-                                if (PreviousStepCount != int.Parse(totalStepsCountKeyValue[1]))
-                                {
-
-                                }
-
                                 CurrentStepCount = int.Parse(totalStepsCountKeyValue[1]);
+
+                                if (CurrentStepCount < PreviousStepCount) {
+                                    PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.PreviousStepCount);
+
+                                    PreviousStepCount = CurrentStepCount;
+                                } else {
+                                    PreviousStepCount = CurrentStepCount;
+                                }
                             }
 
                             string[] speedKeyValue = tokens[1].Split(':');
@@ -197,20 +202,24 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     private IEnumerator ExecutePlayerStop()
     {
-
+        /*
         if (Application.platform == RuntimePlatform.Android)
         {
             Debug.LogError("Runtime platform is A : " + Application.platform);
-            yield return new WaitForSecondsRealtime(0.2f);
+            yield return new WaitForSecondsRealtime(1f);
         }
         else
         {
             Debug.LogError("Runtime platform is W : " + Application.platform);
             yield return new WaitForSecondsRealtime(1f);
         }
+        */
+
+        yield return new WaitForSecondsRealtime(1f);
 
         if (false == bIsInputRevieved && YipliHelper.GetGameClusterId() != 0)
         {
+            //CurrentStepCount = 0;
             OnGotActionFromBridge?.Invoke(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNINGSTOPPED));
         }
     }
