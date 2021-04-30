@@ -38,7 +38,7 @@ public class MatSelection : MonoBehaviour
     public GameObject installDriverButton;
 
     int retriesDone = 0;
-    const int totalMatConnectionRetriesOnRecheck = 5;
+    const int totalMatConnectionRetriesOnRecheck = 2;
 
     private bool autoSkipMatConnection;
 
@@ -186,10 +186,9 @@ public class MatSelection : MonoBehaviour
 
         retriesDone++;
 
-        //if (retriesDone > totalMatConnectionRetriesOnRecheck)
-        if (retriesDone > 1)
+        if (retriesDone > totalMatConnectionRetriesOnRecheck)
         {
-            EnableTroubleshootButton();// ask users if they wants to start it.
+            //EnableTroubleshootButton();// ask users if they wants to start it.
         }
         /*
         #if UNITY_STANDALONE_WIN
