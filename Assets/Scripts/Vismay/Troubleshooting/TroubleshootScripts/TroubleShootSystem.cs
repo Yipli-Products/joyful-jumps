@@ -61,9 +61,7 @@ public class TroubleShootSystem : MonoBehaviour
     //const string siliconLabsDesc = "Silicon Labs CP210x USB to UART Bridge";
     //const string siliconLabsManufacturer = "Silicon Labs";
     private bool checkMatActions = false;
-    private bool startNoteIsShown = false;
 
-    // button flags
     public bool yesClicked = false;
     public bool notSureClicked = false;
     public bool noClicked = false;
@@ -88,7 +86,6 @@ public class TroubleShootSystem : MonoBehaviour
     public string FlowInfo { get => flowInfo; set => flowInfo = value; }
     public TroubleShootManagerS TroubleshootManager { get => troubleshootManager; set => troubleshootManager = value; }
     public YipliConfig CurrentYipliConfig { get => currentYipliConfig; set => currentYipliConfig = value; }
-    public bool StartNoteIsShown { get => startNoteIsShown; set => startNoteIsShown = value; }
 
     private void Awake()
     {
@@ -105,11 +102,7 @@ public class TroubleShootSystem : MonoBehaviour
     public void ResetTroubleShooter()
     {
         TurnOffAllPanels();
-        if (!StartNoteIsShown)
-        {
-            StartNoteIsShown = true;
-            TurnOnNotesPanel(ProductMessages.StartNote);
-        }
+        TurnOnNotesPanel(ProductMessages.StartNote);
     }
 
     private void Update()
@@ -416,46 +409,31 @@ public class TroubleShootSystem : MonoBehaviour
     {
         // ask driver to confirm
 
-        Debug.LogError("mingc : MatIsNotGettingConnected : from ble list couroutine.");
+        Debug.LogError("MatIsNotGettingConnected : from ble list couroutine.");
 
         TurnOnLoadingPanel();
         InitBLE.ScanForPeripherals();
 
-        Debug.LogError("mingc : Wait is startted");
         yield return new WaitForSecondsRealtime(12f);
-        Debug.LogError("mingc : Wait is over");
 
         // string peripheralJsonList = "F4:BF:80:63:E3:7A|honor Band 4-37A,F9:4B:4A:BF:66:C1|Amazfit Bip U,F5:FB:4A:55:76:22|Mi Smart Band 4,F5:FV:4A:55:80:22|Yipli";
 
-        Debug.LogError($"mingc : PeripheralJsonList : {InitBLE.PeripheralJsonList}");
+        string peripheralJsonList = InitBLE.PeripheralJsonList;
 
-        if (InitBLE.PeripheralJsonList == null || InitBLE.PeripheralJsonList == "" || InitBLE.PeripheralJsonList == string.Empty)
+        string[] allBleDevices = peripheralJsonList.Split(',');
+
+        for (int i = 0; i < allBleDevices.Length; i++)
         {
-            string peripheralJsonList = InitBLE.PeripheralJsonList;
+            string[] tempSplits = allBleDevices[i].Split('|');
 
-            string[] allBleDevices = peripheralJsonList.Split(',');
-
-            Debug.LogError("mingc : next line is for loop");
-            for (int i = 0; i < allBleDevices.Length; i++)
+            if (tempSplits[1].Equals("YIPLI", StringComparison.OrdinalIgnoreCase))
             {
-                string[] tempSplits = allBleDevices[i].Split('|');
-
-                if (tempSplits[1].Equals("YIPLI", StringComparison.OrdinalIgnoreCase))
-                {
-                    TroubleshootManager.BleScannedMacAddress = tempSplits[0];
-                    break;
-                }
+                TroubleshootManager.BleScannedMacAddress = tempSplits[0];
+                break;
             }
         }
-        else
-        {
-            Debug.LogError("mingc : from else PeripheralJsonList is null");
-            TroubleshootManager.BleScannedMacAddress = string.Empty;
-        }
-
-        Debug.LogError("mingc : for loop is ended and turning off the loading panel");
+        
         TurnOffLoadingPanel();
-        Debug.LogError("mingc : loading panel is off");
 
         if (TroubleshootManager.BleScannedMacAddress == null || TroubleshootManager.BleScannedMacAddress == "" || TroubleshootManager.BleScannedMacAddress == string.Empty)
         {
@@ -476,7 +454,7 @@ public class TroubleShootSystem : MonoBehaviour
         }
         else
         {
-            Debug.LogError("mingc : scan has ble. mac address is : " + TroubleshootManager.BleScannedMacAddress);
+            Debug.LogError("scan has ble. mac address is : " + TroubleshootManager.BleScannedMacAddress);
             sampleText.text = "all mac addresses : " + InitBLE.PeripheralJsonList + "\nscan has ble. mac address is : " + TroubleshootManager.BleScannedMacAddress;
 
             IsThisSameMatAddedInYipliAccountAndroid(TroubleshootManager.BleScannedMacAddress);
@@ -491,8 +469,6 @@ public class TroubleShootSystem : MonoBehaviour
         }
 
         FlowInfo += "M4->";
-
-        Debug.LogError("mingc : IsBLEListHasYipliAndroid function is finished");
     }
 
 #if UNITY_STANDALONE_WIN
@@ -981,7 +957,7 @@ public class TroubleShootSystem : MonoBehaviour
 
         WhatIsTheColorOfLED();
         */
-        Debug.LogError("mingc : MatIsNotGettingConnected : color of led is done.");
+        Debug.LogError("MatIsNotGettingConnected : color of led is done.");
 
 #if UNITY_STANDALONE_WIN
         IsChargingLightVisible();
@@ -991,7 +967,7 @@ public class TroubleShootSystem : MonoBehaviour
 
         IsSiliconDrivreInstalled();
 #elif UNITY_ANDROID
-        Debug.LogError("mingc : MatIsNotGettingConnected : next line is ble list couroutine.");
+        Debug.LogError("MatIsNotGettingConnected : next line is ble list couroutine.");
 
         StartCoroutine(IsBLEListHasYipliAndroid());
 
@@ -1165,10 +1141,6 @@ public class TroubleShootSystem : MonoBehaviour
         {
             // handle case for no mat connection
             // practical should not start
-            // generate ticket here for ble module
-            Debug.LogError("mingc : Mat is not getting connected, so practical can't start");
-            string desc = "Mat is not getting connected";
-            FmResponseFile.GenerateFilesAndUpload(null, FlowInfo, TroubleshootManager.CurrentAlgorithmID, CurrentYipliConfig, desc, TroubleshootManager.GetTroubleShootScriptableJson());
         }
     }
 

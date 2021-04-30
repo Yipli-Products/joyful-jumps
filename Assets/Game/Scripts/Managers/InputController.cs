@@ -174,15 +174,13 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.Jump);
 
-            /*
             // add running action here as jump is detected
-            if (PlayerSession.Instance != null && UnityFitmatBridge.Instance.CurrentStepCount != 0)
+            if (PlayerSession.Instance != null)
             {
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
                 Debug.LogError("Calories : CurrentStepCount from Jump : " + UnityFitmatBridge.Instance.CurrentStepCount);
                 UnityFitmatBridge.Instance.CurrentStepCount = 0;
             }
-            */
 
             int jump = PlayerData.JumpStep;
             PlayerData.JumpStep = jump + 1;
@@ -202,15 +200,13 @@ public class InputController : PersistentSingleton<InputController>
         {
             SetMove(Move.StopRunning);
 
-            /*
             // add running action here
-            if (PlayerSession.Instance != null && UnityFitmatBridge.Instance.CurrentStepCount != 0)
+            if (PlayerSession.Instance != null)
             {
                 PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, UnityFitmatBridge.Instance.CurrentStepCount);
                 Debug.LogError("Calories : CurrentStepCount from RunningStop : " + UnityFitmatBridge.Instance.CurrentStepCount);
                 UnityFitmatBridge.Instance.CurrentStepCount = 0;
             }
-            */
         }
         else if (data.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.PAUSE), StringComparison.OrdinalIgnoreCase))//&& _lastMatData != "Pause")
         {
