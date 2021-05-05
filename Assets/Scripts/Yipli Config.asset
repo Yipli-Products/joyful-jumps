@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f40c8c606cc173f4eb200ee27aa3e131, type: 3}
   m_Name: Yipli Config
   m_EditorClassIdentifier: 
-  callbackLevel: MenuScene
+  callbackLevel: DemoGameScene
   userId: 
-  gameId: joyfuljumps
+  gameId: trapped
   bIsChangePlayerCalled: 0
   onlyMatPlayMode: 0
   bIsRetakeTutorialFlagActivated: 0
