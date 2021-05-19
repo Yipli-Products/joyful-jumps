@@ -406,6 +406,8 @@ public class LevelManager : Singleton<LevelManager>
                     gameData.Add("reward-points", playerGameData.GetTotalScore().ToString());
                     gameData.Add("current-level", playerGameData.GetCurrentLevel().ToString());
                     PlayerSession.Instance.UpdateGameData(gameData);
+
+                    Debug.Log("Game Data updated successfully");
                 }
 
                 // add running action here
@@ -415,6 +417,9 @@ public class LevelManager : Singleton<LevelManager>
                     Debug.LogError("CurrentStepCount from level success : " + UnityFitmatBridge.Instance.CurrentStepCount);
                     UnityFitmatBridge.Instance.CurrentStepCount = 0;
                 }
+
+                // for testing only
+                PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, 10);
 
                 PlayerSession.Instance.StoreSPSession(tracker.totalPointsEarned);
             }

@@ -624,7 +624,8 @@ public class PlayerSession : MonoBehaviour
     // get game and driver version
     public string GetDriverAndGameVersion()
     {
-        return YipliHelper.GetFMDriverVersion() + " : " + Application.version;
+        //return YipliHelper.GetFMDriverVersion() + " : " + Application.version;
+        return Application.version;
     }
 
     // get fitness poins
