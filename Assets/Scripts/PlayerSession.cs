@@ -225,7 +225,11 @@ public class PlayerSession : MonoBehaviour
             {
                 // Different mat connection (error)message based on Operating system and connectivity type.
 #if UNITY_ANDROID
-                bleErrorText.text = ProductMessages.Err_mat_connection_android_phone;
+                if (currentYipliConfig.isDeviceAndroidTV) {
+                    bleErrorText.text = ProductMessages.Err_mat_connection_android_tv;
+                } else {
+                    bleErrorText.text = ProductMessages.Err_mat_connection_android_phone;
+                }
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR
                 bleErrorText.text = ProductMessages.Err_mat_connection_pc;
 #endif
@@ -261,7 +265,7 @@ public class PlayerSession : MonoBehaviour
             //Initiate mat connection with last set GameCluterId
             Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
 #if UNITY_ANDROID
-            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0);
+            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI", currentYipliConfig.isDeviceAndroidTV);
 #elif UNITY_IOS
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
 #else
@@ -592,6 +596,13 @@ public class PlayerSession : MonoBehaviour
             Debug.Log("playerActionCounts is not set");
             return -1;
         }
+        /* TODO : Confirm with kurus
+        else if (playerDetails.playerActionCounts.Count < 1)
+        {
+            playerDetails.calories = 1;
+        }
+        */
+        
         if (playerDetails.duration == 0)
         {
             Debug.Log("duration is 0");
@@ -624,8 +635,7 @@ public class PlayerSession : MonoBehaviour
     // get game and driver version
     public string GetDriverAndGameVersion()
     {
-        //return YipliHelper.GetFMDriverVersion() + " : " + Application.version;
-        return Application.version;
+        return YipliHelper.GetFMDriverVersion() + " : " + Application.version;
     }
 
     // get fitness poins
@@ -693,7 +703,7 @@ public class PlayerSession : MonoBehaviour
     {
 #if UNITY_EDITOR
         currentYipliConfig.onlyMatPlayMode = false;
-#elif UNITY_ANDROID
+#elif UNITY_ANDROID || UNITY_IOS
         currentYipliConfig.onlyMatPlayMode = true;
 #elif UNITY_STANDALONE_WIN
         currentYipliConfig.onlyMatPlayMode = true;   

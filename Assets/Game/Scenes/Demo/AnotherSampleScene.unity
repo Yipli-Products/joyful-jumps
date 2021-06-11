@@ -413,7 +413,7 @@ MonoBehaviour:
     mixerGroup: {fileID: -4380900092806532690, guid: 67e79a93a0ce9ef4e900f320c8aaa97a,
       type: 2}
     clip: {fileID: 8300000, guid: acec13b2b748a8040b55acc8c3c31bc2, type: 3}
-    duration: 0
+    duration: 10
 --- !u!4 &407171902
 Transform:
   m_ObjectHideFlags: 0
