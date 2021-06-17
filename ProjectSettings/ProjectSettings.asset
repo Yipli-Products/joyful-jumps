@@ -126,7 +126,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 3.01.031
+  bundleVersion: 4.02.050
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -173,7 +173,7 @@ PlayerSettings:
     Android: com.YIPLI.JoyfulJumps
     Standalone: com.yipli.joyfuljumps
   buildNumber: {}
-  AndroidBundleVersionCode: 301031
+  AndroidBundleVersionCode: 402050
   AndroidMinSdkVersion: 21
   AndroidTargetSdkVersion: 30
   AndroidPreferredInstallLocation: 1

@@ -15,7 +15,7 @@ MonoBehaviour:
   callbackLevel: DemoGameScene
   userId: 
   gameId: trapped
-  bIsChangePlayerCalled: 0
+  bIsChangePlayerCalled: 1
   onlyMatPlayMode: 0
   bIsRetakeTutorialFlagActivated: 0
   bIsInternetConnected: 1
@@ -24,3 +24,4 @@ MonoBehaviour:
   troubleshootingPOSTDone: 0
   currentMatID: 
   pId: 
+  isDeviceAndroidTV: 0

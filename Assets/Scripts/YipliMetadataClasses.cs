@@ -13,6 +13,7 @@ public class YipliPlayerInfo
     //public string playerExpertyLevel;//The Experty level of the player at time of playing the game.
     //public string gender;
     public string profilePicUrl;
+    public Sprite playerProfilePicIMG;
     public int isMatTutDone;
     //public string difficultyLevel; // to be decided by the game.
 
@@ -76,6 +77,8 @@ public class YipliPlayerInfo
                     playerId = null;
                 }
 
+                SetProfilePicForPlayer(profilePicUrl);
+
                 Debug.Log("Player Found with details :" + playerAge + " " + playerHeight + " " + playerId + " " + playerWeight + " " + playerName + " ProfilePicUrl:" + profilePicUrl);
             }
             else
@@ -89,6 +92,11 @@ public class YipliPlayerInfo
             Debug.Log("Exception in creating YipliPlayerInfo object from DataSnapshot : " + exp.Message);
             playerId = null;
         }
+    }
+
+    private async void SetProfilePicForPlayer(string profilePicUrlNew) {
+        string onDeviceProfilePicPath = Application.persistentDataPath + "/" + profilePicUrlNew;
+        playerProfilePicIMG = await FirebaseDBHandler.GetImageAsync(profilePicUrlNew, onDeviceProfilePicPath);
     }
 
     private string CalculateAge(string strDob /* 'mm-dd-yyyy' format */)

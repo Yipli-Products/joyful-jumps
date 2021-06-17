@@ -60,7 +60,7 @@ public static class YipliHelper
     public static string GetMatConnectionStatus()
     {
         if(!PlayerSession.Instance.currentYipliConfig.onlyMatPlayMode)
-            return "connected";
+            return "Connected";
         Debug.Log("GetBleConnectionStatus returning : " + InitBLE.getMatConnectionStatus());
         return InitBLE.getMatConnectionStatus();
     }

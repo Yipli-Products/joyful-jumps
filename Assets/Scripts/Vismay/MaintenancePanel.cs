@@ -4,23 +4,26 @@ using TMPro;
 public class MaintenancePanel : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI message;
-    [SerializeField] TextMeshProUGUI title;
+    //[SerializeField] TextMeshProUGUI title;
 
     [SerializeField] GameObject maintenancePanel;
-    [SerializeField] GameObject updateButton;
+    //[SerializeField] GameObject updateButton;
 
     [SerializeField] YipliConfig currentYipliConfig;
+
+    [SerializeField] NewUIManager newUIManager = null;
 
     private void Start()
     {
         maintenancePanel.SetActive(false);
-        updateButton.SetActive(false);
+        newUIManager.TurnOffMainCommonButton();
+        //updateButton.SetActive(false);
     }
 
     private void Update()
     {
         ManageManitanenceOrBlocking();
-        BlockIfTroubleShootingIsOn();
+        //BlockIfTroubleShootingIsOn();
     }
 
     public void QuitApp()
@@ -30,12 +33,15 @@ public class MaintenancePanel : MonoBehaviour
 
     private void ManageManitanenceOrBlocking()
     {
+        if (currentYipliConfig.gameInventoryInfo == null) return;
+
         if (currentYipliConfig.gameInventoryInfo.isGameUnderMaintenance == 1)
         {
             //message.text = char.ToUpper(currentYipliConfig.gameId[0]) + currentYipliConfig.gameId.Substring(1) + " is under maintanance." + "\n\nStay tuned.";
             message.text = currentYipliConfig.gameInventoryInfo.maintenanceMessage;
-            title.text = "Maintenance Notice";
+            //title.text = "Maintenance Notice";
 
+            newUIManager.UpdateButtonDisplay(maintenancePanel.tag, true);
             maintenancePanel.SetActive(true);
             return;
         }
@@ -63,14 +69,17 @@ public class MaintenancePanel : MonoBehaviour
         if (notAllowedVersionCode > gameVersionCode)
         {
             message.text = currentYipliConfig.gameInventoryInfo.versionUpdateMessage;
-            title.text = "Update Notice";
+            //title.text = "Update Notice";
 
             maintenancePanel.SetActive(true);
-            updateButton.SetActive(true);
+            //updateButton.SetActive(true);
+
+            newUIManager.UpdateButtonDisplay(maintenancePanel.tag);
         }
         else
         {
             maintenancePanel.SetActive(false);
+            //newUIManager.TurnOffMainCommonButton();
         }
     }
 
@@ -90,13 +99,14 @@ public class MaintenancePanel : MonoBehaviour
         if (testStatusToCheck.Equals("done", System.StringComparison.OrdinalIgnoreCase))
         {
             message.text = "Your environment is currently under troubleshooting. The game is not playable here at this time.";
-            title.text = "Troubleshoot Notice";
+            //title.text = "Troubleshoot Notice";
 
             maintenancePanel.SetActive(true);
         }
         else
         {
             maintenancePanel.SetActive(false);
+            //newUIManager.TurnOffMainCommonButton();
         }
     }
 }

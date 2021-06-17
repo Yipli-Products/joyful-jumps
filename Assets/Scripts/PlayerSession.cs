@@ -83,6 +83,8 @@ public class PlayerSession : MonoBehaviour
             _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
             Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
             Debug.Log("Loading Yipli scene for player Selection...");
+
+            currentYipliConfig.bIsRetakeTutorialFlagActivated = false;
             if (!_instance.currentYipliConfig.callbackLevel.Equals("Yipli_Testing_harness"))
                 SceneManager.LoadScene("yipli_lib_scene");
         }
@@ -265,9 +267,9 @@ public class PlayerSession : MonoBehaviour
             //Initiate mat connection with last set GameCluterId
             Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
 #if UNITY_ANDROID
-            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI", currentYipliConfig.isDeviceAndroidTV);
+            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS, currentYipliConfig.isDeviceAndroidTV);
 #elif UNITY_IOS
-            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
+            InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS);
 #else
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
             //InitBLE.reconnectMat();

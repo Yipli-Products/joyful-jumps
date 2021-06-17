@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿/* This script is not in use for now. Do not delete this script. */
+
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 

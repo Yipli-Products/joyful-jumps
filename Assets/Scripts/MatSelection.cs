@@ -37,6 +37,9 @@ public class MatSelection : MonoBehaviour
     public GameObject retryButton;
     public GameObject installDriverButton;
 
+    [Header("Required script objects")]
+    [SerializeField] private NewUIManager newUIManager = null;
+
     int retriesDone = 0;
     const int totalMatConnectionRetriesOnRecheck = 2;
 
@@ -72,6 +75,7 @@ public class MatSelection : MonoBehaviour
     {
         Debug.Log("Starting Mat connection flow");
         NoMatPanel.SetActive(false);
+        //newUIManager.TurnOffMainCommonButton();
 
 #if UNITY_ANDROID
         /*
@@ -96,6 +100,7 @@ public class MatSelection : MonoBehaviour
             loadingPanel.SetActive(false);
             Debug.Log("No Mat found in cache."); 
             noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
+            newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
@@ -125,6 +130,7 @@ public class MatSelection : MonoBehaviour
 
             if (!YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
             {
+                newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
                 NoMatPanel.SetActive(true);
             }
         }
@@ -136,6 +142,7 @@ public class MatSelection : MonoBehaviour
         bIsMatFlowInitialized = true;
         bIsGameMainSceneLoading = false;
         NoMatPanel.SetActive(false);
+        //newUIManager.TurnOffMainCommonButton();
 
 #if UNITY_EDITOR
         if (!bIsGameMainSceneLoading)
@@ -151,7 +158,9 @@ public class MatSelection : MonoBehaviour
 
         if (currentYipliConfig.matInfo != null || currentYipliConfig.isDeviceAndroidTV)
         {
-            Debug.Log("Mac Address : " + currentYipliConfig.matInfo.macAddress);
+            if (currentYipliConfig.matInfo != null) {
+                Debug.Log("Mac Address : " + currentYipliConfig.matInfo.macAddress);
+            }
             //Load Game scene if the mat is already connected.
             if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
             {
@@ -163,7 +172,9 @@ public class MatSelection : MonoBehaviour
             loadingPanel.SetActive(false);
             Debug.Log("No Mat found in cache.");
             noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
+            newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
+            newUIManager.TurnOffMainCommonButton();
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
 #elif UNITY_STANDALONE_WIN
@@ -181,6 +192,7 @@ public class MatSelection : MonoBehaviour
 
     public void ReCheckMatConnection()
     {
+        newUIManager.TurnOffMainCommonButton();
 
         Debug.Log("ReCheckMatConnection() called");
         if (bIsMatFlowInitialized)
@@ -243,6 +255,7 @@ public class MatSelection : MonoBehaviour
             Debug.LogError("mat connection failed : " + e.Message);
 
             loadingPanel.SetActive(false);
+            newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
             yield break;
         }
@@ -286,7 +299,7 @@ public class MatSelection : MonoBehaviour
             }
 
 #endif
-
+            newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
         }
     }
@@ -294,6 +307,8 @@ public class MatSelection : MonoBehaviour
     public void SkipMat()
     {
         NoMatPanel.SetActive(false);
+        //newUIManager.TurnOffMainCommonButton();
+
         passwordErrorText.text = "";
         inputPassword.text = "";
         secretEntryPanel.SetActive(true);
@@ -322,6 +337,7 @@ public class MatSelection : MonoBehaviour
         loadingPanel.gameObject.GetComponentInChildren<Text>().text = "launching game..";
         loadingPanel.SetActive(false);
         NoMatPanel.SetActive(false);
+        newUIManager.TurnOffMainCommonButton();
         bleSuccessMsg.text = "Your YIPLI MAT is connected.";
 
         BluetoothSuccessPanel.SetActive(true);
@@ -367,6 +383,7 @@ public class MatSelection : MonoBehaviour
     public void OnBackPress()
     {
         secretEntryPanel.SetActive(false);
+        newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
         NoMatPanel.SetActive(true);
     }
 
@@ -375,9 +392,9 @@ public class MatSelection : MonoBehaviour
         //Initiate the connection with the mat.
 #if UNITY_IOS
         // connection part for ios
-        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS);
 #elif UNITY_ANDROID
-        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI", currentYipliConfig.isDeviceAndroidTV);
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS, currentYipliConfig.isDeviceAndroidTV);
 #else
         InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
 #endif
@@ -388,9 +405,9 @@ public class MatSelection : MonoBehaviour
         //Initiate the connection with the mat.
 #if UNITY_IOS
         // connection part for ios
-        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI");
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS);
 #elif UNITY_ANDROID
-        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? "YIPLI", currentYipliConfig.isDeviceAndroidTV);
+        InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS, currentYipliConfig.isDeviceAndroidTV);
 #else
         InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", 0);
 #endif

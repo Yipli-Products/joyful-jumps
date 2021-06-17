@@ -29,6 +29,8 @@
 
     const string openYipliAppUrl = "https://yipliapp.page.link/gotopage";
 
+    const string getMatUrl = "https://in.playyipli.com/checkout";
+
     // troubleshooting notes
     const string startNote = "Please make sure that your Mat is on and charged.\nMat should show green light in the button side.";
 
@@ -57,6 +59,8 @@
     public static string RelaunchGameUrl => relaunchGameUrl;
 
     public static string OpenYipliAppUrl => openYipliAppUrl;
+
+    public static string GetMatUrl => getMatUrl;
 
     public static string StartNote => startNote;
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿/* This script is not in use for now. Do not delete this script. */
+using UnityEngine;
 public static class AndroidEnvInfo
 {
     public static bool IsAndroidTV
