@@ -122,8 +122,8 @@ public class SecondTutorialManager : MonoBehaviour
         CalculateTime();
 
         if (matInputController.IsTutorialRunning) {
-            ManageMatActionsForTutorial();
             GetMatTutorialKeyboardInputs();
+            //ManageMatActionsForTutorial();
         }
 
         ManageMatTutorial();
@@ -163,6 +163,7 @@ public class SecondTutorialManager : MonoBehaviour
         letsLearnHowToUseMatMSG.gameObject.SetActive(true);
         messageStepOnMatAndCenter.gameObject.SetActive(true);
         newMatInputController.DisplayTextButtons();
+        newMatInputController.KeepLeftNadRightButtonColorToOriginal();
     }
 
     public void EndMatTutorial() {
@@ -903,9 +904,20 @@ public class SecondTutorialManager : MonoBehaviour
         currentCalculatedTime = 0;
     }
 
-    // soung management
+    // sound management
     private void PlaySound(AudioClip clip) {
         tutorialAudioSource.clip = clip;
         tutorialAudioSource.Play();
+    }
+
+    // button functions
+    public void SkipTutorialButton() {
+        DetectedAction = YipliUtils.PlayerActions.LEFT_TAP;
+        ManagePlayerActions();
+    }
+
+    public void ContinueToTutorialButton() {
+        DetectedAction = YipliUtils.PlayerActions.RIGHT_TAP;
+        ManagePlayerActions();
     }
 }

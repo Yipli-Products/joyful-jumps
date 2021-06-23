@@ -53,6 +53,11 @@ public class MatInputController : MonoBehaviour
     [SerializeField] private GameObject switchPlayerPanelPlayerObject = null;
     [SerializeField] private Sprite defaultProfilePic = null;
 
+    [Header("playerButtons")]
+    [SerializeField] Button leftButton = null;
+    [SerializeField] Button middleButton = null;
+    [SerializeField] Button rightButton = null;
+
     // required getters and setters.
     public YipliUtils.PlayerActions DetectedAction { get => detectedAction; set => detectedAction = value; }
     public bool IsThisPlayerSelectionPanel { get => isThisPlayerSelectionPanel; set => isThisPlayerSelectionPanel = value; }
@@ -316,31 +321,31 @@ public class MatInputController : MonoBehaviour
         }
         */
 
-        Debug.LogError("switchPlayer button scroll :  " + currentYipliConfig.allPlayersInfo.Count);
+        //Debug.LogError("switchPlayer button scroll :  " + currentYipliConfig.allPlayersInfo.Count);
 
         if (currentYipliConfig.allPlayersInfo.Count == 1) {
-            UpdateButtonObject(currentYipliConfig.allPlayersInfo[0], playerMiddle);
+            UpdateButtonObject(currentYipliConfig.allPlayersInfo[0], playerMiddle, 0);
 
             playerLeft.SetActive(false);
             playerRight.SetActive(false);
         } else {
             if (btnIndex == 0) {
-                UpdateButtonObject(currentYipliConfig.allPlayersInfo[GetPreviousButton()], playerLeft);
+                UpdateButtonObject(currentYipliConfig.allPlayersInfo[GetPreviousButton()], playerLeft, -1);
             } else {
-                UpdateButtonObject(currentYipliConfig.allPlayersInfo[btnIndex - 1], playerLeft);
+                UpdateButtonObject(currentYipliConfig.allPlayersInfo[btnIndex - 1], playerLeft, -1);
             }
 
-            UpdateButtonObject(currentYipliConfig.allPlayersInfo[btnIndex], playerMiddle);
+            UpdateButtonObject(currentYipliConfig.allPlayersInfo[btnIndex], playerMiddle, 0);
 
             if (btnIndex == currentYipliConfig.allPlayersInfo.Count) {
-                UpdateButtonObject(currentYipliConfig.allPlayersInfo[0], playerRight);
+                UpdateButtonObject(currentYipliConfig.allPlayersInfo[0], playerRight, 1);
             } else {
-                UpdateButtonObject(currentYipliConfig.allPlayersInfo[GetNextButton()], playerRight);
+                UpdateButtonObject(currentYipliConfig.allPlayersInfo[GetNextButton()], playerRight, 1);
             }
         }
     }
 
-    private void UpdateButtonObject(YipliPlayerInfo playerInfo, GameObject playerObject) {
+    private void UpdateButtonObject(YipliPlayerInfo playerInfo, GameObject playerObject, int playerInspectorIndex) {
         playerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerInfo.playerName;
         
         if (playerInfo.playerProfilePicIMG != null) {
@@ -350,6 +355,24 @@ public class MatInputController : MonoBehaviour
         }
 
         playerObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(FindObjectOfType<PlayerSelection>().SelectPlayer);
+
+        switch(playerInspectorIndex) {
+            case -1:
+                leftButton.onClick.AddListener(FindObjectOfType<PlayerSelection>().SelectPlayer);
+                break;
+
+            case 0:
+                middleButton.onClick.AddListener(FindObjectOfType<PlayerSelection>().SelectPlayer);
+                break;
+
+            case 1:
+                rightButton.onClick.AddListener(FindObjectOfType<PlayerSelection>().SelectPlayer);
+                break;
+
+            default:
+                Debug.LogError("Wrong inspector index detected : " + playerInspectorIndex);
+                break;
+        }
     }
 
     public void UpdateSwitchPlayerPanelPlayerObject() {
@@ -360,5 +383,25 @@ public class MatInputController : MonoBehaviour
     public GameObject GetCurrentButton()
     {
         return currentB.gameObject;
+    }
+
+    public void PlayerLeftButtonFunction() {
+        currentPlayerName = playerLeft.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+    }
+
+    public void PlayerMiddleButtonFunction() {
+        currentPlayerName = playerMiddle.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+    }
+
+    public void PlayerRightButtonFunction() {
+        currentPlayerName = playerRight.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+    }
+
+    public void ManualLeftButton() {
+        ProcessMatInputs(LEFT);
+    }
+
+    public void ManualRightButton() {
+        ProcessMatInputs(RIGHT);
     }
 }

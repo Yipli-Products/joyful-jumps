@@ -83,7 +83,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         PlayerSelection.NewUserFound += addGetPlayersListener;
         PlayerSelection.GetAllMats += addGetAllMatsListener;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IOS
         PlayerSelection.NewUserFound += addDefaultMatIdListener;
         PlayerSession.NewMatFound += addDefaultMatIdListener;
 #endif
@@ -108,7 +108,11 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         getGameInfoQueryStatus = global::QueryStatus.InProgress;
         if(e.Snapshot.Value != null)
+        {
             currentYipliConfig.gameInventoryInfo = new YipliInventoryGameInfo(e.Snapshot);
+            Debug.LogError("Game Found : " + currentYipliConfig.gameInventoryInfo.gameId);
+        }
+        else
         {
             Debug.Log("Invalid Game. Nothing found at specified path.");
         }

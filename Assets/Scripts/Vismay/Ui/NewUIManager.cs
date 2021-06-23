@@ -30,6 +30,7 @@ public class NewUIManager : MonoBehaviour
     const string maintanencePanel = "MaintanencePanel";
     const string noMatConnectionPanel = "NoMatConnectionPanel";
     const string phoneHolderTutorialPanel = "PhoneHolderTutorialPanel";
+    const string minimum2Player = "Minimum2Player";
 
     //Buttons---------
 
@@ -56,7 +57,7 @@ public class NewUIManager : MonoBehaviour
             case noMatPanel:
                 currentPanelTag = noMatPanel;
 
-                commonButtonText.text = "Get Mat"; // check if we can use BUY as button text
+                commonButtonText.text = "Get Mat"; // check if we can use BUY as button text // Minimum2Player
                 TurnOnMainCommonButton();
                 TurnMainButtonScaleToOne();
                 break;
@@ -94,6 +95,14 @@ public class NewUIManager : MonoBehaviour
                 commonButtonText.text = "Jump";
                 TurnOnMainCommonButton();
                 TurnMainButtonScaleToZero();
+                break;
+
+            case minimum2Player:
+                currentPanelTag = minimum2Player;
+
+                commonButtonText.text = "Create";
+                TurnOnMainCommonButton();
+                TurnMainButtonScaleToOne();
                 break;
 
             default:
@@ -134,6 +143,10 @@ public class NewUIManager : MonoBehaviour
             case phoneHolderTutorialPanel:
                 TurnMainButtonScaleToOne();
                 playerSelection.OnJumpOnMat();
+                break;
+
+            case minimum2Player:
+                playerSelection.OnGoToYipliPress();
                 break;
 
             default:

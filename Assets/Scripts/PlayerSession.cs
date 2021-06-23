@@ -1,4 +1,5 @@
 ﻿using Firebase.Database;
+using FMInterface_Windows;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -732,5 +733,13 @@ public class PlayerSession : MonoBehaviour
     // Test functions
     public void PrintBundleIdentifier() {
         Debug.LogError("bundle identifier : " + Application.identifier);
+    }
+
+    // application quit systems
+    void OnApplicationQuit()
+    {
+        Debug.LogError("Inside OnApplicationQuit");
+        DeviceControlActivity._disconnect();
+        DeviceControlActivity.readThread.Abort();
     }
 }

@@ -39,6 +39,7 @@ public class MatSelection : MonoBehaviour
 
     [Header("Required script objects")]
     [SerializeField] private NewUIManager newUIManager = null;
+    [SerializeField] private NewMatInputController newMatInputController = null;
 
     int retriesDone = 0;
     const int totalMatConnectionRetriesOnRecheck = 2;
@@ -75,6 +76,7 @@ public class MatSelection : MonoBehaviour
     {
         Debug.Log("Starting Mat connection flow");
         NoMatPanel.SetActive(false);
+        newMatInputController.MakeSortLayerTen();
         //newUIManager.TurnOffMainCommonButton();
 
 #if UNITY_ANDROID
@@ -102,6 +104,7 @@ public class MatSelection : MonoBehaviour
             noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
             newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
+            newMatInputController.MakeSortLayerZero();
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
 #elif UNITY_STANDALONE_WIN
@@ -132,6 +135,7 @@ public class MatSelection : MonoBehaviour
             {
                 newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
                 NoMatPanel.SetActive(true);
+                newMatInputController.MakeSortLayerZero();
             }
         }
     }
@@ -142,6 +146,7 @@ public class MatSelection : MonoBehaviour
         bIsMatFlowInitialized = true;
         bIsGameMainSceneLoading = false;
         NoMatPanel.SetActive(false);
+        newMatInputController.MakeSortLayerTen();
         //newUIManager.TurnOffMainCommonButton();
 
 #if UNITY_EDITOR
@@ -174,6 +179,7 @@ public class MatSelection : MonoBehaviour
             noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
             newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
+            newMatInputController.MakeSortLayerZero();
             newUIManager.TurnOffMainCommonButton();
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
         }
@@ -257,6 +263,7 @@ public class MatSelection : MonoBehaviour
             loadingPanel.SetActive(false);
             newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
+            newMatInputController.MakeSortLayerZero();
             yield break;
         }
 
@@ -301,12 +308,14 @@ public class MatSelection : MonoBehaviour
 #endif
             newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             NoMatPanel.SetActive(true);
+            newMatInputController.MakeSortLayerZero();
         }
     }
 
     public void SkipMat()
     {
         NoMatPanel.SetActive(false);
+        newMatInputController.MakeSortLayerTen();
         //newUIManager.TurnOffMainCommonButton();
 
         passwordErrorText.text = "";
@@ -337,6 +346,7 @@ public class MatSelection : MonoBehaviour
         loadingPanel.gameObject.GetComponentInChildren<Text>().text = "launching game..";
         loadingPanel.SetActive(false);
         NoMatPanel.SetActive(false);
+        newMatInputController.MakeSortLayerTen();
         newUIManager.TurnOffMainCommonButton();
         bleSuccessMsg.text = "Your YIPLI MAT is connected.";
 
@@ -385,6 +395,7 @@ public class MatSelection : MonoBehaviour
         secretEntryPanel.SetActive(false);
         newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
         NoMatPanel.SetActive(true);
+        newMatInputController.MakeSortLayerZero();
     }
 
     private void InitiateMatConnection()

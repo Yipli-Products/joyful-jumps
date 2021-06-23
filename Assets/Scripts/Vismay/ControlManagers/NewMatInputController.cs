@@ -12,11 +12,9 @@ public class NewMatInputController : MonoBehaviour
     [SerializeField] private Image matLeftButton = null;
     [SerializeField] private Image matRightButton = null;
     [SerializeField] private Image matCentreButton = null;
+    [SerializeField] private Canvas matCanvasComponent = null;
 
     [SerializeField] private GameObject matParentObj = null;
-
-    [Header("Colors")]
-    [SerializeField] private Color originalButtonColor;
 
     [Header("Vector for positions")]
     [SerializeField] Vector3 playerSelectionPosition;
@@ -32,6 +30,11 @@ public class NewMatInputController : MonoBehaviour
     [Header("Colors")]
     [SerializeField] private Color yipliRed;
     [SerializeField] private Color yipliBlue;
+    [SerializeField] private Color originalButtonColor;
+
+    [Header("Required script objects")]
+    [SerializeField] private SecondTutorialManager secondTutorialManager = null;
+    [SerializeField] private MatInputController matInputController = null;
 
     public void DisplayMainMat() {
         matParentObj.SetActive(true);
@@ -69,14 +72,20 @@ public class NewMatInputController : MonoBehaviour
         return matParentObj.activeSelf;
     }
 
-    public void DisableAnimators() {
+    public void DisableAnimators()
+    {
         matLeftButton.GetComponent<Animator>().enabled = false;
         matRightButton.GetComponent<Animator>().enabled = false;
         matParentObj.GetComponent<Animator>().enabled = false;
 
+        KeepLeftNadRightButtonColorToOriginal();
+        //matCentreButton.color = originalButtonColor;
+    }
+
+    public void KeepLeftNadRightButtonColorToOriginal()
+    {
         matLeftButton.color = originalButtonColor;
         matRightButton.color = originalButtonColor;
-        //matCentreButton.color = originalButtonColor;
     }
 
     public void SetMatPlayerSelectionPosition() {
@@ -85,6 +94,8 @@ public class NewMatInputController : MonoBehaviour
 
     public void SetMatTutorialPosition() {
         matParentObj.transform.localPosition = tutorialPosition;
+
+        textButtonsParent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Skip";
     }
 
     public void SetMatSwitchPlayerPosition() {
@@ -121,10 +132,34 @@ public class NewMatInputController : MonoBehaviour
     }
 
     public void DisplayMatForSwitchPlayerPanel() {
-        textButtonsParent.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "ReSelect";
+        textButtonsParent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Re Select";
 
         DisplayTextButtons();
 
         SetMatSwitchPlayerPosition();
+    }
+
+    public void MakeSortLayerZero() {
+        matCanvasComponent.sortingOrder = 0;
+    }
+
+    public void MakeSortLayerTen() {
+        matCanvasComponent.sortingOrder = 10;
+    }
+
+    public void SkipReselectButton() {
+        if (matInputController.IsTutorialRunning) {
+            secondTutorialManager.SkipTutorialButton();
+        } else {
+            matInputController.ManualLeftButton();
+        }
+    }
+
+    public void ContinueButton() {
+        if (matInputController.IsTutorialRunning) {
+            secondTutorialManager.ContinueToTutorialButton();
+        } else {
+            matInputController.ManualRightButton();
+        }
     }
 }

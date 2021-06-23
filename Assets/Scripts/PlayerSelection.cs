@@ -130,12 +130,18 @@ public class PlayerSelection : MonoBehaviour
         //keep yipli app Download Url ready
         FileReadWrite.YipliAppDownloadUrl = await FirebaseDBHandler.GetYipliWinAppUpdateUrl();
 
-#elif UNITY_STANDALONE_WIN || UNITY_EDITOR
-
         FetchUserDetailsForWindowsAndEditor();
 
         FetchUserAndInitializePlayerEnvironment();
 #endif
+
+/*
+#if UNITY_EDITOR
+        FetchUserDetailsForWindowsAndEditor();
+
+        FetchUserAndInitializePlayerEnvironment();
+#endif
+*/
 
 #if UNITY_ANDROID || UNITY_IOS
         StartCoroutine(RelaunchgameFromYipliApp());
@@ -629,8 +635,11 @@ public class PlayerSelection : MonoBehaviour
         ReadFromWindowsFile();
 
         currentYipliConfig.matInfo = null;
+
+        //SetLinkData();
 #endif
 
+/*
 #if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
         //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
         currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
@@ -642,6 +651,7 @@ public class PlayerSelection : MonoBehaviour
 
         //GetAllMats();
 #endif
+*/
     }
 
     private IEnumerator InitializeAndStartPlayerSelection()
@@ -674,6 +684,7 @@ public class PlayerSelection : MonoBehaviour
 
         Debug.LogError("Retake Tutorial : initdefault player is done next is to set mat info");
 
+#if UNITY_ANDROID || UNITY_IOS
         if (!currentYipliConfig.isDeviceAndroidTV) {
             while(currentYipliConfig.matInfo == null) {
                 Debug.Log("Waiting until currentYipliConfig.matInfo setup is finished");
@@ -682,6 +693,7 @@ public class PlayerSelection : MonoBehaviour
 
             Debug.Log("Wait is over as currentYipliConfig.matInfo setup is finished");
         }
+#endif
 /*
 #if UNITY_ANDROID || UNITY_IOS
         //Setting Deafult mat
@@ -767,6 +779,7 @@ public class PlayerSelection : MonoBehaviour
                     //Set active a panel to handle atleast 2 players should be there to play
                     TurnOffAllPanels();
                     Minimum2PlayersPanel.SetActive(true);
+                    newUIManager.UpdateButtonDisplay(Minimum2PlayersPanel.tag);
                 }
                 else
                 {
@@ -824,6 +837,7 @@ public class PlayerSelection : MonoBehaviour
     public void retryPlayersCheck()
     {
         Minimum2PlayersPanel.SetActive(false);
+        newUIManager.TurnOffMainCommonButton();
         StartCoroutine(InitializeAndStartPlayerSelection());
     }
 
@@ -918,6 +932,7 @@ public class PlayerSelection : MonoBehaviour
             playerSelectionPanel.SetActive(true);
             newMatInputController.DisplayMainMat();
             newMatInputController.SetMatPlayerSelectionPosition();
+            newMatInputController.KeepLeftNadRightButtonColorToOriginal();
             newMatInputController.DisplayChevrons();
             newMatInputController.HideTextButtons();
         }
