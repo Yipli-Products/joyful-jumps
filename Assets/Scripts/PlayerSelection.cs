@@ -684,7 +684,7 @@ public class PlayerSelection : MonoBehaviour
 
         Debug.LogError("Retake Tutorial : initdefault player is done next is to set mat info");
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_IOS
         if (!currentYipliConfig.isDeviceAndroidTV) {
             while(currentYipliConfig.matInfo == null) {
                 Debug.Log("Waiting until currentYipliConfig.matInfo setup is finished");
