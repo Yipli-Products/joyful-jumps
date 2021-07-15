@@ -106,7 +106,7 @@ public class PlayerSelection : MonoBehaviour
 
     public void OnEnable()
     {
-        defaultProfilePicSprite = profilePicImage.sprite;
+        //defaultProfilePicSprite = profilePicImage.sprite;
     }
 
     // When the game starts
@@ -135,13 +135,11 @@ public class PlayerSelection : MonoBehaviour
         FetchUserAndInitializePlayerEnvironment();
 #endif
 
-/*
 #if UNITY_EDITOR
         FetchUserDetailsForWindowsAndEditor();
 
         FetchUserAndInitializePlayerEnvironment();
 #endif
-*/
 
 #if UNITY_ANDROID || UNITY_IOS
         StartCoroutine(RelaunchgameFromYipliApp());
@@ -150,9 +148,6 @@ public class PlayerSelection : MonoBehaviour
             FetchUserAndInitializePlayerEnvironment();
         }
 #endif
-
-        // Internect connection check coroutine only for yipli-lib-scene
-        StartCoroutine(CheckInternectConnection());
 
         // set link data first
         //await SetLinkData();
@@ -314,7 +309,7 @@ public class PlayerSelection : MonoBehaviour
         //Go to Yipli Panel
         TurnOffAllPanels();
 
-        playerNameText.gameObject.SetActive(false);
+        //playerNameText.gameObject.SetActive(false);
 
         //Depending upon if Main Yipli App is installed or not, take a decision to show No user panel / or Guest User Panel
         if (false == YipliHelper.IsYipliAppInstalled())
@@ -524,9 +519,12 @@ public class PlayerSelection : MonoBehaviour
         }        
 
         // get all mat list og this user
-        GetAllMats();
+        //GetAllMats();
 
+        currentYipliConfig.currentMatID = await FirebaseDBHandler.GetCurrentMatIdOfUserId(currentYipliConfig.userId);
+        Debug.LogError("Retake Tutorial : current mat ID : " + currentYipliConfig.currentMatID);
         currentYipliConfig.currentMatDetails = await FirebaseDBHandler.GetMatDetailsOfUserId(currentYipliConfig.userId, currentYipliConfig.currentMatID);
+        Debug.LogError("Retake Tutorial : current mat address : " + currentYipliConfig.currentMatDetails.Child("mac-address").Value.ToString());
 
 #if UNITY_ANDROID || UNITY_EDITOR
         //currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac);
@@ -635,23 +633,19 @@ public class PlayerSelection : MonoBehaviour
         ReadFromWindowsFile();
 
         currentYipliConfig.matInfo = null;
-
-        //SetLinkData();
 #endif
 
-/*
 #if UNITY_EDITOR // uncoment following lines to test in editor. only one user id uncomment.
         //currentYipliConfig.userId = "F9zyHSRJUCb0Ctc15F9xkLFSH5f1"; // saurabh
-        currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
-        currentYipliConfig.pId = "-MSX--0uyqI7KgKmNOIY"; // vismay player
+        //currentYipliConfig.userId = "lC4qqZCFEaMogYswKjd0ObE6nD43"; // vismay
+        //currentYipliConfig.pId = "-MSX--0uyqI7KgKmNOIY"; // vismay player
         //currentYipliConfig.playerInfo = new YipliPlayerInfo("-MSX--0uyqI7KgKmNOIY", "Nasha Mukti kendra", "07-01-1990", "172", "64", "-MSX--0uyqI7KgKmNOIY.jpg", 1); // vismay user
         //currentYipliConfig.matInfo = new YipliMatInfo("-MUMyYuLTeqXB_K7RT_L", "A4:DA:32:4F:C2:54");
 
-        SetLinkData();
+        //SetLinkData();
 
         //GetAllMats();
 #endif
-*/
     }
 
     private IEnumerator InitializeAndStartPlayerSelection()
@@ -661,6 +655,7 @@ public class PlayerSelection : MonoBehaviour
         // game info status check
         while (firebaseDBListenersAndHandlers.GetGameInfoQueryStatus() != QueryStatus.Completed)
         {
+            Debug.LogError("Retake Tutorial : waiting for GetGameInfo to finish");
             yield return new WaitForSecondsRealtime(0.1f);
         }
 
@@ -756,7 +751,7 @@ public class PlayerSelection : MonoBehaviour
         {
             //Wait till the listeners are synced and the data has been populated
             Debug.Log("Retake Tutorial : Waiting for players query to complete");
-            LoadingPanel.gameObject.GetComponentInChildren<Text>().text = "Getting all players...";
+            LoadingPanel.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = "Getting all players...";
 
             //Mat connection would be required for Mat tutorials and Gamelib Navigation
             if (!YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase)) {
@@ -1200,6 +1195,11 @@ public class PlayerSelection : MonoBehaviour
         YipliHelper.GoToYipli(ProductMessages.noPlayerAdded);
     }
 
+    public void IAlreadyHaveMat()
+    {
+        YipliHelper.GoToYipli(ProductMessages.openYipliApp);
+    }
+
     public void OnBackButtonPress()
     {
         TurnOffAllPanels();
@@ -1297,20 +1297,34 @@ public class PlayerSelection : MonoBehaviour
     {
         while (true)
         {
+            yield return new WaitForSecondsRealtime(1f);
+
+            if (YipliHelper.checkInternetConnection())
+            {
+                //newUIManager.TurnOffMainCommonButton();
+                noNetworkPanel.SetActive(false);
+            }
+            else
+            {
+                newUIManager.UpdateButtonDisplay(noNetworkPanel.tag);
+                noNetworkPanel.SetActive(true);
+            }
+            /*
             noNetworkPanel.SetActive(false);
 
             yield return new WaitForSecondsRealtime(1f);
 
-            if (!YipliHelper.checkInternetConnection())
+            if (!currentYipliConfig.bIsInternetConnected)
             {
                 yield return new WaitForSecondsRealtime(2f);
 
-                if (YipliHelper.checkInternetConnection()) continue;
+                if (currentYipliConfig.bIsInternetConnected) continue;
 
                 //noNetworkPanelText.text = "No Internet connection.\nGame will resume when network is available."; text is already set or set that in inspector
                 newUIManager.UpdateButtonDisplay(noNetworkPanel.tag);
                 noNetworkPanel.SetActive(true);
             }
+            */
         }
     }
 
@@ -1338,13 +1352,13 @@ public class PlayerSelection : MonoBehaviour
 
     // redirect to yipli id userid is notfound after 10 seconds
     private IEnumerator RelaunchgameFromYipliApp() {
-
+        /*
         #if UNITY_EDITOR
             if (currentYipliConfig.userId != null) {
                 yield break;
             }
         #endif
-
+        */
         int totalTime = 0;
 
         while (totalTime < 5) {

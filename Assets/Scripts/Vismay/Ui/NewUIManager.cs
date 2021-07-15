@@ -120,7 +120,11 @@ public class NewUIManager : MonoBehaviour
                 break;
 
             case noMatPanel:
-                Application.OpenURL(ProductMessages.GetMatUrl);
+                if (System.Globalization.RegionInfo.CurrentRegion.ToString().Equals("IN", System.StringComparison.OrdinalIgnoreCase)) {
+                    Application.OpenURL(ProductMessages.GetMatUrlIn);
+                } else {
+                    Application.OpenURL(ProductMessages.GetMatUrlUS);
+                }
                 break;
 
             case launchFromYipliAppPanel:

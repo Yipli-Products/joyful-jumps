@@ -35,8 +35,9 @@ public class MatInputController : MonoBehaviour
     // flag to disable the MatControls when tutorial is active.
     bool isTutorialRunning = false;
 
-    // string to store current playername
+    // string and int to store current playername and index
     string currentPlayerName = null;
+    int currentPlayerIndex = -2;
 
     // colors
     [Header("Required Colors")]
@@ -103,7 +104,13 @@ public class MatInputController : MonoBehaviour
         string fmActionData = InitBLE.GetFMResponse();
         Debug.Log("Json Data from Fmdriver in matinput : " + fmActionData);
 
-        FmDriverResponseInfo singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+        FmDriverResponseInfo singlePlayerResponse = null;
+
+        try {
+            singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+        } catch (System.Exception e) {
+            Debug.Log("singlePlayerResponse is having problem : " + e.Message);
+        }
 
         if (singlePlayerResponse == null) return;
 
@@ -376,8 +383,29 @@ public class MatInputController : MonoBehaviour
     }
 
     public void UpdateSwitchPlayerPanelPlayerObject() {
-        switchPlayerPanelPlayerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerMiddle.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
-        switchPlayerPanelPlayerObject.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = playerMiddle.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite;
+        //switchPlayerPanelPlayerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerMiddle.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        //switchPlayerPanelPlayerObject.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = playerMiddle.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite;
+
+        switch(currentPlayerIndex) {
+            case -1:
+                switchPlayerPanelPlayerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerLeft.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+                switchPlayerPanelPlayerObject.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = playerLeft.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite;
+                break;
+
+            case 0:
+                switchPlayerPanelPlayerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerMiddle.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+                switchPlayerPanelPlayerObject.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = playerMiddle.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite;
+                break;
+
+            case 1:
+                switchPlayerPanelPlayerObject.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = playerRight.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+                switchPlayerPanelPlayerObject.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite = playerRight.transform.GetChild(1).transform.GetChild(0).GetComponent<Image>().sprite;
+                break;
+
+            default:
+                Debug.LogError("Wrong inspector index detected : " + currentPlayerIndex);
+                break;
+        }
     }
 
     public GameObject GetCurrentButton()
@@ -387,14 +415,17 @@ public class MatInputController : MonoBehaviour
 
     public void PlayerLeftButtonFunction() {
         currentPlayerName = playerLeft.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        currentPlayerIndex = -1;
     }
 
     public void PlayerMiddleButtonFunction() {
         currentPlayerName = playerMiddle.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        currentPlayerIndex = 0;
     }
 
     public void PlayerRightButtonFunction() {
         currentPlayerName = playerRight.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        currentPlayerIndex = 1;
     }
 
     public void ManualLeftButton() {

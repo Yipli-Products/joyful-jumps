@@ -123,7 +123,7 @@ public class SecondTutorialManager : MonoBehaviour
 
         if (matInputController.IsTutorialRunning) {
             GetMatTutorialKeyboardInputs();
-            //ManageMatActionsForTutorial();
+            ManageMatActionsForTutorial();
         }
 
         ManageMatTutorial();
@@ -184,6 +184,8 @@ public class SecondTutorialManager : MonoBehaviour
         matInputController.IsTutorialRunning = false;
         
         //ResetTutorial();
+
+        newMatInputController.DisableMatParentButtonAnimator();
 
         FindObjectOfType<PlayerSelection>().OnTutorialContinuePress();
     }
@@ -723,7 +725,13 @@ public class SecondTutorialManager : MonoBehaviour
         string fmActionData = InitBLE.GetFMResponse();
         Debug.Log("Json Data from Fmdriver in matinput : " + fmActionData);
 
-        FmDriverResponseInfo singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+        FmDriverResponseInfo singlePlayerResponse = null;
+
+        try {
+            singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
+        } catch (System.Exception e) {
+            Debug.Log("singlePlayerResponse is having problem : " + e.Message);
+        }
 
         if (singlePlayerResponse == null) return;
 

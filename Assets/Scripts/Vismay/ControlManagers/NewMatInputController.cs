@@ -132,7 +132,7 @@ public class NewMatInputController : MonoBehaviour
     }
 
     public void DisplayMatForSwitchPlayerPanel() {
-        textButtonsParent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Re Select";
+        textButtonsParent.transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Change";
 
         DisplayTextButtons();
 

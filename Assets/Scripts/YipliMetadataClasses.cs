@@ -178,13 +178,16 @@ public class YipliInventoryGameInfo
     public string displayName;
     public string gamePackageId;
     public string gameVersion;
-    public int isGameUnderMaintenance = 0;
+    //public int isGameUnderMaintenance = 0;
     public string androidMinVersion;
     public string androidTVMinVersion;
     public string iosMinVersion;
     public string winMinVersion;
+    public string winCurrentVersion;
+    public string iosCurrentVersion;
     public string versionUpdateMessage;
     public string maintenanceMessage;
+    public string osListForMaintanence;
 
     YipliInventoryGameInfo(string gameId)
     {
@@ -203,11 +206,17 @@ public class YipliInventoryGameInfo
                 gamePackageId = snapshot.Child("android-url").Value?.ToString() ?? "";
                 gameVersion = snapshot.Child("current-version").Value?.ToString() ?? "";
 
-                isGameUnderMaintenance = YipliHelper.StringToIntConvert(snapshot.Child("is-game-under-maintenance").Value.ToString());
+                //isGameUnderMaintenance = YipliHelper.StringToIntConvert(snapshot.Child("is-game-under-maintenance").Value.ToString());
+                osListForMaintanence = snapshot.Child("os-list-for-maintanence").Value.ToString();
+
                 androidMinVersion = snapshot.Child("android-min-version").Value.ToString();
                 androidTVMinVersion = snapshot.Child("android-tv-min-version").Value.ToString();
                 iosMinVersion = snapshot.Child("ios-min-version").Value.ToString();
                 winMinVersion = snapshot.Child("win-min-version").Value.ToString();
+
+                winCurrentVersion = snapshot.Child("win-version").Value.ToString();
+                iosCurrentVersion = snapshot.Child("ios-current-version").Value.ToString();
+
                 maintenanceMessage = snapshot.Child("maintenance-message").Value.ToString();
                 versionUpdateMessage = snapshot.Child("version-update-message").Value.ToString();
             }

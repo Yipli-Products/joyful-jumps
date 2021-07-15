@@ -1,6 +1,6 @@
 ﻿#if UNITY_STANDALONE_WIN
-//using com.fitmat.fitmatdriver.Producer.Connection;
-using FMInterface_Windows;
+using com.fitmat.fitmatdriver.Producer.Connection;
+//using FMInterface_Windows;
 #endif
 
 using BLEFramework.Unity;
@@ -12,8 +12,8 @@ public class InitBLE
 {
     static AndroidJavaClass _pluginClass;
     static AndroidJavaObject _pluginInstance;
-    // const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
-    const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";// This is used only  for android. No dependency on other platforms
+    const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
+    //const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";// This is used only  for android. No dependency on other platforms
     public static string BLEStatus = "";
     public static bool isInitActive = false;
     public static string MAC_ADDRESS = "";

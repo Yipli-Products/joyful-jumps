@@ -110,7 +110,6 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         if(e.Snapshot.Value != null)
         {
             currentYipliConfig.gameInventoryInfo = new YipliInventoryGameInfo(e.Snapshot);
-            Debug.LogError("Game Found : " + currentYipliConfig.gameInventoryInfo.gameId);
         }
         else
         {
@@ -123,12 +122,34 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     {
         yield return anonAuthenticate();
         FirebaseDatabase.DefaultInstance.GetReference(".info/connected").ValueChanged += HandleConnectedChanged;
+
+/*
+#if UNITY_ANDROID || UNITY_IOS
+        FirebaseDatabase.DefaultInstance.GetReference(".info/connected").ValueChanged += HandleConnectedChanged;
+#else
+        StartCoroutine(CheckPingResult());
+#endif
+*/
     }
 
     private void HandleConnectedChanged(object sender, ValueChangedEventArgs e)
     {
         Debug.Log("Network : " + e.Snapshot.Value);
         currentYipliConfig.bIsInternetConnected = e.Snapshot.Value.Equals(true);
+    }
+
+    private IEnumerator CheckPingResult() {
+        while(true) {
+            yield return new WaitForSecondsRealtime(1f);
+            
+            if (Application.internetReachability == NetworkReachability.NotReachable) {
+                Debug.Log("Network from if : " + Application.internetReachability);
+                currentYipliConfig.bIsInternetConnected =false;
+            } else {
+                Debug.Log("Network from else : " + Application.internetReachability);
+                currentYipliConfig.bIsInternetConnected = true;
+            }
+        }
     }
 
     void OnDisable()
@@ -462,6 +483,9 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         }
 
         //Debug.Log("Received dynamic link Argumanets : " + stringToParse);
+
+        // old project api key : AIzaSyAceBtIqNZdErggHnZDuU12DfYrbBhe-T4
+        // new project api key : AIzaSyAKKmLL2iDQRSNMRfToAxDJio7yPjx2NPE
     }
     */
 }

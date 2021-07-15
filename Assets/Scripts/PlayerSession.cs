@@ -1,5 +1,9 @@
 ﻿using Firebase.Database;
-using FMInterface_Windows;
+
+#if UNITY_STANDALONE_WIN
+//using FMInterface_Windows;
+#endif
+
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -360,8 +364,9 @@ public class PlayerSession : MonoBehaviour
             Debug.Log("Game-data is null");
         }
 
-        x.Add("os", Application.platform);
-        x.Add("game-version", GetDriverAndGameVersion());
+        // firebase function ignores and deletes folowing 2 lines. Uncomment lines once FB function is updated
+        //x.Add("os", Application.platform);
+        //x.Add("game-version", GetDriverAndGameVersion());
 
         //Removed following, since mat-id and mac-address couldnt be got on windows
         //x.Add("mat-id", currentYipliConfig.matInfo.matId);
@@ -732,9 +737,13 @@ public class PlayerSession : MonoBehaviour
 
     // Test functions
     public void PrintBundleIdentifier() {
-        Debug.LogError("bundle identifier : " + Application.identifier);
+        //Debug.LogError("bundle identifier : " + Application.identifier);
+
+        Debug.LogError("current country : " + System.Globalization.RegionInfo.CurrentRegion);
     }
 
+/* only for new Driver
+#if UNITY_STANDALONE_WIN
     // application quit systems
     void OnApplicationQuit()
     {
@@ -742,4 +751,6 @@ public class PlayerSession : MonoBehaviour
         DeviceControlActivity._disconnect();
         DeviceControlActivity.readThread.Abort();
     }
+#endif
+*/
 }
