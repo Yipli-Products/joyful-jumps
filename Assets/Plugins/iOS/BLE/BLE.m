@@ -213,6 +213,8 @@ static int rssi = 0;
     [[self delegate] bleDidDisconnect];
     
     isConnected = false;
+
+    NSLog(@"Device disconnected successfully");
 }
 
 - (void) connectPeripheral:(CBPeripheral *)peripheral
@@ -229,6 +231,7 @@ static int rssi = 0;
 {
     if (self.activePeripheral != nil)
     {
+        NSLog(@"Disconnecting the device");
         [self.CM cancelPeripheralConnection:self.activePeripheral];
     }
 }

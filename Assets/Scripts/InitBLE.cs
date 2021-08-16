@@ -12,8 +12,8 @@ public class InitBLE
 {
     static AndroidJavaClass _pluginClass;
     static AndroidJavaObject _pluginInstance;
-    const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
-    //const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";// This is used only  for android. No dependency on other platforms
+    //const string driverPathName = "com.fitmat.fitmatdriver.Producer.Connection.DeviceControlActivity"; // old reference
+    const string driverPathName = "com.fitmat.fmjavainterface.DeviceControlActivity";// This is used only  for android. No dependency on other platforms
     public static string BLEStatus = "";
     public static bool isInitActive = false;
     public static string MAC_ADDRESS = "";
@@ -147,6 +147,7 @@ public class InitBLE
             return PluginInstance.Call<string>("_getFMResponse");
 #elif UNITY_STANDALONE_WIN
             string defaultResponse = DeviceControlActivity._getFMResponse();
+            // this is to check if "null" response is coming from driver as this will come until 1st action is made
             if (defaultResponse.Equals("null", StringComparison.OrdinalIgnoreCase)) {
                 
                 //defaultResponse = "{\"count\":1,\"timestamp\":1597237057689,\"playerdata\":[{\"id\":1,\"fmresponse\":{\"action_id\":\"NOID\",\"action_name\":\"Jump\",\"properties\":\"null\"}}]}";
@@ -480,5 +481,11 @@ public class InitBLE
         }
 #endif
         return result;
+    }
+
+    public static void DisconnectMat() {
+#if UNITY_IOS
+    _Disconnect();
+#endif
     }
 }
