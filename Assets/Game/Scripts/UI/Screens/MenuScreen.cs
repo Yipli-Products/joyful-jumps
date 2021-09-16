@@ -85,18 +85,28 @@ public class MenuScreen : MonoBehaviour
 
     public void ClickOnNextLevel()
     {
-        if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
-        {
-            if (playerGameData.GetCurrentLevel() == 0)
-                LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
-            else
-                LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
+        //if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        //{
+        //    if (playerGameData.GetCurrentLevel() == 0)
+        //        LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
+        //    else
+        //        LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
 
-            PlayerData.FootStep = 0;
-            PlayerData.FallCount = 0;
-            PlayerData.JumpStep = 0;
-            PlayerData.FallCount = 0;
-        }
+        //    PlayerData.FootStep = 0;
+        //    PlayerData.FallCount = 0;
+        //    PlayerData.JumpStep = 0;
+        //    PlayerData.FallCount = 0;
+        //}
+
+        if (playerGameData.GetCurrentLevel() == 0)
+            LoadingManager.Instance.LoadScreen(Constant.DREAM_SCENE_NAME);
+        else
+            LoadingManager.Instance.LoadScreen(Constant.GAME_SCENE_NAME);
+
+        PlayerData.FootStep = 0;
+        PlayerData.FallCount = 0;
+        PlayerData.JumpStep = 0;
+        PlayerData.FallCount = 0;
 
     }
 

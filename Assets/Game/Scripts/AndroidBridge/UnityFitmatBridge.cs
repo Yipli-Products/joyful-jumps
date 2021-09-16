@@ -66,6 +66,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         try
         {
             if (SceneManager.GetActiveScene().name == "yipli_lib_scene") return;
+            if (SceneManager.GetActiveScene().name == "gameLibTutorial") return;
 
             string fmActionData = InitBLE.GetFMResponse();
 

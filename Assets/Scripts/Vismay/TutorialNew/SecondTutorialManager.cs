@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using YipliFMDriverCommunication;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System;
 
 public class SecondTutorialManager : MonoBehaviour
 {
@@ -19,7 +21,7 @@ public class SecondTutorialManager : MonoBehaviour
     [Header("Script objects")]
     [SerializeField] private YipliConfig currentYipliConfig = null;
     [SerializeField] private NewMatInputController newMatInputController = null;
-    [SerializeField] private MatInputController matInputController = null;
+    //[SerializeField] private MatInputController matInputController = null;
     [SerializeField] private ThreeDModelManager threeDModelManager = null;
 
     [Header("All Text messages")]
@@ -118,7 +120,11 @@ public class SecondTutorialManager : MonoBehaviour
         tutorialPanel.SetActive(false);
         skipButton.SetActive(false);
 
-        newMatInputController.HideLegs();
+        //newMatInputController.HideLegs();
+        SetTutorialClusterID(6);
+
+        //TurnOffAllPHAnimationOBJs();
+        //TurnOnPHAnimationOBJs();
     }
 
     public void TurnOffEverything() {
@@ -148,14 +154,17 @@ public class SecondTutorialManager : MonoBehaviour
 
     void Update() {
 
-        if (!tutorialStarted) return;
+        //if (!tutorialStarted) return;
 
         CalculateTime();
 
-        if (matInputController.IsTutorialRunning && listenToMatActions) {
-            GetMatTutorialKeyboardInputs();
-            ManageMatActionsForTutorial();
-        }
+        //if (matInputController.IsTutorialRunning && listenToMatActions) {
+        //    GetMatTutorialKeyboardInputs();
+        //    ManageMatActionsForTutorial();
+        //}
+
+        GetMatTutorialKeyboardInputs();
+        ManageMatActionsForTutorial();
 
         ManageMatTutorial();
     }
@@ -177,7 +186,7 @@ public class SecondTutorialManager : MonoBehaviour
 
         if (tutorialStarted) return;
 
-        matInputController.IsTutorialRunning = true;
+        //matInputController.IsTutorialRunning = true;
         tutorialStarted = true;
 
         SetTutorialClusterID(6);
@@ -226,13 +235,29 @@ public class SecondTutorialManager : MonoBehaviour
 
         SetTutorialClusterID(0);
 
-        matInputController.IsTutorialRunning = false;
+        //matInputController.IsTutorialRunning = false;
         
         //ResetTutorial();
 
         newMatInputController.DisableMatParentButtonAnimator();
 
-        FindObjectOfType<PlayerSelection>().OnTutorialContinuePress();
+        // load main game menu scene
+        // FindObjectOfType<PlayerSelection>().OnTutorialContinuePress();
+
+        // update player' status
+        if (YipliHelper.checkInternetConnection())
+        {
+            if (currentYipliConfig.playerInfo != null)
+            {
+                if (currentYipliConfig.playerInfo.isMatTutDone == 0)
+                {
+                    FirebaseDBHandler.UpdateTutStatusData(currentYipliConfig.userId, currentYipliConfig.playerInfo.playerId, 1);
+                    //UserDataPersistence.SavePropertyValue("player-tutDone", 1.ToString());
+                }
+            }
+        }
+
+        SceneManager.LoadScene(currentYipliConfig.callbackLevel);
     }
 
     public void ManageMatTutorial() {
@@ -890,25 +915,36 @@ public class SecondTutorialManager : MonoBehaviour
         //if (!currentYipliConfig.onlyMatPlayMode) return;
 
         string fmActionData = InitBLE.GetFMResponse();
-        Debug.Log("Json Data from Fmdriver in matinput : " + fmActionData);
+        Debug.Log("stut : Json Data from Fmdriver in matinput : " + fmActionData);
 
         FmDriverResponseInfo singlePlayerResponse = null;
 
+        Debug.LogError("stut : getting single player response");
         try {
+            Debug.LogError("stut : from try");
             singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
         } catch (System.Exception e) {
-            Debug.Log("singlePlayerResponse is having problem : " + e.Message);
+            Debug.LogError("stut : singlePlayerResponse is having problem : " + e.Message);
         }
-
+        
+        Debug.LogError("stut : single player responce might be null returning");
         if (singlePlayerResponse == null) return;
+
+        Debug.LogError("stut : single player response is not null");
+
+        Debug.LogError("stut : currentYipliConfig.oldFMResponseCount : " + currentYipliConfig.oldFMResponseCount);
+        Debug.LogError("stut : singlePlayerResponse.count : " + singlePlayerResponse.count);
 
         if (currentYipliConfig.oldFMResponseCount != singlePlayerResponse.count)
         {
+            Debug.LogError("stut : from if");
             PlayerSession.Instance.currentYipliConfig.oldFMResponseCount = singlePlayerResponse.count;
 
+            Debug.LogError("stut : next line is to detect action");
             DetectedAction = ActionAndGameInfoManager.GetActionEnumFromActionID(singlePlayerResponse.playerdata[0].fmresponse.action_id);
+            Debug.LogError("stut : action is detected" + DetectedAction);
 
-            switch(DetectedAction)
+            switch (DetectedAction)
             {
                 // UI input executions
                 case YipliUtils.PlayerActions.LEFT_TAP:
@@ -928,7 +964,7 @@ public class SecondTutorialManager : MonoBehaviour
                     break;
 
                 default:
-                    Debug.LogError("Wrong Action is detected : " + DetectedAction.ToString());
+                    Debug.LogError("stut : Wrong Action is detected : " + DetectedAction.ToString());
                     break;
             }
         }
@@ -963,11 +999,28 @@ public class SecondTutorialManager : MonoBehaviour
 
     private void ManagePlayerActions() {
 
+        //if (phoneHolderPanel.activeSelf)
+        //{
+        //    Debug.LogError("new tut : from ManagePlayerActions if");
+        //    if (DetectedAction == YipliUtils.PlayerActions.JUMP)
+        //    {
+        //        Debug.LogError("new tut : from ManagePlayerActions if if ");
+        //        StartTutrorialOnJump();
+        //    }
+        //    return;
+        //}
+
+        Debug.LogError("stut : connection status is : " + YipliHelper.GetMatConnectionStatus());
+        Debug.LogError("stut : current cluster id is : " + YipliHelper.GetGameClusterId());
+        Debug.LogError("stut : only mat play mode is : " + currentYipliConfig.onlyMatPlayMode);
+        Debug.LogError("stut : Detected action is : " + DetectedAction.ToString());
+
         if (!startIntroDone) {
-            if (DetectedAction == YipliUtils.PlayerActions.LEFT_TAP) {
-                //EndMatTutorial(); // uncomment to allow skip from mat
-                return;
-            } else if (DetectedAction == YipliUtils.PlayerActions.JUMP) {
+            //if (DetectedAction == YipliUtils.PlayerActions.LEFT_TAP) {
+            //    //EndMatTutorial(); // uncomment to allow skip from mat
+            //    return;
+            //} else
+            if (DetectedAction == YipliUtils.PlayerActions.JUMP) {
                 startIntroDone = true;
                 ManagePlayerActions();
                 DisableMatActionListener();
@@ -1118,5 +1171,52 @@ public class SecondTutorialManager : MonoBehaviour
 
     public void FinalClapsSound() {
         PlayInstructionAudio(finalClaps);
+    }
+
+    // phone holder panel manager
+    [Header("phone holder panel management")]
+    [SerializeField] GameObject phoneHolderPanel = null;
+    [SerializeField] GameObject phoneAnimationOBJ = null;
+    [SerializeField] GameObject stickAnimationOBJ = null;
+    [SerializeField] GameObject pcAnimationOBJ = null;
+
+    private void TurnOffAllPHAnimationOBJs()
+    {
+        phoneAnimationOBJ.SetActive(false);
+        stickAnimationOBJ.SetActive(false);
+        pcAnimationOBJ.SetActive(false);
+        phoneHolderPanel.SetActive(false);
+    }
+
+    private void TurnOnPHAnimationOBJs()
+    {
+        Debug.LogError("new tut : from TurnOnPHAnimationOBJs");
+        phoneAnimationOBJ.SetActive(true);
+
+#if UNITY_STANDALONE_WIN
+        pcAnimationOBJ.SetActive(true);
+#else
+        if (currentYipliConfig.isDeviceAndroidTV)
+        {
+            stickAnimationOBJ.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("new tut : from TurnOnPHAnimationOBJs else else");
+            phoneAnimationOBJ.SetActive(true);
+        }
+#endif
+    }
+
+    private void StartTutrorialOnJump()
+    {
+        Debug.LogError("new tut : from StartTutrorialOnJump");
+        phoneAnimationOBJ.SetActive(false);
+        StartMatTutorial();
+    }
+
+    public void QuitFromTutorial()
+    {
+        Application.Quit();
     }
 }

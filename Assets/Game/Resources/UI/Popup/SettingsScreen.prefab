@@ -886,6 +886,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttons:
   - {fileID: 2013637393969752148}
+  - {fileID: 4394372536944222178}
   - {fileID: 3261211021280681237}
   defaultButtonIndex: 0
   isScrenType: 0
@@ -1995,7 +1996,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6446392811486173810
 RectTransform:
   m_ObjectHideFlags: 0

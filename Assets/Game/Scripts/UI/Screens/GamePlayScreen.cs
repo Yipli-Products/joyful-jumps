@@ -84,6 +84,11 @@ public class GamePlayScreen : MonoBehaviour
     //Pause the game if Bluetooth isnt connected.
     private IEnumerator BluetoothCheck()
     {
+        if (!PlayerSession.Instance.currentYipliConfig.onlyMatPlayMode)
+        {
+            yield break;
+        }
+
         Debug.Log("Starting the Co-routine for Bluetooth Check");
         while (true)
         {

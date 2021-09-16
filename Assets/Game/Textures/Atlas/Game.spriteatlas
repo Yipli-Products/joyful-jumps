@@ -28,11 +28,14 @@ SpriteAtlas:
       allowAlphaSplitting: 0
       enableRotation: 1
       enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: f4c6e3c7c7264fd4e97503abd70478b1, type: 3}
-    totalSpriteSurfaceArea: 262144
     bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 61438f807adeae74f9230e002be5834e, type: 3}
@@ -40,5 +43,6 @@ SpriteAtlas:
   m_PackedSpriteNamesToIndex:
   - Rainbow
   - Castle
+  m_RenderDataMap: {}
   m_Tag: Game
   m_IsVariant: 0

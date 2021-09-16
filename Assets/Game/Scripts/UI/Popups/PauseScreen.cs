@@ -26,16 +26,24 @@ public class PauseScreen : MonoBehaviour
 
     public virtual void ResumeGame()
     {
-        if (YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
-        {
-            if (PlayerSession.Instance != null)
-                PlayerSession.Instance.ResumeSPSession();
-            Time.timeScale = 1;
-            UnityFitmatBridge.Instance.IsGamePaused = false;
-            if (UnityFitmatBridge.Instance != null)
-                UnityFitmatBridge.Instance.EnableGameInput();
-            Destroy(gameObject);
-        } 
+        //if (YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
+        //{
+        //    if (PlayerSession.Instance != null)
+        //        PlayerSession.Instance.ResumeSPSession();
+        //    Time.timeScale = 1;
+        //    UnityFitmatBridge.Instance.IsGamePaused = false;
+        //    if (UnityFitmatBridge.Instance != null)
+        //        UnityFitmatBridge.Instance.EnableGameInput();
+        //    Destroy(gameObject);
+        //} 
+
+        if (PlayerSession.Instance != null)
+            PlayerSession.Instance.ResumeSPSession();
+        Time.timeScale = 1;
+        UnityFitmatBridge.Instance.IsGamePaused = false;
+        if (UnityFitmatBridge.Instance != null)
+            UnityFitmatBridge.Instance.EnableGameInput();
+        Destroy(gameObject);
     }
 
     public virtual void RestartGame()
