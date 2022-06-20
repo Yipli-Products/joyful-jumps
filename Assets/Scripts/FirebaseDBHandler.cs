@@ -34,7 +34,7 @@ public static class FirebaseDBHandler
     //    try
     //    {
     //        Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //        Debug.LogFormat("Dummy User signed in successfully: {0} ({1})",
+    //        //Debug.LogFormat("Dummy User signed in successfully: {0} ({1})",
     //        newUser.DisplayName, newUser.UserId);
 
     //        //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -44,7 +44,7 @@ public static class FirebaseDBHandler
     //    }
     //    catch (Exception exp)
     //    {
-    //        Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+    //        //Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
     //    }
 
     //    return gameInfo ;
@@ -59,8 +59,7 @@ public static class FirebaseDBHandler
         {
             //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-            newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -69,7 +68,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+            //Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
         }
 
         return userId;
@@ -82,23 +81,22 @@ public static class FirebaseDBHandler
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
 
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
 
-            Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic()));
+            //Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic()));
 
             string key = reference.Child("stage-bucket/player-sessions").Push().Key;
             reference.Child("stage-bucket/player-sessions").Child(key).SetRawJsonValueAsync(JsonConvert.SerializeObject(session.GetPlayerSessionDataJsonDic(), Formatting.None, new JsonSerializerSettings
@@ -115,23 +113,22 @@ public static class FirebaseDBHandler
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
 
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
 
-            Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(session.GetMultiPlayerSessionDataJsonDic(playerDetails, mpSessionUUID)));
+            //Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(session.GetMultiPlayerSessionDataJsonDic(playerDetails, mpSessionUUID)));
 
             string key = reference.Child("stage-bucket/player-sessions").Push().Key;
             reference.Child("stage-bucket/player-sessions").Child(key).SetRawJsonValueAsync(JsonConvert.SerializeObject(session.GetMultiPlayerSessionDataJsonDic(playerDetails, mpSessionUUID), Formatting.None, new JsonSerializerSettings
@@ -147,17 +144,17 @@ public static class FirebaseDBHandler
     //    {
     //        if (task.IsCanceled)
     //        {
-    //            Debug.LogError("SignInAnonymouslyAsync was canceled.");
+    //            //Debug.LogError("SignInAnonymouslyAsync was canceled.");
     //            return;
     //        }
     //        if (task.IsFaulted)
     //        {
-    //            Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+    //            //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
     //            return;
     //        }
 
     //        Firebase.Auth.FirebaseUser newUser = task.Result;
-    //        Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //        //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //        //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -173,14 +170,14 @@ public static class FirebaseDBHandler
     //    DataSnapshot snapshot = null;
     //    if (userId.Equals(null) || playerId.Equals(null) || gameId.Equals(null))
     //    {
-    //        Debug.Log("User ID not found");
+    //        //Debug.Log("User ID not found");
     //    }
     //    else
     //    {
     //        try
     //        {
     //            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //            Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //            //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //            //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -189,7 +186,7 @@ public static class FirebaseDBHandler
     //        }
     //        catch(Exception exp)
     //        {
-    //            Debug.Log("Failed to GetGameData : " + exp.Message);
+    //            //Debug.Log("Failed to GetGameData : " + exp.Message);
     //        }
     //    }
     //    return snapshot;
@@ -202,14 +199,14 @@ public static class FirebaseDBHandler
     //    DataSnapshot snapshot = null;
     //    if (userId.Equals(null))
     //    {
-    //        Debug.Log("User ID not found");
+    //        //Debug.Log("User ID not found");
     //    }
     //    else
     //    {
     //        try
     //        {
     //            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //            Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //            //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //            //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -225,13 +222,13 @@ public static class FirebaseDBHandler
     //                }
     //                else
     //                {
-    //                    Debug.Log("Skipping this instance of player, backend seems corrupted.");
+    //                    //Debug.Log("Skipping this instance of player, backend seems corrupted.");
     //                }
     //            }
     //        }
     //        catch(Exception exp)
     //        {
-    //            Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+    //            //Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
     //            return null;
     //        }
     //    }
@@ -241,21 +238,21 @@ public static class FirebaseDBHandler
     ///* The function call to be allowed only if network is available */
     //public static async Task<YipliPlayerInfo> GetCurrentPlayerdetails(string userId, PostUserCallback callback)
     //{
-    //    Debug.Log("Getting the Default player from backend");
+    //    //Debug.Log("Getting the Default player from backend");
 
     //    DataSnapshot snapshot = null;
     //    YipliPlayerInfo defaultPlayer = new YipliPlayerInfo();//Cant return null defaultPlayer. Initialze the default player.
 
     //    if (userId.Equals(null) || userId.Equals(""))
     //    {
-    //        Debug.Log("User ID not found");
+    //        //Debug.Log("User ID not found");
     //    }
     //    else
     //    {
     //        try
     //        {
     //            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //            Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //            //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //            //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -273,19 +270,19 @@ public static class FirebaseDBHandler
     //            if (defaultPlayer.playerId != null)
     //            {
     //                //Do Nothing
-    //                Debug.Log("Found Default player : " + defaultPlayer.playerId);
+    //                //Debug.Log("Found Default player : " + defaultPlayer.playerId);
     //            }
     //            else
     //            {
     //                //Case to handle if the default player object doesnt exist in backend/or is corrupted
-    //                Debug.Log("Default Player Not found. Returning null.");
+    //                //Debug.Log("Default Player Not found. Returning null.");
     //                return null;
     //            }
     //        }
     //        catch(Exception exp)
     //        {
     //            //If couldnt get defualt player details from the backend, return null.
-    //            Debug.Log("Failed to GetAllPlayerdetails: " + exp.Message);
+    //            //Debug.Log("Failed to GetAllPlayerdetails: " + exp.Message);
     //            return null;
     //        }
     //    }
@@ -299,20 +296,20 @@ public static class FirebaseDBHandler
     /* The function call to be allowed only if network is available */
     //public static async Task<YipliMatInfo> GetCurrentMatDetails(string userId, PostUserCallback callback)
     //{
-    //    Debug.Log("Getting the Default mat from backend");
+    //    //Debug.Log("Getting the Default mat from backend");
     //    DataSnapshot snapshot = null;
     //    YipliMatInfo defaultMat = new YipliMatInfo();
 
     //    if (userId.Equals(null) || userId.Equals(""))
     //    {
-    //        Debug.Log("User ID not found");
+    //        //Debug.Log("User ID not found");
     //    }
     //    else
     //    {
     //        try
     //        {
     //            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //            Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //            //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //            //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -329,7 +326,7 @@ public static class FirebaseDBHandler
     //            if (defaultMat.matId != null)
     //            {
     //                //Do Nothing
-    //                Debug.Log("Found Default mat : " + defaultMat.matId);
+    //                //Debug.Log("Found Default mat : " + defaultMat.matId);
     //            }
     //            else
     //            {
@@ -339,7 +336,7 @@ public static class FirebaseDBHandler
     //        }
     //        catch(Exception exp)
     //        {
-    //            Debug.Log("Failed to GetAllMatdetails : " + exp.Message);
+    //            //Debug.Log("Failed to GetAllMatdetails : " + exp.Message);
     //            return null;
     //        }
     //    }
@@ -353,14 +350,14 @@ public static class FirebaseDBHandler
     //    DataSnapshot snapshot = null;
     //    if (userId.Equals(null) || userId.Equals(""))
     //    {
-    //        Debug.Log("User ID not found");
+    //        //Debug.Log("User ID not found");
     //    }
     //    else
     //    {
     //        try
     //        {
     //            Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
-    //            Debug.LogFormat("User signed in successfully: {0} ({1})",
+    //            //Debug.LogFormat("User signed in successfully: {0} ({1})",
     //            newUser.DisplayName, newUser.UserId);
 
     //            //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
@@ -376,13 +373,13 @@ public static class FirebaseDBHandler
     //                }
     //                else
     //                {
-    //                    Debug.Log("Skipping this instance of mat, backend seems corrupted.");
+    //                    //Debug.Log("Skipping this instance of mat, backend seems corrupted.");
     //                }
     //            }
     //        }
     //        catch(Exception exp)
     //        {
-    //            Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
+    //            //Debug.Log("Failed to GetAllPlayerdetails : " + exp.Message);
     //        }
     //    }
     //    return mats;
@@ -395,12 +392,12 @@ public static class FirebaseDBHandler
      */
     public static async Task<Sprite> GetImageAsync(string profilePicUrl, string onDeviceProfilePicPath)
     {
-        Debug.Log("Local path : " + onDeviceProfilePicPath);
+        //Debug.Log("Local path : " + onDeviceProfilePicPath);
 
         // Get a reference to the storage service, using the default Firebase App
         Firebase.Storage.StorageReference storage_ref = yipliStorage.GetReferenceFromUrl(profilePicRootUrl + profilePicUrl);
 
-        Debug.Log("File download started.");
+        //Debug.Log("File download started.");
 
         try
         {
@@ -411,12 +408,12 @@ public static class FirebaseDBHandler
             texture.LoadImage(bytes);
             Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             
-            Debug.Log("Profile image downloaded.");
+            //Debug.Log("Profile image downloaded.");
             return sprite;
         }
         catch (Exception exp)
         {
-            Debug.Log("Failed to download Profile image : " + exp.Message);
+            //Debug.Log("Failed to download Profile image : " + exp.Message);
             return null;
         }
     }
@@ -430,17 +427,16 @@ public static class FirebaseDBHandler
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
             await reference.Child("fgd/" + strUserId).Child(strPlayerId).Child(strGameId).UpdateChildrenAsync(dStoreData);
@@ -456,8 +452,7 @@ public static class FirebaseDBHandler
         {
             //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-            newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -466,7 +461,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.LogError("Failed to tutstatus : " + exp.Message);
+            //Debug.LogError("Failed to tutstatus : " + exp.Message);
         }
 
         return tutStatus;
@@ -480,17 +475,16 @@ public static class FirebaseDBHandler
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
             await reference.Child("/profiles/users/").Child(strUserId).Child("players").Child(strPlayerId).Child("mat-tut-done").SetValueAsync(tutStatus);
@@ -509,7 +503,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.Log("Failed to Get app win version : " + exp.Message);
+            //Debug.Log("Failed to Get app win version : " + exp.Message);
         }
 
         return appUpdateUrl.ToString();
@@ -530,7 +524,7 @@ public static class FirebaseDBHandler
             await fmResponseLogRef.PutFileAsync(filePaths[i]).ContinueWith((Task<StorageMetadata> task) => {
                 if (task.IsFaulted || task.IsCanceled)
                 {
-                    Debug.Log(task.Exception.ToString());
+                    //Debug.Log(task.Exception.ToString());
                     // Uh-oh, an error occurred!
                 }
                 else
@@ -538,8 +532,8 @@ public static class FirebaseDBHandler
                     // Metadata contains file metadata such as size, content-type, and download URL.
                     StorageMetadata metadata = task.Result;
                     string md5Hash = metadata.Md5Hash;
-                    Debug.Log("Finished uploading...");
-                    Debug.Log("md5 hash = " + md5Hash);
+                    //Debug.Log("Finished uploading...");
+                    //Debug.Log("md5 hash = " + md5Hash);
                 }
             });
         }
@@ -556,7 +550,7 @@ public static class FirebaseDBHandler
         {
             //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})", newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -565,7 +559,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.LogError("Failed to tutstatus : " + exp.Message);
+            //Debug.LogError("Failed to tutstatus : " + exp.Message);
         }
 
         //return macAddress;
@@ -581,17 +575,16 @@ public static class FirebaseDBHandler
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
             await reference.Child("/customer-tickets/").Child(strUserId).Child(ticketID).SetValueAsync(ticketData);
@@ -607,17 +600,16 @@ public static class FirebaseDBHandler
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
             await reference.Child("customer-tickets/" + strUserId).Child("open/current_tkt/").UpdateChildrenAsync(ticketData);
@@ -633,20 +625,19 @@ public static class FirebaseDBHandler
         try
         {
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-            newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
             snapshot = await reference.Child("profiles/users").Child(receivedUserID).Child("email").GetValueAsync();
 
-            //Debug.LogError("Player's email : " + snapshot.Value);
+            ////Debug.LogError("Player's email : " + snapshot.Value);
 
             email = snapshot.Value.ToString();
         }
         catch (Exception exp)
         {
-            Debug.LogError("Failed to GetPlayer's email : " + exp.Message);
+            //Debug.LogError("Failed to GetPlayer's email : " + exp.Message);
         }
 
         return email;
@@ -660,8 +651,7 @@ public static class FirebaseDBHandler
         {
             //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-            newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -670,7 +660,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.Log("Failed to GetMatDetailsOfUserId : " + exp.Message);
+            //Debug.Log("Failed to GetMatDetailsOfUserId : " + exp.Message);
         }
 
         return snapshot;
@@ -684,8 +674,7 @@ public static class FirebaseDBHandler
         {
             //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
             Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-            newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -694,7 +683,7 @@ public static class FirebaseDBHandler
         }
         catch (Exception exp)
         {
-            Debug.Log("Failed to GetCurrentMatIdOfUserId : " + exp.Message);
+            //Debug.Log("Failed to GetCurrentMatIdOfUserId : " + exp.Message);
         }
 
         return currentMatID;
@@ -708,23 +697,22 @@ public static class FirebaseDBHandler
         auth.SignInAnonymouslyAsync().ContinueWith(task => {
             if (task.IsCanceled)
             {
-                Debug.LogError("SignInAnonymouslyAsync was canceled.");
+                //Debug.LogError("SignInAnonymouslyAsync was canceled.");
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
+                //Debug.LogError("SignInAnonymouslyAsync encountered an error: " + task.Exception);
                 return;
             }
 
             Firebase.Auth.FirebaseUser newUser = task.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
+            //Debug.LogFormat("User signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
             //FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
             DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
 
-            Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(tempData));
+            //Debug.Log("Pushing data to backend: " + JsonConvert.SerializeObject(tempData));
 
             string key = reference.Child("stage-bucket/player-sessions").Push().Key;
             reference.Child("stage-bucket/player-sessions").Child(key).SetRawJsonValueAsync(JsonConvert.SerializeObject(tempData, Formatting.None, new JsonSerializerSettings

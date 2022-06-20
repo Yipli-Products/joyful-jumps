@@ -36,7 +36,7 @@ public class MenuScreen : MonoBehaviour
         {
             PlayerSession.Instance.LoadingScreenSetActive(true);
             PlayerGameData tempData = GameDataHandler.GetPlayerData();
-            print("Task recieved");
+           // print("Task recieved");
             playerGameData.SetTotalScore(tempData.GetTotalScore());
             playerGameData.SetCurrentLevel(tempData.GetCurrentLevel());
             PlayerSession.Instance.LoadingScreenSetActive(false);
@@ -54,8 +54,8 @@ public class MenuScreen : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("Game Data current level : " + playerGameData.GetCurrentLevel());
-        Debug.Log("Game Data total score : " + playerGameData.GetTotalScore());
+       // Debug.Log("Game Data current level : " + playerGameData.GetCurrentLevel());
+       // Debug.Log("Game Data total score : " + playerGameData.GetTotalScore());
     }
 
     private void SetLevelData()

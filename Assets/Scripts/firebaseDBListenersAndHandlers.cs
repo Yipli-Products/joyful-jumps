@@ -90,7 +90,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         #endif
 
         //Add listeners to the Firebase backend for all the DB Calls
-        Debug.Log("Add listeners to the Firebase backend for all the DB Calls");
+        //Debug.Log("Add listeners to the Firebase backend for all the DB Calls");
         PlayerSelection.NewUserFound += addGetPlayersListener;
         PlayerSelection.GetAllMats += addGetAllMatsListener;
 
@@ -108,7 +108,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private  async void addListnerForGameInfo()
     {
-        Debug.Log("addGetPlayersListener invoked");
+       // Debug.Log("addGetPlayersListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("inventory/games/" + currentYipliConfig.gameId)
@@ -124,7 +124,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         }
         else
         {
-            Debug.Log("onlyMatPlayMode : Invalid Game. Nothing found at specified path.");
+           // Debug.Log("onlyMatPlayMode : Invalid Game. Nothing found at specified path.");
         }
         getGameInfoQueryStatus = global::QueryStatus.Completed;
     }
@@ -147,7 +147,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private void HandleConnectedChanged(object sender, ValueChangedEventArgs e)
     {
-        Debug.Log("Network : " + e.Snapshot.Value);
+      //  Debug.Log("Network : " + e.Snapshot.Value);
         currentYipliConfig.bIsInternetConnected = e.Snapshot.Value.Equals(true);
 
         //FindObjectOfType<NoInternetPanelManager>().ManageNoInternetPanel();
@@ -188,7 +188,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private async void addDefaultMatIdListener()
     {
-        Debug.Log("addDefaultMatIdListener invoked");
+       // Debug.Log("addDefaultMatIdListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("profiles/users/" + currentYipliConfig.userId + "/current-mat-id")
@@ -197,7 +197,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private async void addDefaultMatInfoListener(string matId)
     {
-        Debug.Log("addDefaultMatInfoListener invoked");
+      // Debug.Log("addDefaultMatInfoListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("profiles/users/" + currentYipliConfig.userId + "/mats/" + matId)
@@ -206,7 +206,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private void HandleCurrentMatInfoValueChanged(object sender, ValueChangedEventArgs args)
     {
-        Debug.Log("HandleCurrentMatInfoValueChanged invoked");
+       // Debug.Log("HandleCurrentMatInfoValueChanged invoked");
         if(args.Snapshot.Value != null)
             currentYipliConfig.matInfo = new YipliMatInfo(args.Snapshot, args.Snapshot.Key);
         getDefaultMatQueryStatus = global::QueryStatus.Completed;
@@ -214,7 +214,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private void HandleCurrentMatIdValueChanged(object sender, ValueChangedEventArgs args)
     {
-        Debug.Log("HandleCurrentMatIdValueChanged invoked");
+      //  Debug.Log("HandleCurrentMatIdValueChanged invoked");
         getDefaultMatQueryStatus = global::QueryStatus.InProgress;
         //args.Snapshot has mat-Id for default mat.
         string matId = args.Snapshot.ToString();
@@ -223,12 +223,11 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private async Task anonAuthenticate()
     {
-        Debug.Log("Syncing data from the Firebase backend");
+       // Debug.Log("Syncing data from the Firebase backend");
         Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         //Firebase.Auth.FirebaseUser newUser = await auth.SignInWithEmailAndPasswordAsync(YipliHelper.userName, YipliHelper.password);
         Firebase.Auth.FirebaseUser newUser = await auth.SignInAnonymouslyAsync();
-        Debug.LogFormat("Dummy user signed in successfully: {0} ({1})",
-        newUser.DisplayName, newUser.UserId);
+      //  Debug.LogFormat("Dummy user signed in successfully: {0} ({1})",newUser.DisplayName, newUser.UserId);
 
         //Firebase.FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://yipli-project.firebaseio.com/");
         DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -236,7 +235,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     private async void addGetPlayersListener()
     {
-        Debug.Log("addGetPlayersListener invoked");
+       // Debug.Log("addGetPlayersListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("profiles/users/" + currentYipliConfig.userId + "/players")
@@ -246,7 +245,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     void HandleAllPlayersDataValueChanged(object sender, ValueChangedEventArgs args)
     {
         getAllPlayersQureyStatus = global::QueryStatus.InProgress;
-        Debug.Log("HandleAllPlayersDataValueChanged invoked");
+       // Debug.Log("HandleAllPlayersDataValueChanged invoked");
         if (args.DatabaseError != null)
         {
             Debug.LogError(args.DatabaseError.Message);
@@ -272,7 +271,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
             }
             else
             {
-                Debug.Log("Skipping this instance of player, backend seems corrupted.");
+               // Debug.Log("Skipping this instance of player, backend seems corrupted.");
             }
         }
 
@@ -289,7 +288,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
         }
         */
 
-        Debug.Log("All players data got successfully.");
+       // Debug.Log("All players data got successfully.");
         getAllPlayersQureyStatus = global::QueryStatus.Completed;
     }
 
@@ -309,7 +308,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     void HandleGameDataValueChanged(object sender, ValueChangedEventArgs args)
     {
         getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.InProgress;
-        Debug.Log("HandleGameDataValueChanged invoked");
+      //  Debug.Log("HandleGameDataValueChanged invoked");
         currentYipliConfig.gameDataForCurrentPlayer = args.Snapshot;
         getGameDataForCurrentPlayerQueryStatus = global::QueryStatus.Completed;
     }
@@ -317,7 +316,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     // ticket data info
     private async void addListnerForThisUserTicketDataInfo()
     {
-        Debug.Log("addListnerForThisUserTicketDataInfo invoked");
+      //  Debug.Log("addListnerForThisUserTicketDataInfo invoked");
         await anonAuthenticate();
         //FirebaseDatabase.DefaultInstance.GetReference("customer-tickets/" + currentYipliConfig.userId + "/").ValueChanged += HandleThisUserTicketDataInfoValueChanged;
         FirebaseDatabase.DefaultInstance.GetReference("customer-tickets/")
@@ -336,7 +335,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     // get all the mats od the received user ID
     private async void addGetAllMatsListener()
     {
-        Debug.Log("addGetAllMatsListener invoked");
+     //   Debug.Log("addGetAllMatsListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("profiles/users/" + currentYipliConfig.userId + "/mats")
@@ -346,10 +345,10 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     void HandleAllMatsDataValueChanged(object sender, ValueChangedEventArgs args)
     {
         GetAllMatsQureyStatus = global::QueryStatus.InProgress;
-        Debug.Log("HandleAllMatsDataValueChanged invoked");
+       // Debug.Log("HandleAllMatsDataValueChanged invoked");
         if (args.DatabaseError != null)
         {
-            Debug.LogError(args.DatabaseError.Message);
+            //Debug.LogError(args.DatabaseError.Message);
             return;
         }
 
@@ -364,11 +363,11 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
             }
             else
             {
-                Debug.Log("Skipping this instance of mat, backend seems corrupted.");
+                //Debug.Log("Skipping this instance of mat, backend seems corrupted.");
             }
         }
 
-        Debug.Log("All mats data got successfully.");
+        //Debug.Log("All mats data got successfully.");
         GetAllMatsQureyStatus = global::QueryStatus.Completed;
     }
 
@@ -380,7 +379,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
             var dynamicLinkEventArgs = args as ReceivedDynamicLinkEventArgs;
             string dynamicLinkOrig = dynamicLinkEventArgs.ReceivedDynamicLink.Url.OriginalString;
-            Debug.Log("Deep link : Received dynamic link : " + dynamicLinkOrig);
+            //Debug.Log("Deep link : Received dynamic link : " + dynamicLinkOrig);
 
             dynamicLinkOrig.Remove(0, dynamicLinkOrig.IndexOf("?"));
 
@@ -413,7 +412,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
                         break;
 
                     default:
-                        Debug.LogError("Wrong data set field : " + tempSplits[0]);
+                        //Debug.LogError("Wrong data set field : " + tempSplits[0]);
                         break;
                 }
             }
@@ -515,7 +514,7 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
     // achieve all required urls
     private async void addGetAllURLListener()
     {
-        Debug.Log("addGetAllMatsListener invoked");
+       // Debug.Log("addGetAllMatsListener invoked");
         await anonAuthenticate();
         FirebaseDatabase.DefaultInstance
         .GetReference("inventory/yipli-app/urls")
@@ -524,16 +523,16 @@ public class firebaseDBListenersAndHandlers : MonoBehaviour
 
     void HandleAllURLDataValueChanged(object sender, ValueChangedEventArgs args)
     {
-        Debug.Log("HandleAllURLDataValueChanged invoked");
+        //Debug.Log("HandleAllURLDataValueChanged invoked");
         if (args.DatabaseError != null)
         {
-            Debug.LogError(args.DatabaseError.Message);
+            //Debug.LogError(args.DatabaseError.Message);
             return;
         }
 
         currentYipliConfig.getMatUrlIn = args.Snapshot.Child("get-mat-in").Value.ToString();
         currentYipliConfig.getMatUrlUS = args.Snapshot.Child("get-mat-us").Value.ToString();
 
-        Debug.Log("All url data got successfully.");
+        //Debug.Log("All url data got successfully.");
     }
 }

@@ -69,7 +69,7 @@ public class PlayerSession : MonoBehaviour
         
         if (_instance != null && _instance != this)
         {
-            Debug.Log("Destroying current instance of playersession and reinitializing");
+            //Debug.Log("Destroying current instance of playersession and reinitializing");
             Destroy(gameObject);
             _instance = this;
         }
@@ -90,8 +90,8 @@ public class PlayerSession : MonoBehaviour
         {
             // Call Yipli_GameLib_Scene
             _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
-            Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
-            Debug.Log("Loading Yipli scene for player Selection...");
+            //Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
+            //Debug.Log("Loading Yipli scene for player Selection...");
 
             currentYipliConfig.bIsRetakeTutorialFlagActivated = false;
             if (!_instance.currentYipliConfig.callbackLevel.Equals("Yipli_Testing_harness"))
@@ -99,7 +99,7 @@ public class PlayerSession : MonoBehaviour
         }
         else
         {
-            Debug.Log("Current player is not null. Not calling yipli_lib_scene");
+            //Debug.Log("Current player is not null. Not calling yipli_lib_scene");
         }
     }
 
@@ -115,7 +115,7 @@ public class PlayerSession : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Game Id not Set");
+            //Debug.LogError("Game Id not Set");
         }
 
         if (currentYipliConfig.gameType != GameType.MULTIPLAYER_GAMING)
@@ -123,14 +123,14 @@ public class PlayerSession : MonoBehaviour
             playerNameGreetingText.text = "Hi, " + GetCurrentPlayer();
         }
         
-        Debug.Log("Starting the BLE routine check in PlayerSession Start()");
+        //Debug.Log("Starting the BLE routine check in PlayerSession Start()");
 
         StartCoroutine(CheckInternetConnection());
     }
 
     public void Update()
     {
-        Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
+        //Debug.Log("Game Cluster Id : " + YipliHelper.GetGameClusterId());
         
         if (currentYipliConfig.onlyMatPlayMode)
         {
@@ -151,8 +151,8 @@ public class PlayerSession : MonoBehaviour
     public void ChangePlayer()
     {
         _instance.currentYipliConfig.callbackLevel = SceneManager.GetActiveScene().name;
-        Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
-        Debug.Log("Loading Yipli scene for player Selection...");
+      //  Debug.Log("Updating the callBackLevel Value to :" + _instance.currentYipliConfig.callbackLevel);
+       // Debug.Log("Loading Yipli scene for player Selection...");
 
         firebaseDBListenersAndHandlers.SetGameDataForCurrenPlayerQueryStatus(QueryStatus.NotStarted);
 
@@ -190,7 +190,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
@@ -199,14 +199,14 @@ public class PlayerSession : MonoBehaviour
         FitnesssPoints = 0;
         gamePoints = 0;
         duration = 0;
-        Debug.Log("Aborting current player session.");
+       // Debug.Log("Aborting current player session.");
     }
 
     //to be called from all the player movment actions handled script
     //To be called from GameObject FixedUpdate
     public void UpdateDuration()
     {
-        Debug.Log("Updating duration for current player session.");
+      //  Debug.Log("Updating duration for current player session.");
         if (bIsPaused == false)
         {
             duration += Time.deltaTime;
@@ -214,7 +214,7 @@ public class PlayerSession : MonoBehaviour
 
         if (YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
-            Debug.Log("In UpdateDuration : Ble connected");
+          //  Debug.Log("In UpdateDuration : Ble connected");
             if (BleErrorPanel.activeSelf)
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_success");
@@ -226,11 +226,11 @@ public class PlayerSession : MonoBehaviour
 
     private void CheckMatConnection()
     {
-        Debug.Log("Before Processing : BleErrorPanel.activeSelf = " + BleErrorPanel.activeSelf);
+     //   Debug.Log("Before Processing : BleErrorPanel.activeSelf = " + BleErrorPanel.activeSelf);
 
         if (YipliHelper.GetMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
-            Debug.Log("Mat connection is established.");
+          //  Debug.Log("Mat connection is established.");
             
             if (BleErrorPanel.activeSelf)
             {
@@ -241,7 +241,7 @@ public class PlayerSession : MonoBehaviour
         }
         else
         {
-            Debug.Log("Mat connection is lost.");
+          //  Debug.Log("Mat connection is lost.");
             if (!BleErrorPanel.activeSelf)
             {
                 // Different mat connection (error)message based on Operating system and connectivity type.
@@ -266,13 +266,13 @@ public class PlayerSession : MonoBehaviour
     {
         try
         {
-            Debug.Log("In StartCoroutineForBleReConnection.");
+         //   Debug.Log("In StartCoroutineForBleReConnection.");
             if (!bIsBleCheckRunning)
                 StartCoroutine(ReconnectBleFromGame());
         }
         catch(Exception e)
         {
-            Debug.Log("Exception in Retrying ble connection." + e.Message);
+           // Debug.Log("Exception in Retrying ble connection." + e.Message);
         }
     }
 
@@ -280,11 +280,11 @@ public class PlayerSession : MonoBehaviour
     {
         bIsBleCheckRunning = true;
         retryBleConnectionButton.SetActive(false);
-        Debug.Log("In ReconnectBleFromGame.");
+       // Debug.Log("In ReconnectBleFromGame.");
         try
         {
             //Initiate mat connection with last set GameCluterId
-            Debug.Log("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
+           //("ReconnectBle with Game clster ID : " + YipliHelper.GetGameClusterId());
 #if UNITY_ANDROID
             InitBLE.InitBLEFramework(currentYipliConfig.matInfo?.macAddress ?? "", YipliHelper.GetGameClusterId() != 1000 ? YipliHelper.GetGameClusterId() : 0, currentYipliConfig.matInfo?.matAdvertisingName ?? LibConsts.MatTempAdvertisingNameOnlyForNonIOS, currentYipliConfig.isDeviceAndroidTV);
 #elif UNITY_IOS
@@ -296,7 +296,7 @@ public class PlayerSession : MonoBehaviour
         }
         catch (Exception exp)
         {
-            Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
+           // Debug.Log("Exception in InitBLEFramework from ReconnectBleFromGame" + exp.Message);
         }
 
         //Block this function for next 5 seconds by disabling the retry Button.
@@ -308,7 +308,7 @@ public class PlayerSession : MonoBehaviour
 
     public void LoadingScreenSetActive(bool bOn)
     {
-        Debug.Log("Loading Screen called : " + bOn);
+       // Debug.Log("Loading Screen called : " + bOn);
         YipliBackgroundPanel.SetActive(bOn);
         LoadingScreen.SetActive(bOn);
     }
@@ -336,7 +336,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
@@ -376,12 +376,12 @@ public class PlayerSession : MonoBehaviour
             }
             else
             {
-                Debug.Log("Game-data is empty");
+               // Debug.Log("Game-data is empty");
             }
         }
         else
         {
-            Debug.Log("Game-data is null");
+           // Debug.Log("Game-data is null");
         }
 
         // firebase function ignores and deletes folowing 2 lines. Uncomment lines once FB function is updated
@@ -413,11 +413,11 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Starting current player session.");
+      //  Debug.Log("Starting current player session.");
         playerActionCounts = new Dictionary<YipliUtils.PlayerActions, int>();
         gamePoints = 0;
         duration = 0;
@@ -429,11 +429,11 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Storing current player session to backend database.");
+       // Debug.Log("Storing current player session to backend database.");
         this.gamePoints = gamePoints;
 
         //Calories = YipliUtils.GetCaloriesBurned(getPlayerActionCounts());
@@ -444,11 +444,11 @@ public class PlayerSession : MonoBehaviour
         {
             //Store the session data to backend.
             FirebaseDBHandler.PostPlayerSession(Instance, () => { Debug.Log("Session stored in db"); });
-            Debug.Log("Single player session stored successfully.");
+           // Debug.Log("Single player session stored successfully.");
         }
         else
         {
-            Debug.Log("Session not posted : Validation failed for sessoin data.");
+           // Debug.Log("Session not posted : Validation failed for sessoin data.");
         }
     }
 
@@ -460,27 +460,27 @@ public class PlayerSession : MonoBehaviour
     {
         if (currentYipliConfig.gameId == null || currentYipliConfig.gameId == "")
         {
-            Debug.Log("gameId is not set");
+           // Debug.Log("gameId is not set");
             return -1;  
         }
         if (currentYipliConfig.playerInfo.playerId == null || currentYipliConfig.playerInfo.playerId == "")
         {
-            Debug.Log("playerId is not set");
+           // Debug.Log("playerId is not set");
             return -1;
         }
         if (playerActionCounts.Count == 0)
         {
-            Debug.Log("playerActionCounts is not set");
+           // Debug.Log("playerActionCounts is not set");
             return -1;
         }
         if (duration == 0)
         {
-            Debug.Log("duration is 0");
+           // Debug.Log("duration is 0");
             return -1;
         }
         if (intensityLevel == "")
         {
-            Debug.Log("intensityLevel is not set");
+         //   Debug.Log("intensityLevel is not set");
             return -1;
         }
         return 0;
@@ -489,16 +489,16 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Pausing current player session.");
+       // Debug.Log("Pausing current player session.");
         bIsPaused = true; // only set the paused flat to true. Fixed update will take care of halting the time counter
                           //Ble check
         if (!YipliHelper.GetMatConnectionStatus().Equals("Connected", StringComparison.OrdinalIgnoreCase))
         {
-            Debug.Log("In PauseSPSession : Ble disconnected");
+           // Debug.Log("In PauseSPSession : Ble disconnected");
             if (!BleErrorPanel.activeSelf)
             {
                 FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
@@ -511,24 +511,24 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Resuming current player session.");
+      //  Debug.Log("Resuming current player session.");
         bIsPaused = false;
     }
     public void AddPlayerAction(YipliUtils.PlayerActions action, int count = 1)
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
         if (count < 1) return;
 
-        Debug.Log("Adding action in current player session.");
+       // Debug.Log("Adding action in current player session.");
         if (playerActionCounts.ContainsKey(action))
         {
             playerActionCounts[action] = playerActionCounts[action] + count;
@@ -552,7 +552,7 @@ public class PlayerSession : MonoBehaviour
     }
     public Dictionary<string, dynamic> GetMultiPlayerSessionDataJsonDic(PlayerDetails playerDetails, string mpSessionUUID)
     {
-        Debug.Log("UUID= " + mpSessionUUID);
+        //Debug.Log("UUID= " + mpSessionUUID);
 
         Dictionary<string, dynamic> x;
         x = new Dictionary<string, dynamic>();
@@ -581,12 +581,12 @@ public class PlayerSession : MonoBehaviour
             }
             else
             {
-                Debug.Log("Game-data is empty");
+               // Debug.Log("Game-data is empty");
             }
         }
         else
         {
-            Debug.Log("Game-data is null");
+            //Debug.Log("Game-data is null");
         }
 
         return x;
@@ -595,11 +595,11 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Starting multi player session.");
+       // Debug.Log("Starting multi player session.");
         currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.playerActionCounts = new Dictionary<YipliUtils.PlayerActions, int>();
         currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.playerActionCounts = new Dictionary<YipliUtils.PlayerActions, int>();
 
@@ -623,17 +623,17 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+           // Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.LogError("Duration is " + duration);
+       // Debug.LogError("Duration is " + duration);
         currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.duration = duration;
         currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.duration = duration;
 
-        Debug.Log("Storing current player session to backend database.");
+       // Debug.Log("Storing current player session to backend database.");
 
-        Debug.Log("Count Test- " + currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.playerActionCounts.Count + " , " + currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.playerActionCounts.Count);
+       // Debug.Log("Count Test- " + currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.playerActionCounts.Count + " , " + currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails.playerActionCounts.Count);
 
 
         currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails.points = playerOneGamePoints;
@@ -645,39 +645,39 @@ public class PlayerSession : MonoBehaviour
         {
             //Store the session data to backend.
             FirebaseDBHandler.PostMultiPlayerSession(Instance, currentYipliConfig.MP_GameStateManager.playerData.PlayerOneDetails, mpSessionUUID, () => { Debug.Log("Session stored in db"); });
-            Debug.Log("Player 1 session stored successfully.");
+           // Debug.Log("Player 1 session stored successfully.");
         }
         else
         {
-            Debug.Log("Session not posted : Validation failed for sessoin data.");
+           // Debug.Log("Session not posted : Validation failed for sessoin data.");
         }
 
         if (0 == ValidateMPSessionBeforePosting(currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails))
         {
             //Store the session data to backend.
             FirebaseDBHandler.PostMultiPlayerSession(Instance, currentYipliConfig.MP_GameStateManager.playerData.PlayerTwoDetails, mpSessionUUID, () => { Debug.Log("Session stored in db"); });
-            Debug.Log("Player 2 session stored successfully.");
+           // Debug.Log("Player 2 session stored successfully.");
         }
         else
         {
-            Debug.Log("Session not posted : Validation failed for sessoin data.");
+           // Debug.Log("Session not posted : Validation failed for sessoin data.");
         }
     }
     private int ValidateMPSessionBeforePosting(PlayerDetails playerDetails)
     {
         if (playerDetails.gameId == null || playerDetails.gameId == "")
         {
-            Debug.Log("gameId is not set");
+           // Debug.Log("gameId is not set");
             return -1;
         }
         if (playerDetails.playerId == null || playerDetails.playerId == "")
         {
-            Debug.Log("playerId is not set");
+           // Debug.Log("playerId is not set");
             return -1;
         }
         if (playerDetails.playerActionCounts.Count == 0)
         {
-            Debug.Log("playerActionCounts is not set");
+            //Debug.Log("playerActionCounts is not set");
             return -1;
         }
         /* TODO : Confirm with kurus
@@ -689,7 +689,7 @@ public class PlayerSession : MonoBehaviour
         
         if (playerDetails.duration == 0)
         {
-            Debug.Log("duration is 0");
+            //Debug.Log("duration is 0");
             return -1;
         }
         return 0;
@@ -698,7 +698,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+            //Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
@@ -708,7 +708,7 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+            //Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
@@ -718,11 +718,11 @@ public class PlayerSession : MonoBehaviour
     {
         if (!currentYipliConfig.onlyMatPlayMode)
         {
-            Debug.LogError("onlyMatPlayMode is on, returning");
+            //Debug.LogError("onlyMatPlayMode is on, returning");
             return;
         }
 
-        Debug.Log("Adding action in current player session.");
+        //Debug.Log("Adding action in current player session.");
         if (playerDetails.playerActionCounts.ContainsKey(action))
             playerDetails.playerActionCounts[action] = playerDetails.playerActionCounts[action] + count;
         else
@@ -775,7 +775,7 @@ public class PlayerSession : MonoBehaviour
             }
             else
             {
-                Debug.Log("Internect connection is lost.");
+                //Debug.Log("Internect connection is lost.");
                 if (!netErrorPanel.activeSelf)
                 {
                     FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
@@ -851,7 +851,7 @@ public class PlayerSession : MonoBehaviour
         void OnApplicationQuit()
         {
             #if UNITY_STANDALONE_WIN
-                Debug.LogError("Inside OnApplicationQuit");
+                //Debug.LogError("Inside OnApplicationQuit");
                 DeviceControlActivity._disconnect();
                 DeviceControlActivity.readThread.Abort();
             #elif UNITY_IOS
@@ -873,6 +873,6 @@ public class PlayerSession : MonoBehaviour
 
         int totalDaysSinceLastSkipped = (int)(todaysDate - skippedDate).TotalDays;
 
-        Debug.LogError("todaysDate : " + totalDaysSinceLastSkipped);
+        //Debug.LogError("todaysDate : " + totalDaysSinceLastSkipped);
     }
 }

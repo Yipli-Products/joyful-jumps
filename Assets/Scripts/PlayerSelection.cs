@@ -235,7 +235,7 @@ public class PlayerSelection : MonoBehaviour
     public void OnUpdateGameClick()
     {
         string gameAppId = Application.identifier;
-        Debug.Log("App Id is : " + gameAppId);
+        //Debug.Log("App Id is : " + gameAppId);
         YipliHelper.GoToPlaystoreUpdate(gameAppId);
     }
 
@@ -251,23 +251,23 @@ public class PlayerSelection : MonoBehaviour
     IEnumerator KeepFindingUserId()
     {
         yield return new WaitForSeconds(.5f);
-        Debug.Log("Started Coroutine : KeepCheckingForIntents");
+        //Debug.Log("Started Coroutine : KeepCheckingForIntents");
         while (currentYipliConfig.userId == null || currentYipliConfig.userId.Length < 1)
         {
-            Debug.Log("Calling CheckIntentsAndInitializePlayerEnvironment()");
+            //Debug.Log("Calling CheckIntentsAndInitializePlayerEnvironment()");
 
             // Read intents and Initialize defaults
             FetchUserDetailsForAndroidAndIOS();
 
             yield return new WaitForSeconds(0.2f);
         }
-        Debug.Log("Ending Coroutine. UserId = " + currentYipliConfig.userId);
+        //Debug.Log("Ending Coroutine. UserId = " + currentYipliConfig.userId);
         //StartCoroutine(InitializeAndStartPlayerSelection());
     }
 
     private void FetchUserAndInitializePlayerEnvironment()
     {
-        Debug.Log("Deep link : In CheckIntentsAndInitializePlayerEnvironment()");
+        //Debug.Log("Deep link : In CheckIntentsAndInitializePlayerEnvironment()");
 
         // Read intents and Initialize defaults
         //FetchUserDetailsForAndroidAndIOS();
@@ -301,7 +301,7 @@ public class PlayerSelection : MonoBehaviour
 
         allowPhoneHolderAudioPlay = true;
 
-        Debug.LogError("phoneHolderTUTPlayed : " + phoneHolderTUTPlayed);
+       // Debug.LogError("phoneHolderTUTPlayed : " + phoneHolderTUTPlayed);
 
         phoneHolderTUTPlayed = true;
 
@@ -366,7 +366,7 @@ public class PlayerSelection : MonoBehaviour
         }
         else
         {
-            Debug.Log("Calling RedirectToYipliAppForNoUserFound()");
+            //Debug.Log("Calling RedirectToYipliAppForNoUserFound()");
             //Automatically redirect to Yipli App
             StartCoroutine(RedirectToYipliAppForNoUserFound());
         }
@@ -374,7 +374,7 @@ public class PlayerSelection : MonoBehaviour
 
     IEnumerator RedirectToYipliAppForNoUserFound()
     {
-        Debug.Log("In RedirectToYipliAppForNoUserFound()");
+        //Debug.Log("In RedirectToYipliAppForNoUserFound()");
 
         LaunchFromYipliAppPanel.SetActive(true);
         yield return new WaitForSecondsRealtime(1f);
@@ -384,11 +384,11 @@ public class PlayerSelection : MonoBehaviour
         LaunchFromYipliAppPanel.SetActive(false);
         LoadingPanel.SetActive(true);
 
-        Debug.Log("Calling KeepFindingUserId()");
+        //Debug.Log("Calling KeepFindingUserId()");
         //Currently User isnt found. Start a coroutine which keeps on checking for the user details.
         //StartCoroutine(KeepFindingUserId());
 
-        Debug.Log("Redirecting to Yipli App");
+        //Debug.Log("Redirecting to Yipli App");
         //YipliHelper.GoToYipli(ProductMessages.noUserFound);
         YipliHelper.GoToYipli(ProductMessages.relaunchGame, currentYipliConfig.gameId);
     }
@@ -460,7 +460,7 @@ public class PlayerSelection : MonoBehaviour
         }
         else
         {
-            Debug.Log("Deep link : currentYipliConfig.playerInfo is still null");
+            //Debug.Log("Deep link : currentYipliConfig.playerInfo is still null");
         }
     }
 
@@ -513,7 +513,7 @@ public class PlayerSelection : MonoBehaviour
 
     private void ReadAndroidIntents()
     {
-        Debug.Log("Deep link : Reading intents.");
+       // Debug.Log("Deep link : Reading intents.");
         AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
         AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
@@ -522,7 +522,7 @@ public class PlayerSelection : MonoBehaviour
         currentYipliConfig.userId = extras.Call<string>("getString", "uId");
         if (currentYipliConfig.userId == null)
         {
-            Debug.Log("Deep link : Returning from readIntents as no userId found.");
+            //Debug.Log("Deep link : Returning from readIntents as no userId found.");
             throw new Exception("Deep link : UserId is not found");
         }
 
@@ -536,7 +536,7 @@ public class PlayerSelection : MonoBehaviour
         string mMac = extras.Call<string>("getString", "mMac");
         string pTutDone = extras.Call<string>("getString", "pTutDone");
 
-        Debug.Log("Deep link : Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pic);
+        //Debug.Log("Deep link : Found intents : " + currentYipliConfig.userId + ", " + pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + pic);
 
         if (pId != null && pName != null)
         {
@@ -564,10 +564,10 @@ public class PlayerSelection : MonoBehaviour
         }
         */
 
-        Debug.Log("Deep link : from set link data");
+        //Debug.Log("Deep link : from set link data");
 
         if (currentYipliConfig.userId == null || currentYipliConfig.userId == string.Empty || currentYipliConfig.userId == "") {
-            Debug.Log("Deep link : from set link data : currentYipliConfig.userId is empty, returning");
+            //Debug.Log("Deep link : from set link data : currentYipliConfig.userId is empty, returning");
             return;
         }        
 
@@ -576,21 +576,21 @@ public class PlayerSelection : MonoBehaviour
         //GetAllMats();
 
         currentYipliConfig.currentMatID = await FirebaseDBHandler.GetCurrentMatIdOfUserId(currentYipliConfig.userId);
-        Debug.LogError("Retake Tutorial : current mat ID : " + currentYipliConfig.currentMatID);
+        //Debug.LogError("Retake Tutorial : current mat ID : " + currentYipliConfig.currentMatID);
         currentYipliConfig.currentMatDetails = await FirebaseDBHandler.GetMatDetailsOfUserId(currentYipliConfig.userId, currentYipliConfig.currentMatID);
-        Debug.LogError("Retake Tutorial : current mat address : " + currentYipliConfig.currentMatDetails.Child("mac-address").Value.ToString());
+        //Debug.LogError("Retake Tutorial : current mat address : " + currentYipliConfig.currentMatDetails.Child("mac-address").Value.ToString());
 #endif
 
 #if UNITY_ANDROID
         //currentYipliConfig.matInfo = new YipliMatInfo(mId, mMac);
 
         if (currentYipliConfig.isDeviceAndroidTV) {
-            Debug.Log("Android TV  =  " + currentYipliConfig.isDeviceAndroidTV);
+            //Debug.Log("Android TV  =  " + currentYipliConfig.isDeviceAndroidTV);
 
             // Do specific Android TV stuff if required as this is just user info setting initialisation from here.
 
         } else {
-            Debug.Log("Android TV is not detected, this is from Android OS part from set link Data  =  " + currentYipliConfig.isDeviceAndroidTV);
+            //Debug.Log("Android TV is not detected, this is from Android OS part from set link Data  =  " + currentYipliConfig.isDeviceAndroidTV);
 
             currentYipliConfig.matInfo = new YipliMatInfo(currentYipliConfig.currentMatID, currentYipliConfig.currentMatDetails.Child("mac-address").Value.ToString());
         }
@@ -601,7 +601,7 @@ public class PlayerSelection : MonoBehaviour
 #endif
 
         // logs only
-        Debug.Log("Deep link : Found intents : " + currentYipliConfig.userId + ", " + currentYipliConfig.pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + mName + "," + pPicUrl);
+        //Debug.Log("Deep link : Found intents : " + currentYipliConfig.userId + ", " + currentYipliConfig.pId + ", " + pDOB + ", " + pHt + ", " + pWt + ", " + pName + ", " + mId + ", " + mMac + "," + mName + "," + pPicUrl);
 
         FetchUserAndInitializePlayerEnvironment();
     }
@@ -648,20 +648,20 @@ public class PlayerSelection : MonoBehaviour
     {
         try
         {
-            Debug.Log("Deep link : FetchUserDetails : " + currentYipliConfig.playerInfo + " : " + currentYipliConfig.matInfo);
+            //Debug.Log("Deep link : FetchUserDetails : " + currentYipliConfig.playerInfo + " : " + currentYipliConfig.matInfo);
 #if UNITY_ANDROID
             if (currentYipliConfig.userId == null || currentYipliConfig.userId == "")
             {
-                Debug.Log("Deep link : Reading intents as currentyipliConfig is empty");
+               // Debug.Log("Deep link : Reading intents as currentyipliConfig is empty");
                 //ReadAndroidIntents();
 
-                Debug.Log("Calling NoUserFoundInGameFlow()");
+               // Debug.Log("Calling NoUserFoundInGameFlow()");
                 //This code block will be called when the game App is not launched from the Yipli app even once.
                 NoUserFoundInGameFlow();
             }
             else
             {
-                Debug.Log("Deep link : no need to read intents as currentYipliConfig has data : " + currentYipliConfig.userId);
+                //Debug.Log("Deep link : no need to read intents as currentYipliConfig has data : " + currentYipliConfig.userId);
             }
 #elif UNITY_IOS
             /*
@@ -674,8 +674,8 @@ public class PlayerSelection : MonoBehaviour
         }
         catch (System.Exception exp)// handling of game directing opening, without yipli app
         {
-            Debug.Log("Deep link : Exception occured in GetIntent!!!");
-            Debug.Log(exp.Message);
+            //Debug.Log("Deep link : Exception occured in GetIntent!!!");
+            //Debug.Log(exp.Message);
 
             currentYipliConfig.userId = null;
             currentYipliConfig.playerInfo = null;
@@ -738,7 +738,7 @@ public class PlayerSelection : MonoBehaviour
         // testing purpose only
         else if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            Debug.LogError("Executing E : " + currentYipliConfig.gameInventoryInfo.onlyMatPlayMode);
+            //Debug.LogError("Executing E : " + currentYipliConfig.gameInventoryInfo.onlyMatPlayMode);
             currentYipliConfig.onlyMatPlayMode = false;
         }
         else
@@ -791,7 +791,7 @@ public class PlayerSelection : MonoBehaviour
         // wait for only matplay mode to be set
         if (!onlyMatPlayModeIsSet) return;
 
-        Debug.LogError("stut : only mat play mode : " + currentYipliConfig.onlyMatPlayMode);
+        //Debug.LogError("stut : only mat play mode : " + currentYipliConfig.onlyMatPlayMode);
 
         // only once start the connection flow
         if (!matConnectionStarted && currentYipliConfig.onlyMatPlayMode)
@@ -965,7 +965,7 @@ public class PlayerSelection : MonoBehaviour
 
     public void SwitchPlayerFlow()//Call this for every StartGame()/Game Session
     {
-        Debug.Log("Checking current player.");
+        //Debug.Log("Checking current player.");
 
         TurnOffAllPanels();
         LoadingPanel.SetActive(true);
@@ -976,7 +976,7 @@ public class PlayerSelection : MonoBehaviour
         {
             //This means we have the default Player info from backend.
             //In this case we need to call the player change screen and not the player selection screen
-            Debug.Log("Found current player : " + currentYipliConfig.playerInfo.playerName);
+            //Debug.Log("Found current player : " + currentYipliConfig.playerInfo.playerName);
 
             //StartCoroutine(ImageUploadAndPlayerUIInit());
 
@@ -1006,7 +1006,7 @@ public class PlayerSelection : MonoBehaviour
 
     public void PlayerSelectionFlow()
     {
-        Debug.Log("In Player selection flow.");
+        //Debug.Log("In Player selection flow.");
 
         // first of all destroy all PlayerButton prefabs. This is required to remove stale prefabs.
         //if (generatedObjects.Count > 0)
@@ -1020,7 +1020,7 @@ public class PlayerSelection : MonoBehaviour
 
         if (currentYipliConfig.allPlayersInfo != null && currentYipliConfig.allPlayersInfo.Count != 0) //Atleast 1 player found for the corresponding userId
         {
-            Debug.Log("Player/s found from firebase : " + currentYipliConfig.allPlayersInfo.Count);
+            //Debug.Log("Player/s found from firebase : " + currentYipliConfig.allPlayersInfo.Count);
 
             //List<InfiniteWheel.InfiniteWheelItem> allButtons = new List<InfiniteWheel.InfiniteWheelItem>();
 
@@ -1046,7 +1046,7 @@ public class PlayerSelection : MonoBehaviour
             }
             catch (Exception exp)
             {
-                Debug.Log("Exception in Adding player : " + exp.Message);
+                //Debug.Log("Exception in Adding player : " + exp.Message);
                 //Application.Quit();
             }
             TurnOffAllPanels();
@@ -1064,7 +1064,7 @@ public class PlayerSelection : MonoBehaviour
         }
         else
         {
-            Debug.Log("No player found from firebase.");
+            //Debug.Log("No player found from firebase.");
             TurnOffAllPanels();
             //zeroPlayersPanel.SetActive(true);
             // TODO : if no players are found
@@ -1198,17 +1198,17 @@ public class PlayerSelection : MonoBehaviour
         {
             foreach (YipliPlayerInfo player in currentYipliConfig.allPlayersInfo)
             {
-                Debug.Log("Found player : " + player.playerName);
+                //Debug.Log("Found player : " + player.playerName);
                 if (player.playerName == playerName)
                 {
-                    Debug.Log("Found player : " + player.playerName);
+                    //Debug.Log("Found player : " + player.playerName);
                     return player;
                 }
             }
         }
         else
         {
-            Debug.Log("No Players found.");
+            //Debug.Log("No Players found.");
         }
         return null;
     }
@@ -1217,7 +1217,7 @@ public class PlayerSelection : MonoBehaviour
      * This function takes the flow to Mat connection */
     public void OnContinuePress()
     {
-        Debug.Log("Continue Pressed.");
+        //Debug.Log("Continue Pressed.");
         TurnOffAllPanels();
         //matSelectionScript.MatConnectionFlow();
         matSelectionScript.LoadMainGameSceneIfMatIsConnected();
@@ -1320,7 +1320,7 @@ public class PlayerSelection : MonoBehaviour
                 //First check if the players count under userId is more than 0?
                 if (currentYipliConfig.allPlayersInfo != null && currentYipliConfig.allPlayersInfo.Count > 0)
                 {
-                    Debug.Log("Calling the PlayerSelectionFlow");
+                    //Debug.Log("Calling the PlayerSelectionFlow");
                     PlayerSelectionFlow();
                 }
                 /*
@@ -1394,7 +1394,7 @@ public class PlayerSelection : MonoBehaviour
         {
             if (profilePicUrl == null || profilePicUrl == "" || gameObj == null)
             {
-                Debug.Log("Something went wrong. Returning.");
+                //Debug.Log("Something went wrong. Returning.");
                 //Set the profile pic to a default one.
                 gameObj.sprite = defaultProfilePicSprite;
             }
@@ -1418,7 +1418,7 @@ public class PlayerSelection : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError("Loading of profile pic failed : " + e.Message);
+            //Debug.LogError("Loading of profile pic failed : " + e.Message);
         }
     }
 

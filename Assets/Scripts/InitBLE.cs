@@ -1,6 +1,6 @@
 ﻿#if UNITY_STANDALONE_WIN
-using com.fitmat.fitmatdriver.Producer.Connection;
-//using FMInterface_Windows;
+//using com.fitmat.fitmatdriver.Producer.Connection;
+using FMInterface_Windows;
 #endif
 
 using BLEFramework.Unity;
@@ -270,8 +270,9 @@ public class InitBLE
             */
         }
 #elif UNITY_STANDALONE_WIN
-            Debug.Log("Calling DeviceControlActivity.InitPCFramework()");
+            Debug.LogError("Calling DeviceControlActivity.InitPCFramework()");
             DeviceControlActivity.InitPCFramework(gameID);
+            Debug.LogError("Connection established");
 #endif
     }
     

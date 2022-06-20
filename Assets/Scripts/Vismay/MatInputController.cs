@@ -96,7 +96,7 @@ public class MatInputController : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError("Something went wrong with setting the cluster id : " + e.Message);
+            //Debug.LogError("Something went wrong with setting the cluster id : " + e.Message);
         }
     }
 
@@ -105,14 +105,14 @@ public class MatInputController : MonoBehaviour
         //if (!currentYipliConfig.onlyMatPlayMode) return;
         
         string fmActionData = InitBLE.GetFMResponse();
-        Debug.Log("Json Data from Fmdriver in matinput : " + fmActionData);
+       // Debug.Log("Json Data from Fmdriver in matinput : " + fmActionData);
 
         FmDriverResponseInfo singlePlayerResponse = null;
 
         try {
             singlePlayerResponse = JsonUtility.FromJson<FmDriverResponseInfo>(fmActionData);
         } catch (System.Exception e) {
-            Debug.Log("singlePlayerResponse is having problem : " + e.Message);
+           // Debug.Log("singlePlayerResponse is having problem : " + e.Message);
         }
 
         if (singlePlayerResponse == null) return;
@@ -139,7 +139,7 @@ public class MatInputController : MonoBehaviour
                     break;
 
                 default:
-                    Debug.LogError("Wrong Action is detected : " + DetectedAction.ToString());
+                   // Debug.LogError("Wrong Action is detected : " + DetectedAction.ToString());
                     break;
             }
         }
@@ -210,7 +210,7 @@ public class MatInputController : MonoBehaviour
                 break;
 
             default:
-                Debug.Log("Wrong Input");
+               // Debug.Log("Wrong Input");
                 break;
         }
     }
@@ -407,7 +407,7 @@ public class MatInputController : MonoBehaviour
                 break;
 
             default:
-                Debug.LogError("Wrong inspector index detected : " + playerInspectorIndex);
+               // Debug.LogError("Wrong inspector index detected : " + playerInspectorIndex);
                 break;
         }
         
@@ -437,7 +437,7 @@ public class MatInputController : MonoBehaviour
                 break;
 
             default:
-                Debug.LogError("Wrong inspector index detected : " + currentPlayerIndex);
+                //Debug.LogError("Wrong inspector index detected : " + currentPlayerIndex);
                 break;
         }
     }

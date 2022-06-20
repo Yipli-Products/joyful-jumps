@@ -80,7 +80,7 @@ public class MatSelection : MonoBehaviour
     // Mat tutorial requires the mat connection to be established.
     public void EstablishMatConnection()
     {
-        Debug.Log("Starting Mat connection flow");
+        //Debug.Log("Starting Mat connection flow");
         NoMatPanel.SetActive(false);
         newMatInputController.MakeSortLayerTen();
         //newUIManager.TurnOffMainCommonButton();
@@ -106,7 +106,7 @@ public class MatSelection : MonoBehaviour
         else //Current Mat not found in Db.
         {
             loadingPanel.SetActive(false);
-            Debug.Log("No Mat found in cache."); 
+            //Debug.Log("No Mat found in cache."); 
             //noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
             //newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             newMatInputController.MakeSortLayerZero();
@@ -165,7 +165,7 @@ public class MatSelection : MonoBehaviour
 
     public void MatConnectionFlow()
     {
-        Debug.Log("Starting Mat connection flow");
+        //Debug.Log("Starting Mat connection flow");
         bIsMatFlowInitialized = true;
         bIsGameMainSceneLoading = false;
         NoMatPanel.SetActive(false);
@@ -173,8 +173,14 @@ public class MatSelection : MonoBehaviour
         //newUIManager.TurnOffMainCommonButton();
 
 #if UNITY_EDITOR
+        /*
         if (!bIsGameMainSceneLoading)
-            StartCoroutine(LoadMainGameScene());
+            StartCoroutine(LoadMainGameScene());*/
+
+        if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
+        {
+            StartCoroutine(ConnectMat(true));
+        }
 #elif UNITY_ANDROID
         /*
         if (currentYipliConfig.matInfo == null && !currentYipliConfig.isDeviceAndroidTV)
@@ -187,7 +193,7 @@ public class MatSelection : MonoBehaviour
         if (currentYipliConfig.matInfo != null || currentYipliConfig.isDeviceAndroidTV)
         {
             if (currentYipliConfig.matInfo != null) {
-                Debug.Log("Mac Address : " + currentYipliConfig.matInfo.macAddress);
+                //Debug.Log("Mac Address : " + currentYipliConfig.matInfo.macAddress);
             }
             //Load Game scene if the mat is already connected.
             if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
@@ -198,7 +204,7 @@ public class MatSelection : MonoBehaviour
         else //Current Mat not found in Db.
         {
             loadingPanel.SetActive(false);
-            Debug.Log("No Mat found in cache.");
+            //Debug.Log("No Mat found in cache.");
             //noMatText.text = ProductMessages.Err_mat_connection_android_phone_register;
             //newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
             newMatInputController.MakeSortLayerZero();
@@ -240,7 +246,7 @@ public class MatSelection : MonoBehaviour
     {
         //newUIManager.TurnOffMainCommonButton();
 
-        Debug.Log("ReCheckMatConnection() called");
+        //Debug.Log("ReCheckMatConnection() called");
         if (bIsMatFlowInitialized)
             MatConnectionFlow();
         else
@@ -308,7 +314,7 @@ public class MatSelection : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError("mat connection failed : " + e.Message);
+            //Debug.LogError("mat connection failed : " + e.Message);
 
             loadingPanel.SetActive(false);
             //newUIManager.UpdateButtonDisplay(NoMatPanel.tag);
@@ -341,7 +347,7 @@ public class MatSelection : MonoBehaviour
         if (!InitBLE.getMatConnectionStatus().Equals("connected", StringComparison.OrdinalIgnoreCase))
         {
             FindObjectOfType<YipliAudioManager>().Play("BLE_failure");
-            Debug.Log("Mat not reachable.");
+            //Debug.Log("Mat not reachable.");
 
 //#if UNITY_ANDROID || UNITY_IOS
 //                //noMatText.text = ProductMessages.Err_mat_connection_mat_off;
@@ -415,7 +421,7 @@ public class MatSelection : MonoBehaviour
         {
             while (firebaseDBListenersAndHandlers.GetGameDataForCurrenPlayerQueryStatus() != QueryStatus.Completed)
             {
-                Debug.Log("waiting to finish new player's game data");
+                //Debug.Log("waiting to finish new player's game data");
                 yield return new WaitForSecondsRealtime(0.1f);
             }
         }
@@ -441,7 +447,7 @@ public class MatSelection : MonoBehaviour
         }
 
         //load last Scene
-        Debug.LogError("Time to launch the scene : " + currentYipliConfig.allowMainGameSceneToLoad);
+        //Debug.LogError("Time to launch the scene : " + currentYipliConfig.allowMainGameSceneToLoad);
         if (currentYipliConfig.allowMainGameSceneToLoad) {
 
             SceneManager.LoadScene(currentYipliConfig.callbackLevel);

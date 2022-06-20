@@ -32,7 +32,7 @@ public class YipliPlayerInfo
         }
         else
         {
-            Debug.Log("Calculation player age for DOB : " + playerDob);
+         //   //Debug.Log("Calculation player age for DOB : " + playerDob);
             playerAge = CalculateAge(playerDob);
         }
         this.playerHeight = playerHeight;
@@ -47,7 +47,7 @@ public class YipliPlayerInfo
         {
             if (snapshot != null)
             {
-                Debug.Log("filling the YipliPlayerInfo from Snapshot.");
+//                //Debug.Log("filling the YipliPlayerInfo from Snapshot.");
                 playerId = key.ToString();
                 playerName = snapshot.Child("name").Value?.ToString() ?? "";
                 playerName = char.ToUpper(playerName[0]) + playerName.Substring(1);
@@ -57,16 +57,16 @@ public class YipliPlayerInfo
                 isMatTutDone = snapshot.Child("mat-tut-done").Value == null ? 0 : YipliHelper.StringToIntConvert(snapshot.Child("mat-tut-done").Value.ToString());
 
                 //DOB is stored in the format "mm-dd-yyyy" in the backend
-                Debug.Log("DOB recieved from backend : " + playerDob);
+             //   //Debug.Log("DOB recieved from backend : " + playerDob);
                 if (playerDob == "")
                 {
-                    Debug.Log("Player age is null.");
+             //       //Debug.Log("Player age is null.");
                     playerAge = "";
                 }
                 else
                 {
                     playerAge = CalculateAge(playerDob);
-                    Debug.Log("Got Player age : " + playerAge);
+            //        //Debug.Log("Got Player age : " + playerAge);
                 }
 
                 profilePicUrl = snapshot.Child("profile-pic-url").Value?.ToString() ?? "";
@@ -79,17 +79,17 @@ public class YipliPlayerInfo
 
                 SetProfilePicForPlayer(profilePicUrl);
 
-                Debug.Log("Player Found with details :" + playerAge + " " + playerHeight + " " + playerId + " " + playerWeight + " " + playerName + " ProfilePicUrl:" + profilePicUrl);
+             //   //Debug.Log("Player Found with details :" + playerAge + " " + playerHeight + " " + playerId + " " + playerWeight + " " + playerName + " ProfilePicUrl:" + profilePicUrl);
             }
             else
             {
-                Debug.Log("DataSnapshot is null. Can't create YipliPlayerInfo instance.");
+                //Debug.Log("DataSnapshot is null. Can't create YipliPlayerInfo instance.");
                 playerId = null;
             }
         }
         catch (Exception exp)
         {
-            Debug.Log("Exception in creating YipliPlayerInfo object from DataSnapshot : " + exp.Message);
+            //Debug.Log("Exception in creating YipliPlayerInfo object from DataSnapshot : " + exp.Message);
             playerId = null;
         }
     }
@@ -150,22 +150,22 @@ public class YipliMatInfo
         {
             if (snapshot != null)
             {
-                Debug.Log("filling the YipliMatInfo from Snapshot.");
+                //Debug.Log("filling the YipliMatInfo from Snapshot.");
                 matId = key.ToString();
                 matName = snapshot.Child("display-name").Value?.ToString() ?? "";
                 macAddress = snapshot.Child("mac-address").Value?.ToString() ?? "";
                 matAdvertisingName = snapshot.Child("mac-name").Value?.ToString() ?? matAdvertisingName;
-                Debug.Log("Mat Found with details :" + matName + " " + macAddress + " " + matId + " " + matAdvertisingName);
+                //Debug.Log("Mat Found with details :" + matName + " " + macAddress + " " + matId + " " + matAdvertisingName);
             }
             else
             {
-                Debug.Log("DataSnapshot is null. Can't create YipliMatInfo instance.");
+                //Debug.Log("DataSnapshot is null. Can't create YipliMatInfo instance.");
                 matId = null;
             }
         }
         catch (Exception exp)
         {
-            Debug.Log("Exception in creating YipliMatInfo object from DataSnapshot : " + exp.Message);
+            //Debug.Log("Exception in creating YipliMatInfo object from DataSnapshot : " + exp.Message);
             matId = null;
         }
     }
@@ -202,7 +202,7 @@ public class YipliInventoryGameInfo
         {
             if (snapshot != null)
             {
-                Debug.Log("onlyMatPlayMode : filling the GameInfo from Snapshot.");
+//                //Debug.Log("onlyMatPlayMode : filling the GameInfo from Snapshot.");
                 gameId = snapshot.Key;
                 displayName = snapshot.Child("name").Value?.ToString() ?? "";
                 gamePackageId = snapshot.Child("android-url").Value?.ToString() ?? "";
@@ -242,13 +242,13 @@ public class YipliInventoryGameInfo
             }
             else
             {
-                Debug.Log("DataSnapshot is null. Can't create YipliGameInfo instance.");
+                //Debug.Log("DataSnapshot is null. Can't create YipliGameInfo instance.");
                 gameId = null;
             }
         }
         catch (Exception exp)
         {
-            Debug.Log("Exception in creating YipliMatInfo object from DataSnapshot : " + exp.Message);
+            //Debug.Log("Exception in creating YipliMatInfo object from DataSnapshot : " + exp.Message);
             gameId = null;
         }
     }
@@ -273,7 +273,7 @@ public class YipliThisUserTicketInfo
         {
             if (snapshot != null)
             {
-                Debug.Log("filling the Ticket info from Snapshot.");
+                //Debug.Log("filling the Ticket info from Snapshot.");
 
                 bleTest = snapshot.Child("ble-test").Value?.ToString() ?? "";
                 description = snapshot.Child("description").Value?.ToString() ?? "";
@@ -284,7 +284,7 @@ public class YipliThisUserTicketInfo
             }
             else
             {
-                Debug.Log("DataSnapshot is null. Can't create UserTicketInfo instance.");
+                //Debug.Log("DataSnapshot is null. Can't create UserTicketInfo instance.");
                 bleTest = string.Empty;
                 description = string.Empty;
                 fileStorageLocation = string.Empty;
@@ -295,7 +295,7 @@ public class YipliThisUserTicketInfo
         }
         catch (Exception exp)
         {
-            Debug.Log("Exception in creating UserTicketInfo object from DataSnapshot : " + exp.Message);
+            //Debug.Log("Exception in creating UserTicketInfo object from DataSnapshot : " + exp.Message);
             bleTest = string.Empty;
             description = string.Empty;
             fileStorageLocation = string.Empty;

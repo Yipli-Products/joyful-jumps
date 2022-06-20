@@ -39,7 +39,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     public void EnableGameInput()
     {
-        Debug.Log("Enabling Game Input");
+        //Debug.Log("Enabling Game Input");
         normalInput = true;
         if (PlayerSession.Instance != null)
             YipliHelper.SetGameClusterId(1);
@@ -47,7 +47,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     public void DisableGameInput()
     {
-        Debug.Log("Disabling Game Input");
+        //Debug.Log("Disabling Game Input");
         normalInput = false;
         if (PlayerSession.Instance != null)
             YipliHelper.SetGameClusterId(0);
@@ -70,8 +70,8 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
             string fmActionData = InitBLE.GetFMResponse();
 
-            Debug.LogError("ClusterID : " + YipliHelper.GetGameClusterId());
-            Debug.LogError("Json Data from Fmdriver : " + fmActionData);
+          //  Debug.LogError("ClusterID : " + YipliHelper.GetGameClusterId());
+//            Debug.LogError("Json Data from Fmdriver : " + fmActionData);
 
             ///if (fmActionData == "No input yet!") return;
 
@@ -108,7 +108,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                 if (PlayerSession.Instance != null && CurrentStepCount != 0)
                 {
                     PlayerSession.Instance.AddPlayerAction(YipliUtils.PlayerActions.RUNNING, CurrentStepCount);
-                    Debug.LogError("CurrentStepCount from pause : " + CurrentStepCount);
+                    //Debug.LogError("CurrentStepCount from pause : " + CurrentStepCount);
                     CurrentStepCount = 0;
                 }
 
@@ -118,7 +118,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
             if (PlayerSession.Instance.currentYipliConfig.oldFMResponseCount != singlePlayerResponse.count)
             {
                 bIsInputRevieved = true;
-                Debug.Log("FMResponse " + fmActionData);
+               // Debug.Log("FMResponse " + fmActionData);
                 PlayerSession.Instance.currentYipliConfig.oldFMResponseCount = singlePlayerResponse.count;
 
                 if (singlePlayerResponse.playerdata[0].fmresponse.action_id.Equals(ActionAndGameInfoManager.getActionIDFromActionName(YipliUtils.PlayerActions.RUNNING)))
@@ -138,9 +138,9 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
                             if (totalStepsCountKeyValue[0].Equals("totalStepsCount"))
                             {
                                 PlayerData.FootStep += int.Parse(totalStepsCountKeyValue[1]);
-                                Debug.LogError("Total footSteps : " + PlayerData.FootStep);
+                                //Debug.LogError("Total footSteps : " + PlayerData.FootStep);
 
-                                Debug.LogError("Adding steps : " + totalStepsCountKeyValue[1]);
+                               // Debug.LogError("Adding steps : " + totalStepsCountKeyValue[1]);
 
                                 CurrentStepCount = int.Parse(totalStepsCountKeyValue[1]);
 
@@ -172,7 +172,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
         }
         catch(Exception exp)
         {
-            Debug.Log("Exception in _getFMResponse processing : " + exp);
+           // Debug.Log("Exception in _getFMResponse processing : " + exp);
         }
 
         /*string[] FMTokens = FMResponse.Split('.');
@@ -233,7 +233,7 @@ public class UnityFitmatBridge : PersistentSingleton<UnityFitmatBridge>
 
     public void GotResponseFromBridge(string message)
     {
-        Debug.Log("GotResponseFromBridge " + message);
+      //  Debug.Log("GotResponseFromBridge " + message);
         OnGotActionFromBridge?.Invoke(message);
     }
 }

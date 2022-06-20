@@ -54,7 +54,8 @@
       "url": "https://unityregistry-pa.googleapis.com",
       "scopes": [
         "com.google"
-      ]
+      ],
+      "overrideReferences": true
     }
   ]
 }
