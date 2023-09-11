@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 11156ac0ab51d054c849604dbd747a7e
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Karla
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 902c4672cee292143a23f1fb2a094c6a, type: 3}
+  - {fileID: 12800000, guid: 30905aff2d7746849b25aaf3d56b494e, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
